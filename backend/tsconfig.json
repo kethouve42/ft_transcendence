@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+	  "target": "ES2020",                 // Version JS générée : moderne, mais compatible Node.js
+	  "module": "CommonJS",               // Type de module (CommonJS pour Node.js)
+	  "strict": true,                     // Active toutes les vérifications strictes (fortement conseillé)
+	  "rootDir": "./src",                 // Dossier des fichiers source
+	  "outDir": "./dist",                 // Dossier où ira le code JS compilé
+	  "esModuleInterop": true,            // Permet d'importer des modules CommonJS avec "import" au lieu de require()
+	  "resolveJsonModule": true           // Permet d'importer des fichiers .json en TS (import config from './config.json')
+	},
+	"include": ["src"],                   // Dossiers/fichiers que TypeScript doit compiler
+	"exclude": ["node_modules"]           // Exclusions (par défaut, node_modules est toujours exclu)
+  }
+  
