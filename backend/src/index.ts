@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import userRoutes from './routes/users';
 import dotenv from 'dotenv';
 
 dotenv.config(); // charge les variable de .env dans process.env
@@ -8,6 +9,8 @@ const app = Fastify({ logger: true }); //(logger: true) active les logs dans la 
 app.get('/ping', async () => {
   return { pong: 'it works!' };
 });
+
+app.register(userRoutes, { prefix: '/api/users' });
 
 //Démarre le serveur
 const start = async () => {
