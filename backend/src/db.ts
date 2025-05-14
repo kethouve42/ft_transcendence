@@ -1,43 +1,71 @@
 import Database from 'better-sqlite3';
 
-// Ouvre ou crée le fichier de base de données
+// Ouvre ou crée la base de données
 const db = new Database('/app/data/db.sqlite');
 
-// Crée la table "users" si elle n'existe pas
+// Active les foreign keys
+db.pragma('foreign_keys = ON');
+
+// Crée les tables
 db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL
-  );
+
+-- Table des utilisateurs
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  login TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  alias TEXT,
+  avatar TEXT,
+  email TEXT UNIQUE NOT NULL,
+  log_data TEXT
+);
+
+-- Table des relations d'amitié
+CREATE TABLE IF NOT EXISTS friends (
+  user_id INTEGER NOT NULL,
+  friend_id INTEGER NOT NULL,
+  PRIMARY KEY (user_id, friend_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE matchs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date TEXT NOT NULL,
+  duration INTEGER,
+  user1_id INTEGER NOT NULL,
+  user2_id INTEGER NOT NULL,
+  winner_id INTEGER,
+  score TEXT,
+  FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
 `);
 
-console.log("✅ Table 'users' créée ou déjà existante.");
+console.log("✅ Toutes les tables ont été créées ou existaient déjà.");
 
-// Prépare une requête d'insertion
+// Prépare une insertion d'exemple
 const insert = db.prepare(`
-  INSERT INTO users (username, email)
-  VALUES (?, ?)
+  INSERT INTO users (login, password, alias, email)
+  VALUES (?, ?, ?, ?)
 `);
 
 try {
-  const result = insert.run('Antoine', 'antoine@42.fr');
-  console.log(`✅ Utilisateur inséré avec ID ${result.lastInsertRowid}`);
+  const result = insert.run('antoine42', 'hashed_password123', 'Kagnous', 'antoine@42.fr');
+  console.log(`Utilisateur inséré avec ID ${result.lastInsertRowid}`);
 } catch (err: any) {
   if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-    console.warn('⚠️ Email déjà utilisé, utilisateur non inséré.');
+    console.warn('⚠️ Conflit de clé unique : login ou email déjà utilisé.');
   } else {
     console.error('❌ Erreur d’insertion :', err.message);
   }
 }
 
-// Lecture de tous les utilisateurs
+// Affiche tous les utilisateurs
 const users = db.prepare(`SELECT * FROM users`).all();
-console.log("📋 Contenu de la table 'users' :");
+console.log("Table USERS :");
 console.table(users);
 
-// Fermer la base (optionnel ici, car process se termine)
-//db.close();
-
 export default db;
-
