@@ -12,3 +12,15 @@ services:
     volumes:
       - ./backend/data:/app/data
     restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
