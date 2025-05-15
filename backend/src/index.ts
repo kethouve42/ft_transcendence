@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import userRoutes from './routes/users';
+import matchsRoutes from './routes/matchs';
 import dotenv from 'dotenv';
 
 dotenv.config(); // charge les variable de .env dans process.env
@@ -11,6 +12,7 @@ app.get('/ping', async () => {
 });
 
 app.register(userRoutes, { prefix: '/api/users' });
+app.register(matchsRoutes, { prefix: '/api/matchs' });
 
 //Démarre le serveur
 const start = async () => {

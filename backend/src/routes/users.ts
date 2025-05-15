@@ -105,7 +105,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 		try
 		{
-			const stmt = db.prepare(`UPDATE users SET password = ? WHERE = ?`);
+			const stmt = db.prepare(`UPDATE users SET password = ? WHERE id = ?`);
 			const result = stmt.run(newPassword, id);
 
 			if (result.changes === 0)
