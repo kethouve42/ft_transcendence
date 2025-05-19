@@ -3,7 +3,9 @@
 NAME=ft_transcendence
 
 up:
-	docker-compose up --build
+	docker-compose up --build -d
+	@echo "Containers are up and running"
+
 
 down:
 	docker-compose down
