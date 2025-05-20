@@ -2,7 +2,8 @@ import {Routes, Route, Link, useLocation} from 'react-router-dom'
 import Home from './pages/home'
 import Game from './pages/game'
 import Error from './pages/error'
-import UsersList from './pages/login'
+import Login from './pages/login'
+import Register from './pages/register'
 
 export default function Navbar() {
   const location = useLocation()
@@ -47,7 +48,8 @@ export default function Navbar() {
                 <Route path="/" element={<Home />} />
                 <Route path="/error" element={<Error />} />
                 <Route path="/game" element={<Game />} />
-                <Route path="/login" element={<UsersList />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
             </Routes>
         </div>
     </>

@@ -10,16 +10,15 @@ type User = {
   log_data?: string;
 };
 
-export default function UsersList() {
+export default function Login() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [login, setLogin] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-useEffect(() => {
-  fetch("/api/users")
+  useEffect(() => {
+    fetch("/api/users")
     .then(res => {
       if (!res.ok) throw new Error("Erreur API: " + res.status);
       return res.json();
@@ -34,27 +33,17 @@ useEffect(() => {
     });
   }, []);
 
- const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
-    try {
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ login, email, password }),
-      });
-      if (!res.ok) throw new Error("Erreur API: " + res.status);
-      setMessage("Utilisateur ajouté !");
-      setLogin("");
-      setEmail("");
-      setPassword("");
-      window.location.reload();
-      // Recharge la liste
-      const data = await res.json();
-      setUsers(data);
-    } catch (err: any) {
-      setMessage("Erreur lors de l'ajout : " + err.message);
+    const user = users.find(u => u.login === login || u.email === login);
+    if (user) {
+      setMessage(`Utilisateur trouvé : ${user.login} (${user.email})`);
+    } else {
+      setMessage("Aucun utilisateur trouvé avec ce login.");
     }
+    setLogin("");
+    setPassword("");
   };
 
   if (loading) return <div>Chargement...</div>;
@@ -64,17 +53,9 @@ useEffect(() => {
       <form onSubmit={handleSubmit} className="mb-4">
         <input
           type="text"
-          placeholder="Login"
+          placeholder="Login/Email"
           value={login}
           onChange={e => setLogin(e.target.value)}
-          required
-          className="border px-2 py-1 mr-2"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
           required
           className="border px-2 py-1 mr-2"
         />
@@ -91,11 +72,6 @@ useEffect(() => {
         </button>
       </form>
       {message && <div>{message}</div>}
-      <ul>
-        {users.map(user => (
-          <li key={user.id}>{user.login} ({user.email})</li>
-        ))}
-      </ul>
     </div>
   );
 }
