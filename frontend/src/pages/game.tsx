@@ -36,24 +36,24 @@ export default function Game() {
 
     // Drawing functions
     function drawRectangle(x: number, y: number, width: number, height: number, color: string = "white") {
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y, width, height);
+      ctx!.fillStyle = color;
+      ctx!.fillRect(x, y, width, height);
     }
     function drawBall() {
       drawRectangle(ball.x, ball.y, ballSize, ballSize);
     }
     function drawScore() {
-      ctx.font = "40px Arial";
-      ctx.fillStyle = "white";
-      ctx.fillText(`SCORE: ${score.left}`, 15, 40);
-      ctx.fillText(`SCORE: ${score.right}`, canvas.width - 210, 40);
+      ctx!.font = "40px Arial";
+      ctx!.fillStyle = "white";
+      ctx!.fillText(`SCORE: ${score.left}`, 15, 40);
+      ctx!.fillText(`SCORE: ${score.right}`, canvas!.width - 210, 40);
     }
     function drawTimer() {
       const elapsed = Math.floor((Date.now() - timer.start) / 1000);
       const remaining = Math.max(0, timer.duration - elapsed);
-      ctx.font = "20px Arial";
-      ctx.fillStyle = "white";
-      ctx.fillText(`TIME: ${remaining}`, canvas.width / 2 - 50, 20);
+      ctx!.font = "20px Arial";
+      ctx!.fillStyle = "white";
+      ctx!.fillText(`TIME: ${remaining}`, canvas!.width / 2 - 50, 20);
     }
 
     // Game logic
@@ -71,8 +71,8 @@ export default function Game() {
       startTimer(20);
     }
     function resetBall() {
-      ball.x = canvas.width / 2 - ballSize / 2;
-      ball.y = canvas.height / 2 - ballSize / 2;
+      ball.x = canvas!.width / 2 - ballSize / 2;
+      ball.y = canvas!.height / 2 - ballSize / 2;
       ball.vx = -ball.vx;
       ball.vy = Math.random() < 0.5 ? speed : -speed;
     }
@@ -84,14 +84,14 @@ export default function Game() {
     }
     function update() {
       if (keys["ArrowUp"] && rightPaddle.y > 0) rightPaddle.y -= speed;
-      if (keys["ArrowDown"] && rightPaddle.y < canvas.height - paddleHeight) rightPaddle.y += speed;
+      if (keys["ArrowDown"] && rightPaddle.y < canvas!.height - paddleHeight) rightPaddle.y += speed;
       if (keys["w"] && leftPaddle.y > 0) leftPaddle.y -= speed;
-      if (keys["s"] && leftPaddle.y < canvas.height - paddleHeight) leftPaddle.y += speed;
+      if (keys["s"] && leftPaddle.y < canvas!.height - paddleHeight) leftPaddle.y += speed;
 
       ball.x += ball.vx;
       ball.y += ball.vy;
 
-      if (ball.y <= 0 || ball.y >= canvas.height - ballSize) ball.vy = -ball.vy;
+      if (ball.y <= 0 || ball.y >= canvas!.height - ballSize) ball.vy = -ball.vy;
 
       if (
         (ball.x <= leftPaddle.x + paddleWidth && ball.x >= leftPaddle.x &&
@@ -102,7 +102,7 @@ export default function Game() {
         ball.vx = -ball.vx;
       }
 
-      if (ball.x < 0 || ball.x > canvas.width) {
+      if (ball.x < 0 || ball.x > canvas!.width) {
         if (ball.x < 0) score.right += 1;
         else score.left += 1;
         resetBall();
@@ -122,7 +122,7 @@ export default function Game() {
       }
     }
     function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
       drawRectangle(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
       drawRectangle(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
       drawBall();

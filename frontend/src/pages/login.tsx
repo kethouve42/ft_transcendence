@@ -93,7 +93,7 @@ useEffect(() => {
       {message && <div>{message}</div>}
       <ul>
         {users.map(user => (
-          <li key={user.id}>{user.login} ({user.email}) ({user.password})</li>
+          <li key={user.id}>{user.login} ({user.email})</li>
         ))}
       </ul>
     </div>
