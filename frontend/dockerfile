@@ -1,41 +1,23 @@
-# Étape 1 : Build
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copie des fichiers nécessaires
+# Copie des fichiers de config et package
 COPY package.json pnpm-lock.yaml ./
 COPY tsconfig*.json ./
 COPY vite.config.ts ./
 COPY postcss.config.js tailwind.config.js ./
-COPY public ./public
-COPY src ./src
 COPY index.html ./
+COPY public ./public
 
 # Installation de pnpm
 RUN npm install -g pnpm
 
 # Installation des dépendances
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
-# Build du projet
-RUN pnpm run build
+# Le code source sera monté par le volume, inutile de le copier ici
 
-# Étape 2 : Image finale pour servir le build
-FROM node:20-alpine
+EXPOSE 5173
 
-WORKDIR /app
-
-# Copie du build depuis l’étape précédente
-COPY --from=builder /app/dist ./dist
-COPY package.json pnpm-lock.yaml ./
-COPY vite.config.ts ./
-
-# Réinstaller pnpm et les dépendances de prod (optionnel, utile si tu utilises vite preview)
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
-
-# Exposer le port par défaut de Vite preview
-EXPOSE 4173
-
-# Commande de lancement
-CMD ["pnpm", "preview", "--host", "0.0.0.0"]
+CMD ["pnpm", "dev", "--host", "0.0.0.0"]

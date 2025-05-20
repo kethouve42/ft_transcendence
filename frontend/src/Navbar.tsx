@@ -2,6 +2,7 @@ import {Routes, Route, Link, useLocation} from 'react-router-dom'
 import Home from './pages/home'
 import Game from './pages/game'
 import Error from './pages/error'
+import UsersList from './pages/login'
 
 export default function Navbar() {
   const location = useLocation()
@@ -11,9 +12,10 @@ export default function Navbar() {
       : 'text-gray-700 hover:text-blue-500'
 
       let pageClass = ''
-      if (location.pathname === '/') pageClass = 'bg-pink-800 min-h-screen'
-      else if (location.pathname === '/game') pageClass = 'bg-pink-800 min-h-screen'
-      else if (location.pathname === '/error') pageClass = 'bg-pink-800 min-h-screen'
+      if (location.pathname === '/') pageClass = 'bg-pink-800'
+      else if (location.pathname === '/game') pageClass = 'bg-pink-800'
+      else if (location.pathname === '/error') pageClass = 'bg-pink-800'
+      else if (location.pathname === '/login') pageClass = 'bg-pink-800'
 
   return (
     <>
@@ -30,10 +32,14 @@ export default function Navbar() {
                         Erreur
                     </Link>
                 </div>
-                {/* Bouton optionnel à droite */}
-                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                Connexion
-                </button>
+                <div className="flex gap-8">
+                    <Link to="/login" className={`${isActive('/login')} transition`}>
+                        Connexion
+                    </Link>
+                    <Link to="/register" className={`${isActive('/register')} transition`}>
+                        Inscription
+                    </Link>
+                </div>
             </div>
         </nav>
         <div className={pageClass}>
@@ -41,6 +47,7 @@ export default function Navbar() {
                 <Route path="/" element={<Home />} />
                 <Route path="/error" element={<Error />} />
                 <Route path="/game" element={<Game />} />
+                <Route path="/login" element={<UsersList />} />
             </Routes>
         </div>
     </>
