@@ -17,4 +17,4 @@ RUN node typescript/lib/tsc.js --project tsconfig.json
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 COPY public/index.html .
-COPY --from=build /app/dist/game.js .
+COPY --from=build /app/dist/*.js ./

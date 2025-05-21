@@ -5,6 +5,7 @@ Aucune installation Node.js ou NPM n'est nécessaire sur la machine hôte.
 
 ## 🛠 Structure du projet
 
+```bash
 .
 ├── Dockerfile
 ├── src/
@@ -14,7 +15,7 @@ Aucune installation Node.js ou NPM n'est nécessaire sur la machine hôte.
 ├── public/
 │ └── index.html
 ├── tsconfig.json
-
+```
 
 ---
 
