@@ -94,6 +94,20 @@ export default async function userRoutes(app: FastifyInstance)
 		}
 	});
 
+	// Récupérer le mot de passe d'un utilisateur
+	app.get('/connect/:login', async (req, reply) =>
+	{
+		const { login } = req.params as any;
+		const user = db.prepare(`
+			SELECT id, login, email, password
+			FROM users WHERE login = ?
+		`).get(login);
+	
+		if (!user)
+			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+		return user;
+	});
+
 	//changer le mot de passe utilisateur
 	app.patch('/:id/password', async (req, reply) =>
 	{
@@ -119,21 +133,21 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//Authentification de l'utilisateur
-	app.post('/:login', async (req, reply) =>
+	app.post('/auth', async (req, reply) =>
 	{
-		const { email, password } = req.body as any;
+		const { identifier, password } = req.body as any;
 
-		if (!email || !password)
-			return reply.status(400).send({ error: 'Champs requis manquents' });
+		if (!identifier || !password)
+			return reply.status(400).send({ error: 'Champs requis manquants' });
 
 		try
 		{
-			const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as { id: number; password: string; };
+			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string };
 
-			if (!user || user.password !== password)
+			if (!user || user.password !== password || (user.email !== identifier && user.login !== identifier))
 				return reply.status(401).send({ error: 'Email ou mot de passe incorrect' });
 
-			return { success: true, UserId: user.id };
+			return { success: true, UserId: user.id, email: user.email, login: user.login };
 		}
 		catch (err: any)
 		{
