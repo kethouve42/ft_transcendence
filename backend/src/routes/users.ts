@@ -1,5 +1,7 @@
 import { FastifyInstance } from "fastify";
 import db from '../db';
+import { signToken } from '../utils/jwt';
+import { authMiddleware } from '../middlewares/auth';
 
 export default async function userRoutes(app: FastifyInstance)
 {
@@ -69,9 +71,14 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//Met a jour les infos utilisateur
-	app.put('/:id', async (req, reply) =>
+	app.put('/:id', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const { id } = req.params as any;
+		const user = (req as any).user;
+
+		if (parseInt(id) !== user.id)
+			return reply.status(403).send({ error: "Accès interdit" });
+
 		const { login, email, password, alias, avatar, log_data} = req.body as any;
 
 		if (!login || !email || !password)
@@ -94,24 +101,15 @@ export default async function userRoutes(app: FastifyInstance)
 		}
 	});
 
-	// Récupérer le mot de passe d'un utilisateur
-	app.get('/connect/:login', async (req, reply) =>
-	{
-		const { login } = req.params as any;
-		const user = db.prepare(`
-			SELECT id, login, email, password
-			FROM users WHERE login = ?
-		`).get(login);
-	
-		if (!user)
-			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
-		return user;
-	});
-
 	//changer le mot de passe utilisateur
-	app.patch('/:id/password', async (req, reply) =>
+	app.patch('/:id/password', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const { id } = req.params as any;
+		const user = (req as any).user;
+
+		if (parseInt(id) !== user.id)
+			return reply.status(403).send({ error: "Accès interdit" });
+
 		const { newPassword } = req.body as any;
 
 		if (!newPassword)
@@ -147,7 +145,9 @@ export default async function userRoutes(app: FastifyInstance)
 			if (!user || user.password !== password || (user.email !== identifier && user.login !== identifier))
 				return reply.status(401).send({ error: 'Email ou mot de passe incorrect' });
 
-			return { success: true, UserId: user.id, email: user.email, login: user.login };
+			const token = signToken({ id: user.id, login: user.login });
+
+			return { success: true, token, UserId: user.id, email: user.email, login: user.login };
 		}
 		catch (err: any)
 		{
@@ -157,9 +157,14 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	// Supprimer un utilisateur
-	app.delete('/:id', async (req, reply) =>
+	app.delete('/:id', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const { id } = req.params as any;
+		const user = (req as any).user;
+
+		if (parseInt(id) !== user.id)
+			return reply.status(403).send({ error: "Accès interdit" });
+
 		const stmt = db.prepare('DELETE FROM users WHERE id = ?');
 		const result = stmt.run(id);
 
@@ -169,7 +174,8 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//supprimer tous les utilisateurs (SuperAdmin)
-	app.delete('/', async (req, reply) =>
+	//!!!!!!!!!!   Rajout de la vérification Admin nécessaire   !!!!!!!!!!!!
+	app.delete('/', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		try
 		{
@@ -182,4 +188,10 @@ export default async function userRoutes(app: FastifyInstance)
 			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
 		}
 	});
+
+	//Permet de savoir id et le login de la personne connecter
+	app.get('/me', { preHandler: authMiddleware }, async (req, reply) => {
+	const user = (req as any).user;
+	return { id: user.id, login: user.login };
+});
 }
