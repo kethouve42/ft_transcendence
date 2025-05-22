@@ -1,5 +1,3 @@
-import { ctx, canvas } from './canvas.js'
-
 
 export type Score = {
     left: number
@@ -11,7 +9,7 @@ export const score: Score = {
     right: 0,
 }
 
-export function drawScore(): void {
+export function drawScore(ctx: CanvasRenderingContext2D, canvas:HTMLCanvasElement): void {
   if (!ctx) {
     throw new Error('Canvas context is not available')
   }

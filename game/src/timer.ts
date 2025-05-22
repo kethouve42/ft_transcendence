@@ -1,5 +1,3 @@
-import { ctx, canvas } from './canvas.js'
-
 
 export type Timer = {
     start: number
@@ -13,7 +11,7 @@ export const timer: Timer = {
     isRunning: false,
 }
 
-export function drawTimer(): void {
+export function drawTimer(ctx: CanvasRenderingContext2D, canvas:HTMLCanvasElement): void {
   if (!ctx) {
     throw new Error('Canvas context is not available')
   }

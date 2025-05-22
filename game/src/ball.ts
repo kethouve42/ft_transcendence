@@ -1,4 +1,3 @@
-import { canvas } from './canvas.js'
 import { drawRectangle } from './paddle.js'
 
 export type Ball = {
@@ -9,20 +8,20 @@ export type Ball = {
 }
 
 export const ballSize = 10
-export const speed = 5
+export let speed = 5
 
 export const ball: Ball = {
-  x: canvas.width / 2 - ballSize / 2,
-  y: canvas.height / 2 - ballSize / 2,
+  x: 0,
+  y: 0,
   vx: speed,
   vy: speed,
 }
 
-export function drawBall(): void {
-  drawRectangle(ball.x, ball.y, ballSize, ballSize)
+export function drawBall(ctx: CanvasRenderingContext2D): void {
+  drawRectangle(ctx, ball.x, ball.y, ballSize, ballSize)
 }
 
-export function resetBall(): void {
+export function resetBall(canvas: HTMLCanvasElement): void {
   ball.x = canvas.width / 2 - ballSize / 2
   ball.y = canvas.height / 2 - ballSize / 2
   ball.vx = -ball.vx
