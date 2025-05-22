@@ -1,5 +1,6 @@
 // Exemple pour récupérer la liste des utilisateurs
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type User = {
   id: number;
@@ -16,6 +17,7 @@ export default function Login() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("/api/users")
@@ -35,15 +37,29 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("");
-    const user = users.find(u => u.login === login || u.email === login);
-    if (user) {
-      setMessage(`Utilisateur trouvé : ${user.login} (${user.email})`);
-    } else {
-      setMessage("Aucun utilisateur trouvé avec ce login.");
+    setMessage("test");
+    try {
+      const res = await fetch("/api/users/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier: login, password }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setMessage(data.error || "Identifiants incorrects");
+        return;
+      }
+      if (data.success)
+      {
+        localStorage.setItem("token", data.token);
+        navigate("/dashboard");
+      }
+      setMessage(`Bienvenue ${data.login} (${data.email}) !`);
+      setLogin("");
+      setPassword("");
+    } catch (err: any) {
+      setMessage("Erreur lors de la connexion : " + err.message);
     }
-    setLogin("");
-    setPassword("");
   };
 
   if (loading) return <div>Chargement...</div>;
