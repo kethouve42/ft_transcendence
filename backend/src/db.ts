@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS users (
   alias TEXT,
   avatar TEXT,
   email TEXT UNIQUE NOT NULL,
-  log_data TEXT
+  tfa_enabled BOOLEAN DEFAULT 0,
+  tfa_code TEXT,
+  tfa_expires INTEGER
 );
 
 -- Table des relations d'amitié

@@ -24,7 +24,9 @@ db.serialize(() => {
       alias TEXT,
       avatar TEXT,
       email TEXT UNIQUE NOT NULL,
-      log_data TEXT
+      tfa_enabled BOOLEAN DEFAULT 0,
+      tfa_code TEXT,
+      tfa_expires INTEGER
     )
   `);
 
@@ -63,14 +65,14 @@ if (shouldSeed) {
   db.serialize(() => {
     // Utilisateurs
     const users = [
-      ['antoine', 'pass1', 'Kagnous', '/avatars/antoine.png', 'antoine@42.fr', 'cf ELK'],
-      ['lea', 'pass2', 'Lea42', '/avatars/lea.png', 'lea@42.fr', 'cf ELK'],
-      ['zack', 'pass3', 'Zack', '/avatars/zack.png', 'zack@42.fr', 'cf ELK'],
+      ['antoine', 'pass1', 'Kagnous', '/avatars/antoine.png', 'antoine@42.fr'],
+      ['lea', 'pass2', 'Lea42', '/avatars/lea.png', 'lea@42.fr'],
+      ['zack', 'pass3', 'Zack', '/avatars/zack.png', 'zack@42.fr'],
     ];
 
     const insertUser = db.prepare(`
-      INSERT INTO users (login, password, alias, avatar, email, log_data)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO users (login, password, alias, avatar, email)
+      VALUES (?, ?, ?, ?, ?)
     `);
     users.forEach(u => insertUser.run(...u));
     insertUser.finalize();
