@@ -5,7 +5,11 @@ WORKDIR /app
 
 # Copier et installer les dépendances
 COPY package*.json ./
+COPY .env ./
 RUN npm install
+RUN npm install jsonwebtoken
+RUN npm install -D @types/jsonwebtoken
+
 
 # Copier la config et le code
 COPY tsconfig.json ./
