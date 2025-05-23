@@ -1,0 +1,83 @@
+/* Corps */
+.app-container {
+  text-align: center;
+}
+
+/* Titre */
+.title {
+  font-size: 2.5rem;
+  margin: 2rem 0 1.5rem;
+  letter-spacing: 2px;
+  color: #38bdf8;
+  text-shadow: 0 2px 8px #0ea5e9aa;
+}
+
+/* Menu */
+#menu.menu {
+  background: #27272a;
+  border-radius: 45px;
+  padding: 3%;
+  box-shadow: 0 4px 24px #0003;
+  display: inline-block;
+  margin-top: 2rem;
+}
+
+/* Boutons du menu */
+.menu-btn {
+  background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0.5rem 1rem 0;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px #0ea5e955;
+}
+.menu-btn:hover {
+  background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Save button espacé */
+.save-btn {
+  margin-left: 1rem;
+}
+
+/* Slider */
+.settings-ball {
+  width: 180px;
+  margin: 0 1rem;
+  accent-color: #38bdf8;
+  height: 4px;
+  background: #18181b;
+  border-radius: 4px;
+  outline: none;
+}
+.settings-label {
+  font-size: 1.1rem;
+  margin-right: 1rem;
+  color: #f4f4f5;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+/* Canvas */
+.pong-canvas {
+  background: black;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  #menu {
+    padding: 1rem;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+}

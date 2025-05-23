@@ -1,24 +1,22 @@
 FROM node:18-slim AS build
 WORKDIR /app
 
-RUN npm install -g esbuild
+RUN npm install -g vite
 
 COPY package.json package-lock.json* ./
 RUN npm install
 
-COPY tsconfig.json ./
-COPY src ./src
-COPY public ./public
+COPY vite.config.ts* ./
+COPY public/. ./
+COPY tsconfig.json  ./
+COPY src  ./src
 
-RUN esbuild src/main.tsx \
-  --bundle \
-  --outfile=dist/main.js \
-  --loader:.tsx=tsx \
-  --format=esm \
-  --target=es2020
+RUN npx vite build
 
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
-COPY public/index.html .
-COPY --from=build /app/dist/*.js .
+COPY public/index.html ./
+COPY --from=build /app/dist ./
+
+EXPOSE 80

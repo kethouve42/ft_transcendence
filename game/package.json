@@ -4,8 +4,7 @@
     "description": "Pong",
     "main": "dist/game.js",
     "scripts": {
-        "build": "tsc",
-        "dev": "tsc --watch"
+        "build": "vite"
     },
     "dependencies": {
         "react": "^18.2.0",
@@ -15,6 +14,8 @@
         "@types/react": "^18.0.28",
         "@types/react-dom": "^18.0.11",
         "csstype": "^3.1.3",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "vite": "^5.3.10",
+        "@vitejs/plugin-react": "^4.4.1"
     }
 }

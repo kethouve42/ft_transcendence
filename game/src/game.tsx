@@ -3,6 +3,7 @@ import { paddleHeight, paddleWidth, leftPaddle, rightPaddle, drawRectangle, init
 import { ballSize, speed, ball, drawBall, resetBall } from './ball.js'
 import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
+import './css/style.css'
 
 let mode: 'local' | 'ai' = 'local';
 const epsilon = 0.1
@@ -142,23 +143,24 @@ export default function Game() {
   }, [showMenu])
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <h1>Pong game</h1>
+    <div className="app-container">
+      <h1 className="title">Pong game</h1>
       {showMenu && (
-        <div id="menu">
-          <button onClick={() => { mode = 'local'; setShowMenu(false)}}> Local </button>
-          <button onClick={() => {mode = 'ai'; setShowMenu(false)}}> AI </button>
-          <div style={{ marginTop: 20}}>
-            <label>
+        <div id="menu" className="menu">
+          <button className="menu-btn" onClick={() => { mode = 'local'; setShowMenu(false)}}> Local </button>
+          <button className="menu-btn" onClick={() => {mode = 'ai'; setShowMenu(false)}}> AI </button>
+          <div className="settings">
+            <label className="settings-label">
               Vitesse: {ballSpeed}
-              <input type="range" 
+              <input type="range"
+                className="settings-ball"
                 min={1} 
                 max={20} 
                 value={ballSpeed} 
                 onChange={e => setBallSpeed(Number(e.target.value))}
               ></input>
             </label>
-            <button style={{ marginLeft: 10 }}
+            <button className="menu-btn save-btn"
             onClick={() => {
               const signX = Math.sign(ball.vx) || 1
               const signY = Math.sign(ball.vy) || 1
@@ -175,6 +177,7 @@ export default function Game() {
       <canvas
         ref={canvasRef}
         id="pong"
+        className="pong-canvas"
         width={800}
         height={500}
         style={{ background: "black", display: "block", margin: "0 auto" }}
