@@ -60,15 +60,16 @@ useEffect(() => {
   if (loading) return <div>Chargement...</div>;
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="mb-4">
+    <div className="max-w-md mx-auto mt-12 bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 backdrop-blur-md">
+      <h2 className="text-2xl font-bold mb-6 text-cyan-300 tracking-widest uppercase">Inscription</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <input
           type="text"
           placeholder="Login"
           value={login}
           onChange={e => setLogin(e.target.value)}
           required
-          className="border px-2 py-1 mr-2"
+          className="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
         />
         <input
           type="email"
@@ -76,7 +77,7 @@ useEffect(() => {
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
-          className="border px-2 py-1 mr-2"
+          className="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
         />
         <input
           type="password"
@@ -84,20 +85,17 @@ useEffect(() => {
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
-          className="border px-2 py-1 mr-2"
+          className="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
         />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition"
+        >
           Ajouter
         </button>
+        {message && <div className="text-cyan-200">{message}</div>}
       </form>
-      <br />
-      <br />
-      <br />
-      {message && <div>{message}</div>}
-      <br />
-      <br />
-      <br />
-      <ul>
+      <ul className="mt-8 text-cyan-100">
         {users.map(user => (
           <li key={user.id}>{user.login} ({user.email})</li>
         ))}
