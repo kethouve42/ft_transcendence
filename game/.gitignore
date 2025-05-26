@@ -2,3 +2,4 @@
 .vscode
 compile.sh
 node_modules/
+dist/

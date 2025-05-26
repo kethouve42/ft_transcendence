@@ -8,13 +8,21 @@ Aucune installation Node.js ou NPM n'est nécessaire sur la machine hôte.
 ```bash
 .
 ├── Dockerfile
-├── src/
-│ └── game.ts
-├── dist/
-│ └── game.js # (généré automatiquement)
-├── public/
-│ └── index.html
+├── package.json
+├── public
+│   └── index.html
+├── README.md
+├── src
+│   ├── ball.ts
+│   ├── css
+│   │   └── style.css
+│   ├── game.tsx
+│   ├── main.tsx
+│   ├── paddle.ts
+│   ├── score.ts
+│   └── timer.ts
 ├── tsconfig.json
+└── vite.config.ts
 ```
 
 ---
