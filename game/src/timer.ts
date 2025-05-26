@@ -25,6 +25,12 @@ export function drawTimer(ctx: CanvasRenderingContext2D, canvas:HTMLCanvasElemen
 export function startTimer(duration: number): void {
   timer.start = Date.now()
   timer.duration = duration
+  if (timer.duration < 10) {
+    timer.duration = 10
+  }
+  if (timer.duration > 300) {
+    timer.duration = 300
+  }
   timer.isRunning = true
 }
 

@@ -7,14 +7,18 @@ import './css/style.css'
 
 let mode: 'local' | 'ai' = 'local';
 const epsilon = 0.1
-
+let time = 60
+let score_df = 1
 
 export default function Game() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [showMenu, setShowMenu] = useState(true)
-  const  [ballSpeed, setBallSpeed] = useState(speed)
-  let animationId: number
+  const [ballSpeed, setBallSpeed] = useState(speed)
+  const [showSettings, setShowSettings] = useState(false)
+  const [timerMod, setTimerMod] = useState(time)
+  let [scoreMod, setScoreMod] = useState(score_df)
+  let   animationId: number
 
   useEffect(() => {
 
@@ -31,8 +35,11 @@ export default function Game() {
     window.addEventListener("keydown", keyDown)
     window.addEventListener("keyup", keyUp)
 
+    if (scoreMod == 0)
+      scoreMod = 1
+
     function startGame(): void {
-      startTimer(60)
+      startTimer(timerMod)
     }
 
     function resetGame(): void {
@@ -109,6 +116,14 @@ export default function Game() {
           return
         }
       }
+
+      if (score.left == scoreMod || score.right == scoreMod) {
+        timer.isRunning = false
+        alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right)
+        setShowMenu(true)
+        resetGame()
+        return
+      }
     }
 
     function render(): void {
@@ -145,31 +160,50 @@ export default function Game() {
   return (
     <div className="app-container">
       <h1 className="title">Pong game</h1>
-      {showMenu && (
+      {showMenu && !showSettings && (
         <div id="menu" className="menu">
           <button className="menu-btn" onClick={() => { mode = 'local'; setShowMenu(false)}}> Local </button>
           <button className="menu-btn" onClick={() => {mode = 'ai'; setShowMenu(false)}}> AI </button>
-          <div className="settings">
-            <label className="settings-label">
-              Vitesse: {ballSpeed}
-              <input type="range"
-                className="settings-ball"
-                min={1} 
-                max={20} 
-                value={ballSpeed} 
-                onChange={e => setBallSpeed(Number(e.target.value))}
+          <button className="menu-btn" onClick={() => setShowSettings(true)}>Settings</button>
+        </div>
+      )}
+      {showSettings && (
+        <div className="settings-panel">
+          <h1>Settings</h1>
+          <div className="settings-grid">
+            <div className="settings-ball">
+              <label className="settings-label">Vitesse de la balle: {ballSpeed}</label>
+                <input type="range"
+                      min={1} max={20} 
+                      value={ballSpeed} 
+                      onChange={e => setBallSpeed(Number(e.target.value))}
+                ></input>
+            </div>
+            <div className="settings-timer">
+            <label className="settings-label"></label>
+              Le temps en seconde du match: {timerMod}
+              <input type="number"
+                    min={10} max={300}
+                    value={timerMod}
+                    onChange={e => setTimerMod(Number(e.target.value))}
               ></input>
-            </label>
-            <button className="menu-btn save-btn"
-            onClick={() => {
-              const signX = Math.sign(ball.vx) || 1
-              const signY = Math.sign(ball.vy) || 1
-              ball.vx = signX * ballSpeed
-              ball.vy = signY * ballSpeed
-            }}
-            >
-              Save
-            </button>
+            </div>
+            <div className="settings-score">
+            <label className="settings-label"></label>
+              Le nombre de points pour finir: {scoreMod}
+              <input type="number"
+                    min={1}
+                    value={scoreMod}
+                    onChange={e => setScoreMod(Number(e.target.value))}
+              ></input>
+            </div>
+          <button className="menu-btn save-btn"
+                  onClick={() => {
+                      const signX = Math.sign(ball.vx) || 1
+                      const signY = Math.sign(ball.vy) || 1
+                      ball.vx = signX * ballSpeed
+                      ball.vy = signY * ballSpeed }}>Save</button>
+          <button className="menu-btn save-btn" onClick={() => setShowSettings(false)}>Close</button>
         </div>
       </div>
       )}
