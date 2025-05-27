@@ -1,27 +1,34 @@
 import Fastify from 'fastify';
-import pino from 'pino';
+import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 import userRoutes from './routes/users';
 import matchsRoutes from './routes/matchs';
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
 
 dotenv.config();
 
 // Assure que le dossier logs existe
 const logsDir = path.resolve(__dirname, '../logs');
 if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir);
+  fs.mkdirSync(logsDir, { recursive: true });
 }
 
-// Logger pino dédié pour fichier
-const fileLogger = pino(pino.destination(path.join(logsDir, 'app.log')));
+// Fastify avec configuration de logger compatible
+const app = Fastify({
+  logger: {
+    transport: {
+      target: 'pino/file',
+      options: {
+        destination: path.join(logsDir, 'app.log'),
+        mkdir: true,
+      },
+    },
+    level: 'info',
+  },
+});
 
-// Fastify avec logger console activé
-const app = Fastify({ logger: true });
-
-app.get('/ping', async () => {
-  fileLogger.info('Ping reçu');
+app.get('/ping', async (req, reply) => {
+  req.log.info('Ping reçu');
   return { pong: 'it works!' };
 });
 
@@ -34,7 +41,7 @@ const start = async () => {
       port: parseInt(process.env.PORT || '3000'),
       host: '0.0.0.0',
     });
-    console.log(`Server running on port ${process.env.PORT || 3000}`);
+    app.log.info(`Server running on port ${process.env.PORT || 3000}`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);

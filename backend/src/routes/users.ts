@@ -103,8 +103,7 @@ export default async function userRoutes(app: FastifyInstance)
 		console.error('Erreur lors de la mise à jour :', err);
 		return reply.status(500).send({ error: 'Erreur interne', message: err.message });
 	}
-});
-
+	});
 
 	//changer le mot de passe utilisateur
 	app.patch('/:id/password', { preHandler: authMiddleware }, async (req, reply) =>
@@ -140,6 +139,10 @@ export default async function userRoutes(app: FastifyInstance)
 	app.post('/auth', async (req, reply) =>
 	{
 		const { identifier, password, stayConnected } = req.body as {identifier: string; password: string; stayConnected: boolean};
+
+		app.log.info(`Test2`); ///// <===== TEST LOG
+		
+		req.log.info(`Test1`); ///// <===== TEST LOG
 
 		if (!identifier || !password)
 			return reply.status(400).send({ error: 'Champs requis manquants' });
@@ -182,6 +185,9 @@ export default async function userRoutes(app: FastifyInstance)
 			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
 		}
 	});
+
+
+
 
 	//Verification code 2FA pour la suite de l'authentification avec 2FA
 	app.post('/auth/2fa', async (req, reply) => 
