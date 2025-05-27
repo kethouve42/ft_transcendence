@@ -1,5 +1,5 @@
-// Exemple pour récupérer la liste des utilisateurs
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type User = {
   id: number;
@@ -17,24 +17,25 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-useEffect(() => {
-  fetch("/api/users")
-    .then(res => {
-      if (!res.ok) throw new Error("Erreur API: " + res.status);
-      return res.json();
-    })
-    .then(data => {
-      setUsers(data);
-      setLoading(false);
-    })
-    .catch(err => {
-      setLoading(false);
-      alert("Erreur lors du chargement: " + err.message);
-    });
+  useEffect(() => {
+    fetch("/api/users")
+      .then(res => {
+        if (!res.ok) throw new Error("Erreur API: " + res.status);
+        return res.json();
+      })
+      .then(data => {
+        setUsers(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(err => {
+        setLoading(false);
+        alert("Erreur lors du chargement: " + err.message);
+      });
   }, []);
 
- const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
     try {
@@ -48,10 +49,7 @@ useEffect(() => {
       setLogin("");
       setEmail("");
       setPassword("");
-      window.location.reload();
-      // Recharge la liste
-      const data = await res.json();
-      setUsers(data);
+      navigate("/login");
     } catch (err: any) {
       setMessage("Erreur lors de l'ajout : " + err.message);
     }
@@ -96,7 +94,7 @@ useEffect(() => {
         {message && <div className="text-cyan-200">{message}</div>}
       </form>
       <ul className="mt-8 text-cyan-100">
-        {users.map(user => (
+        {Array.isArray(users) && users.map(user => (
           <li key={user.id}>{user.login} ({user.email})</li>
         ))}
       </ul>
