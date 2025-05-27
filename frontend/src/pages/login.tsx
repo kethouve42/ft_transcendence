@@ -2,38 +2,29 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-type User = {
-  id: number;
-  login: string;
-  email: string;
-  alias?: string;
-  avatar?: string;
-  log_data?: string;
-};
 
-export default function Login() {
-  const [users, setUsers] = useState<User[]>([]);
+export default function Login({ refreshUserData }) {
   const [loading, setLoading] = useState(true);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch("/api/users")
-    .then(res => {
+useEffect(() => {
+  const checkDbConnection = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/users");
       if (!res.ok) throw new Error("Erreur API: " + res.status);
-      return res.json();
-    })
-    .then(data => {
-      setUsers(data);
+      setMessage("Connexion à la base OK !");
+    } catch (err: any) {
+      setMessage("Impossible de se connecter à la base : " + err.message);
+    } finally {
       setLoading(false);
-    })
-    .catch(err => {
-      setLoading(false);
-      alert("Erreur lors du chargement: " + err.message);
-    });
-  }, []);
+    }
+  };
+  checkDbConnection();
+}, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +43,7 @@ export default function Login() {
       if (data.success)
       {
         localStorage.setItem("token", data.token);
+        await refreshUserData();
         navigate("/dashboard");
       }
       setMessage(`Bienvenue ${data.login} (${data.email}) !`);
