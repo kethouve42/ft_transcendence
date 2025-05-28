@@ -83,3 +83,39 @@
 {"level":30,"time":1748444389025,"pid":1,"hostname":"bf4e88004756","reqId":"req-2","res":{"statusCode":200},"responseTime":0.9311289999168366,"msg":"request completed"}
 {"level":30,"time":1748444427170,"pid":1,"hostname":"bf4e88004756","reqId":"req-3","req":{"method":"POST","url":"/api/friends","host":"localhost:3000","remoteAddress":"192.168.65.1","remotePort":27503},"msg":"incoming request"}
 {"level":30,"time":1748444427189,"pid":1,"hostname":"bf4e88004756","reqId":"req-3","res":{"statusCode":200},"responseTime":17.68362999986857,"msg":"request completed"}
+{"level":30,"time":1748445026115,"pid":1,"hostname":"3356950e1999","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1748445026116,"pid":1,"hostname":"3356950e1999","msg":"Server listening at http://172.18.0.2:3000"}
+{"level":30,"time":1748445026116,"pid":1,"hostname":"3356950e1999","msg":"Server running on port 3000"}
+{"level":30,"time":1748445031567,"pid":1,"hostname":"3356950e1999","reqId":"req-1","req":{"method":"GET","url":"/api/users","host":"backend:3000","remoteAddress":"172.18.0.3","remotePort":35526},"msg":"incoming request"}
+{"level":30,"time":1748445031575,"pid":1,"hostname":"3356950e1999","reqId":"req-1","res":{"statusCode":200},"responseTime":7.674122999997053,"msg":"request completed"}
+{"level":30,"time":1748445031584,"pid":1,"hostname":"3356950e1999","reqId":"req-2","req":{"method":"GET","url":"/api/users","host":"backend:3000","remoteAddress":"172.18.0.3","remotePort":35534},"msg":"incoming request"}
+{"level":30,"time":1748445031590,"pid":1,"hostname":"3356950e1999","reqId":"req-2","res":{"statusCode":200},"responseTime":5.041183000001183,"msg":"request completed"}
+{"level":30,"time":1748445033035,"pid":1,"hostname":"3356950e1999","reqId":"req-3","req":{"method":"GET","url":"/api/users","host":"backend:3000","remoteAddress":"172.18.0.3","remotePort":35548},"msg":"incoming request"}
+{"level":30,"time":1748445033041,"pid":1,"hostname":"3356950e1999","reqId":"req-3","res":{"statusCode":200},"responseTime":5.7538019999992684,"msg":"request completed"}
+{"level":30,"time":1748445033049,"pid":1,"hostname":"3356950e1999","reqId":"req-4","req":{"method":"GET","url":"/api/users","host":"backend:3000","remoteAddress":"172.18.0.3","remotePort":35560},"msg":"incoming request"}
+{"level":30,"time":1748445033050,"pid":1,"hostname":"3356950e1999","reqId":"req-4","res":{"statusCode":200},"responseTime":0.9455050000033225,"msg":"request completed"}
+{"level":30,"time":1748445057559,"pid":1,"hostname":"3356950e1999","reqId":"req-5","req":{"method":"GET","url":"/api/users","host":"backend:3000","remoteAddress":"172.18.0.3","remotePort":47510},"msg":"incoming request"}
+{"level":30,"time":1748445057563,"pid":1,"hostname":"3356950e1999","reqId":"req-5","res":{"statusCode":200},"responseTime":2.733800000001793,"msg":"request completed"}
+{"level":30,"time":1748445057569,"pid":1,"hostname":"3356950e1999","reqId":"req-6","req":{"method":"GET","url":"/api/users","host":"backend:3000","remoteAddress":"172.18.0.3","remotePort":47514},"msg":"incoming request"}
+{"level":30,"time":1748445057570,"pid":1,"hostname":"3356950e1999","reqId":"req-6","res":{"statusCode":200},"responseTime":0.5877959999997984,"msg":"request completed"}
+{"level":30,"time":1748448114081,"pid":1,"hostname":"259fb128371a","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1748448114081,"pid":1,"hostname":"259fb128371a","msg":"Server listening at http://172.18.0.2:3000"}
+{"level":30,"time":1748448114081,"pid":1,"hostname":"259fb128371a","msg":"Server running on port 3000"}
+{"level":30,"time":1748448120123,"pid":1,"hostname":"259fb128371a","reqId":"req-1","req":{"method":"GET","url":"/api/friends/1/friends","host":"localhost:3000","remoteAddress":"192.168.65.1","remotePort":59119},"msg":"incoming request"}
+{"level":30,"time":1748448120129,"pid":1,"hostname":"259fb128371a","reqId":"req-1","res":{"statusCode":200},"responseTime":5.192423000000417,"msg":"request completed"}
+{"level":30,"time":1748448124331,"pid":1,"hostname":"259fb128371a","reqId":"req-2","req":{"method":"GET","url":"/api/friends/2/friends","host":"localhost:3000","remoteAddress":"192.168.65.1","remotePort":51822},"msg":"incoming request"}
+{"level":30,"time":1748448124333,"pid":1,"hostname":"259fb128371a","reqId":"req-2","res":{"statusCode":200},"responseTime":1.3457110000017565,"msg":"request completed"}
+{"level":30,"time":1748448149700,"pid":1,"hostname":"259fb128371a","reqId":"req-3","req":{"method":"DELETE","url":"/api/friends","host":"localhost:3000","remoteAddress":"192.168.65.1","remotePort":53514},"msg":"incoming request"}
+{"level":30,"time":1748448149722,"pid":1,"hostname":"259fb128371a","reqId":"req-3","res":{"statusCode":500},"responseTime":22.01413200001116,"msg":"request completed"}
+{"level":30,"time":1748448172598,"pid":1,"hostname":"259fb128371a","reqId":"req-4","req":{"method":"DELETE","url":"/api/friends","host":"localhost:3000","remoteAddress":"192.168.65.1","remotePort":53670},"msg":"incoming request"}
+{"level":30,"time":1748448172600,"pid":1,"hostname":"259fb128371a","reqId":"req-4","res":{"statusCode":500},"responseTime":1.6232819999859203,"msg":"request completed"}
+{"level":30,"time":1748448394050,"pid":1,"hostname":"2675ead57778","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1748448394050,"pid":1,"hostname":"2675ead57778","msg":"Server listening at http://172.18.0.2:3000"}
+{"level":30,"time":1748448394050,"pid":1,"hostname":"2675ead57778","msg":"Server running on port 3000"}
+{"level":30,"time":1748448401200,"pid":1,"hostname":"2675ead57778","reqId":"req-1","req":{"method":"DELETE","url":"/api/friends","host":"localhost:3000","remoteAddress":"192.168.65.1","remotePort":33226},"msg":"incoming request"}
+{"level":30,"time":1748448401205,"pid":1,"hostname":"2675ead57778","reqId":"req-1","res":{"statusCode":500},"responseTime":4.232209000037983,"msg":"request completed"}
+{"level":30,"time":1748448425830,"pid":1,"hostname":"17a73d35237c","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1748448425831,"pid":1,"hostname":"17a73d35237c","msg":"Server listening at http://172.18.0.2:3000"}
+{"level":30,"time":1748448425831,"pid":1,"hostname":"17a73d35237c","msg":"Server running on port 3000"}
+{"level":30,"time":1748448471301,"pid":1,"hostname":"17a73d35237c","reqId":"req-1","req":{"method":"DELETE","url":"/api/friends","host":"localhost:3000","remoteAddress":"192.168.65.1","remotePort":48676},"msg":"incoming request"}
+{"level":30,"time":1748448471317,"pid":1,"hostname":"17a73d35237c","reqId":"req-1","res":{"statusCode":200},"responseTime":15.782376000075601,"msg":"request completed"}
