@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import userRoutes from './routes/users';
 import matchsRoutes from './routes/matchs';
+import friendsRoutes from './routes/friends';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.get('/ping', async (req, reply) => {
 
 app.register(userRoutes, { prefix: '/api/users' });
 app.register(matchsRoutes, { prefix: '/api/matchs' });
+app.register(friendsRoutes, { prefix: '/api/friends' });
 
 const start = async () => {
   try {
