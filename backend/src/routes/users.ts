@@ -142,8 +142,10 @@ export default async function userRoutes(app: FastifyInstance)
 
 		app.log.info(`Test2`); ///// <===== TEST LOG
 		
-		req.log.info(`Test1`); ///// <===== TEST LOG
+		//req.log.info(`Test1`); ///// <===== TEST LOG
 
+		app.log.info('User logged in'); // <=== Log de connection
+		
 		if (!identifier || !password)
 			return reply.status(400).send({ error: 'Champs requis manquants' });
 
@@ -184,6 +186,7 @@ export default async function userRoutes(app: FastifyInstance)
 			console.error('Erreur lors de l\'authentification :', err);
 			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
 		}
+
 	});
 
 

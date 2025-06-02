@@ -51,7 +51,9 @@ services:
       - elk
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.4
+    build:
+      context: ./elk/kibana
+      dockerfile: Dockerfile
     container_name: kibana
     ports:
       - "5601:5601"
