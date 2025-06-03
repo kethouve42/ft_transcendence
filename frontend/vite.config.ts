@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [react()],
     server: {
     proxy: {
-      '/api': 'http://backend:3000', // "backend" = nom du service docker-compose
+      '/api': 'http://backend:3000',
     },
   },
 })

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-export default function Login({ refreshUserData }) {
+export default function Login({ refreshUserData } : {refreshUserData: () => Promise<void> }) {
   const [loading, setLoading] = useState(true);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
