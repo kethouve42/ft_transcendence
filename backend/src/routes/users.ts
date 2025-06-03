@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import { signToken } from '../utils/jwt';
 import { authMiddleware } from '../middlewares/auth';
 import { generate2FACode } from '../utils/2fa';
+/*import path from 'path';
+import fs from 'fs';*/
 
 export default async function userRoutes(app: FastifyInstance)
 {
@@ -278,5 +280,33 @@ export default async function userRoutes(app: FastifyInstance)
 			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
 		}
 	});
+
+	//Upload d'avatar
+	/*app.post('/upload-avatar', { preHandler: authMiddleware }, async (req, reply) => {
+	const user = (req as any).user;
+	const parts = req.parts();
+
+	for await (const part of parts) {
+		if (part.type === 'file') {
+			const fileExt = path.extname(part.filename);
+			const fileName = `avatar_${user.id}_${Date.now()}${fileExt}`;
+			const uploadPath = path.join(__dirname, '../../uploads/avatars', fileName);
+
+			await new Promise((resolve, reject) => {
+				const stream = fs.createWriteStream(uploadPath);
+				part.file.pipe(stream);
+				part.file.on('end', resolve);
+				part.file.on('error', reject);
+			});
+
+			// Sauvegarde le chemin relatif ou URL dans la DB
+			db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(`/uploads/avatars/${fileName}`, user.id);
+
+			return reply.send({ success: true, url: `/uploads/avatars/${fileName}` });
+		}
+	}
+
+	return reply.status(400).send({ error: 'Aucun fichier reçu' });
+	});*/
 
 }

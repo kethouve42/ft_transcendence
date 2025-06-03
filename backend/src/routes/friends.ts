@@ -23,9 +23,9 @@ export default async function friendsRoutes(app: FastifyInstance)
 		try
 		{
 			const stmt = db.prepare(`INSERT INTO friends (user_id, friend_id)
-									 VALUES (?, ?)
-				`);
+									 VALUES (?, ?)`);
 			const result = stmt.run(user_id, friend_id);
+			const result2 = stmt.run(friend_id, user_id);
 			return { success: true, id: result.lastInsertRowid };
 		}
 		catch (err: any)
@@ -54,9 +54,10 @@ export default async function friendsRoutes(app: FastifyInstance)
 		try
 		{
 			const stmt = db.prepare(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`);
-			const result = stmt.run(user_id, friend_id);
+			const result1 = stmt.run(user_id, friend_id);
+			const result2 = stmt.run(friend_id, user_id);
 
-			if (result.changes === 0)
+			if (result1.changes === 0)
 				return reply.status(404).send({ error: "Amitié non trouvée" });
 
 			return { success: true };

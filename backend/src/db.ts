@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS matchs (
   date TEXT NOT NULL,
   duration INTEGER,
   user1_id INTEGER NOT NULL,
-  user2_id INTEGER NOT NULL,
+  user2_id INTEGER,
   winner_id INTEGER,
   score TEXT,
   FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,

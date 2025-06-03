@@ -16,22 +16,27 @@ export default async function matchsRoutes(app: FastifyInstance)
 	{
 		const { date, duration, user1_id, user2_id, winner_id, score } = req.body as any;
 
-		if (!date || !duration || !user1_id || !user2_id || !winner_id || !score)
+		if (!date || !duration || !user1_id || !score)
 			return reply.status(400).send({ error: "Données du match incomplétes" });
 
 		// Vérifie que les joueurs sont différents
-		if (user1_id === user2_id) {
+		if (user2_id && user1_id === user2_id) {
 		return reply.status(400).send({ error: "Un joueur ne peut pas jouer contre lui-même" });
 		}
 
 		// Vérifie que les joueurs existent
 		const getUser = db.prepare(`SELECT id FROM users WHERE id = ?`);
-		if (!getUser.get(user1_id) || !getUser.get(user2_id)) {
-		return reply.status(404).send({ error: "Un ou plusieurs joueurs n'existent pas" });
+
+		if (!getUser.get(user1_id)) {
+		return reply.status(404).send({ error: "Joueur 1 non trouvé" });
+		}
+
+		if (user2_id && !getUser.get(user2_id)) {
+		return reply.status(404).send({ error: "Joueur 2 non trouvé" });
 		}
 
 		// Vérifie que le gagnant est l'un des deux
-		if (winner_id !== user1_id && winner_id !== user2_id) {
+		if (winner_id !== user1_id && winner_id !== user2_id && winner_id !== null) {
 		return reply.status(400).send({ error: "Le gagnant doit être l’un des deux joueurs" });
 		}
 
@@ -40,7 +45,15 @@ export default async function matchsRoutes(app: FastifyInstance)
 			const stmt = db.prepare(`INSERT INTO matchs (date, duration, user1_id, user2_id, winner_id, score)
 									 VALUES (?, ?, ?, ?, ?, ?)
 				`);
-			const result = stmt.run(date, duration, user1_id, user2_id, winner_id, score);
+			const result = stmt.run(
+									date,
+									duration,
+									user1_id,
+									user2_id === undefined || user2_id === 0 ? null : user2_id,
+									winner_id === undefined || winner_id === 0 ? null : winner_id,
+									score
+									);
+
 			return { success: true, id: result.lastInsertRowid };
 		}
 		catch (err: any)
@@ -89,6 +102,31 @@ export default async function matchsRoutes(app: FastifyInstance)
 		`).all(user_id, user_id);
 
 		return matchs;
+	});
+
+	app.get('/user/:user_id/stats', async (requestAnimationFrame, reply) =>
+	{
+		const { user_id } = requestAnimationFrame.params as any;
+
+		//vérifie que l'utilisateur existe
+		const user = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+		if (!user)
+			return reply.status(404).send({ error: "Utilisateur non trouvé" });
+		
+		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { total: number };
+
+		const totalWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ?`).get(user_id) as { wins: number };
+
+		const totalLosses = totalMatches.total - totalWins.wins;
+
+		const avgDuration = db.prepare(`SELECT AVG(duration) as average_duration FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { average_duration: number | null };
+
+		return {
+			totalMatches: totalMatches.total,
+			wins: totalWins.wins,
+			losses: totalLosses,
+			averageDuration: Math.round(avgDuration.average_duration ?? 0)
+		};
 	});
 
 }
