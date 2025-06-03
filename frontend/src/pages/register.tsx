@@ -1,17 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-type User = {
-  id: number;
-  login: string;
-  email: string;
-  alias?: string;
-  avatar?: string;
-  log_data?: string;
-};
 
 export default function Register() {
-  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
@@ -20,19 +11,19 @@ export default function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/users")
-      .then(res => {
+    const checkDbConnection = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/users");
         if (!res.ok) throw new Error("Erreur API: " + res.status);
-        return res.json();
-      })
-      .then(data => {
-        setUsers(Array.isArray(data) ? data : []);
+        setMessage("Connexion à la base OK !");
+      } catch (err: any) {
+        setMessage("Impossible de se connecter à la base : " + err.message);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        alert("Erreur lors du chargement: " + err.message);
-      });
+      }
+    };
+    checkDbConnection();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,11 +84,6 @@ export default function Register() {
         </button>
         {message && <div className="text-cyan-200">{message}</div>}
       </form>
-      <ul className="mt-8 text-cyan-100">
-        {Array.isArray(users) && users.map(user => (
-          <li key={user.id}>{user.login} ({user.email})</li>
-        ))}
-      </ul>
     </div>
   );
 }

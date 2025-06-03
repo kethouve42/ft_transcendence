@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Navbar from "../Navbar";
 import Dashboard from "../pages/dashboard";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import fetchUserId from "../auth/authHelpers";
 import Home from "../pages/home";
 import Game from "../pages/game";
@@ -10,6 +10,8 @@ import Login from "../pages/login";
 import Register from "../pages/register";
 import PublicRoute from "../auth/PublicRoute";
 import ProtectedRoute from "../auth/ProtectedRoute";
+import Profile from "./profile";
+import { isTokenExpired } from "../auth/token";
 
 type User = {
   id: number;
@@ -21,6 +23,7 @@ type User = {
 
 export default function App() {
   const [userData, setUserData] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   const refreshUserData = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -34,6 +37,13 @@ export default function App() {
 
   // Rafraîchit au chargement ou quand le token change
   useEffect(() => {
+  const token = localStorage.getItem("token");
+
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem("token");
+      navigate("/login");
+      return;
+    }
     refreshUserData();
   }, [refreshUserData]);
 
@@ -52,6 +62,7 @@ export default function App() {
                 <Dashboard userData={userData} refreshUserData={refreshUserData} />
               </ProtectedRoute>
             } />
+            <Route path="/profile/:id" element={<Profile userData={userData}/>} />
             <Route path="*" element={<Error />} />
           </Routes>
         </div>
