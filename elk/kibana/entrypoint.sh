@@ -1,27 +1,26 @@
 #!/bin/bash
 
 echo "⏳ Démarrage de Kibana..."
-
-# Lancer Kibana en arrière-plan
 /usr/share/kibana/bin/kibana &
 
-# Sauver le PID pour plus tard
 KIBANA_PID=$!
 
-# Attendre que Kibana réponde sur le port 5601
-until curl -s http://localhost:5601/api/status | grep -q "available"; do
-  echo "⌛ En attente que Kibana soit prêt..."
+# Attente du démarrage complet de Kibana
+echo "⌛ En attente que Kibana soit complètement prêt..."
+until curl -s -o /dev/null -w "%{http_code}" http://localhost:5601/api/saved_objects/_find?type=dashboard | grep -q "200"; do
   sleep 2
 done
 
 echo "✅ Kibana est prêt, import du dashboard..."
 
-# Importer le dashboard si le fichier existe
-if [ -f /usr/share/kibana/scripts/dashboard.ndjson ]; then
-  curl -X POST "http://localhost:5601/api/saved_objects/_import?overwrite=true" \
+if [ -f /usr/share/kibana/dashboard.ndjson ]; then
+  curl -s -X POST "http://localhost:5601/api/saved_objects/_import?overwrite=true" \
     -H "kbn-xsrf: true" \
-    --form file=@/usr/share/kibana/scripts/dashboard.ndjson
+    --form file=@/usr/share/kibana/dashboard.ndjson
+  echo "🔥 Dashboard importé"
+else
+  echo "⚠️ Fichier dashboard.ndjson introuvable"
 fi
 
-# Attendre la fin du process Kibana
+# Fin du script : attendre Kibana
 wait $KIBANA_PID
