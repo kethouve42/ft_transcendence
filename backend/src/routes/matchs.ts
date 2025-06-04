@@ -104,6 +104,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		return matchs;
 	});
 
+	//Obtenir les stats d'un joueur
 	app.get('/user/:user_id/stats', async (requestAnimationFrame, reply) =>
 	{
 		const { user_id } = requestAnimationFrame.params as any;
@@ -113,19 +114,68 @@ export default async function matchsRoutes(app: FastifyInstance)
 		if (!user)
 			return reply.status(404).send({ error: "Utilisateur non trouvé" });
 		
+		//compte des matchs
 		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { total: number };
 
+		//victoires total
 		const totalWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ?`).get(user_id) as { wins: number };
 
+		//défaites total
 		const totalLosses = totalMatches.total - totalWins.wins;
 
+		//Pourcentage global
+		const globalWinRate = totalMatches.total > 0 ? Math.round((totalWins.wins / totalMatches.total) * 100) : 0;
+
+		//Durée moyenne des matchs
 		const avgDuration = db.prepare(`SELECT AVG(duration) as average_duration FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { average_duration: number | null };
 
+		//stats contre l'IA (user2_id = null)
+		const aiMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? AND user2_id IS NULL`).get(user_id) as { total: number };
+
+		//Victoire contre l'IA
+		const aiWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ? AND (user1_id = ? AND user2_id IS NULL)`).get(user_id, user_id) as { wins: number };
+		
+		//Défaite contre l'IA
+		const aiLosses = aiMatches.total - aiWins.wins;
+
+		//Pourcentage contre l'IA
+		const aiWinsRate = aiMatches.total > 0 ? Math.round((aiWins.wins / aiMatches.total) * 100) : 0;
+
+		//Stats contre un autre joueur
+		const pvpMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE (user1_id = ? OR user2_id = ?) AND user1_id IS NOT NULL AND user2_id IS NOT NULL`).get(user_id, user_id) as { total: number };
+
+		//Victoire contre d'autre joueur
+		const pvpWins = db.prepare(`SELECT COUNT (*) as wins FROM matchs WHERE (winner_id = ? AND user1_id IS NOT NULL AND user2_id IS NOT NULL)`).get(user_id) as { wins: number };
+
+		//Défaite en PvP
+		const pvpLosses = pvpMatches.total - pvpWins.wins;
+
+		//PvP Winrate
+		const pvpWinRate = pvpMatches.total > 0 ? Math.round((pvpWins.wins / pvpMatches.total) * 100) : 0; 
+
 		return {
-			totalMatches: totalMatches.total,
-			wins: totalWins.wins,
-			losses: totalLosses,
-			averageDuration: Math.round(avgDuration.average_duration ?? 0)
+			global:
+			{
+				totalMatches: totalMatches.total,
+				wins: totalWins.wins,
+				losses: totalLosses,
+				winRate: globalWinRate,
+				averageDuration: Math.round(avgDuration.average_duration ?? 0)
+			},
+			vsAI:
+			{
+				matches: aiMatches.total,
+				wins: aiWins.wins,
+				losses: aiLosses,
+				winRate: aiWinsRate
+			},
+			vsPlayer:
+			{
+				matches: pvpMatches.total,
+				wins: pvpWins.wins,
+				losses: pvpLosses,
+				winRate: pvpWinRate
+			}
 		};
 	});
 
