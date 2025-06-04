@@ -16,22 +16,27 @@ export default async function matchsRoutes(app: FastifyInstance)
 	{
 		const { date, duration, user1_id, user2_id, winner_id, score } = req.body as any;
 
-		if (!date || !duration || !user1_id || !user2_id || !winner_id || !score)
+		if (!date || !duration || !user1_id || !score)
 			return reply.status(400).send({ error: "Données du match incomplétes" });
 
 		// Vérifie que les joueurs sont différents
-		if (user1_id === user2_id) {
+		if (user2_id && user1_id === user2_id) {
 		return reply.status(400).send({ error: "Un joueur ne peut pas jouer contre lui-même" });
 		}
 
 		// Vérifie que les joueurs existent
 		const getUser = db.prepare(`SELECT id FROM users WHERE id = ?`);
-		if (!getUser.get(user1_id) || !getUser.get(user2_id)) {
-		return reply.status(404).send({ error: "Un ou plusieurs joueurs n'existent pas" });
+
+		if (!getUser.get(user1_id)) {
+		return reply.status(404).send({ error: "Joueur 1 non trouvé" });
+		}
+
+		if (user2_id && !getUser.get(user2_id)) {
+		return reply.status(404).send({ error: "Joueur 2 non trouvé" });
 		}
 
 		// Vérifie que le gagnant est l'un des deux
-		if (winner_id !== user1_id && winner_id !== user2_id) {
+		if (winner_id !== user1_id && winner_id !== user2_id && winner_id !== null) {
 		return reply.status(400).send({ error: "Le gagnant doit être l’un des deux joueurs" });
 		}
 
@@ -40,7 +45,15 @@ export default async function matchsRoutes(app: FastifyInstance)
 			const stmt = db.prepare(`INSERT INTO matchs (date, duration, user1_id, user2_id, winner_id, score)
 									 VALUES (?, ?, ?, ?, ?, ?)
 				`);
-			const result = stmt.run(date, duration, user1_id, user2_id, winner_id, score);
+			const result = stmt.run(
+									date,
+									duration,
+									user1_id,
+									user2_id === undefined || user2_id === 0 ? null : user2_id,
+									winner_id === undefined || winner_id === 0 ? null : winner_id,
+									score
+									);
+
 			return { success: true, id: result.lastInsertRowid };
 		}
 		catch (err: any)
@@ -89,6 +102,81 @@ export default async function matchsRoutes(app: FastifyInstance)
 		`).all(user_id, user_id);
 
 		return matchs;
+	});
+
+	//Obtenir les stats d'un joueur
+	app.get('/user/:user_id/stats', async (requestAnimationFrame, reply) =>
+	{
+		const { user_id } = requestAnimationFrame.params as any;
+
+		//vérifie que l'utilisateur existe
+		const user = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+		if (!user)
+			return reply.status(404).send({ error: "Utilisateur non trouvé" });
+		
+		//compte des matchs
+		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { total: number };
+
+		//victoires total
+		const totalWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ?`).get(user_id) as { wins: number };
+
+		//défaites total
+		const totalLosses = totalMatches.total - totalWins.wins;
+
+		//Pourcentage global
+		const globalWinRate = totalMatches.total > 0 ? Math.round((totalWins.wins / totalMatches.total) * 100) : 0;
+
+		//Durée moyenne des matchs
+		const avgDuration = db.prepare(`SELECT AVG(duration) as average_duration FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { average_duration: number | null };
+
+		//stats contre l'IA (user2_id = null)
+		const aiMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? AND user2_id IS NULL`).get(user_id) as { total: number };
+
+		//Victoire contre l'IA
+		const aiWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ? AND (user1_id = ? AND user2_id IS NULL)`).get(user_id, user_id) as { wins: number };
+		
+		//Défaite contre l'IA
+		const aiLosses = aiMatches.total - aiWins.wins;
+
+		//Pourcentage contre l'IA
+		const aiWinsRate = aiMatches.total > 0 ? Math.round((aiWins.wins / aiMatches.total) * 100) : 0;
+
+		//Stats contre un autre joueur
+		const pvpMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE (user1_id = ? OR user2_id = ?) AND user1_id IS NOT NULL AND user2_id IS NOT NULL`).get(user_id, user_id) as { total: number };
+
+		//Victoire contre d'autre joueur
+		const pvpWins = db.prepare(`SELECT COUNT (*) as wins FROM matchs WHERE (winner_id = ? AND user1_id IS NOT NULL AND user2_id IS NOT NULL)`).get(user_id) as { wins: number };
+
+		//Défaite en PvP
+		const pvpLosses = pvpMatches.total - pvpWins.wins;
+
+		//PvP Winrate
+		const pvpWinRate = pvpMatches.total > 0 ? Math.round((pvpWins.wins / pvpMatches.total) * 100) : 0; 
+
+		return {
+			global:
+			{
+				totalMatches: totalMatches.total,
+				wins: totalWins.wins,
+				losses: totalLosses,
+				winRate: globalWinRate,
+				averageDuration: Math.round(avgDuration.average_duration ?? 0)
+			},
+			vsAI:
+			{
+				matches: aiMatches.total,
+				wins: aiWins.wins,
+				losses: aiLosses,
+				winRate: aiWinsRate
+			},
+			vsPlayer:
+			{
+				matches: pvpMatches.total,
+				wins: pvpWins.wins,
+				losses: pvpLosses,
+				winRate: pvpWinRate
+			}
+		};
 	});
 
 }

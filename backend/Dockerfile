@@ -7,10 +7,12 @@ WORKDIR /app
 COPY package*.json ./
 COPY .env ./
 RUN npm install
+#RUN npm install fastify-websocket ping
 RUN npm install bcrypt
 RUN npm install -D @types/bcrypt
 RUN npm install jsonwebtoken
 RUN npm install -D @types/jsonwebtoken
+#RUN npm install fastify-multipart avatar
 
 
 # Copier la config et le code

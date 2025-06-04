@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+
 const paddleWidth = 10;
 const paddleHeight = 100;
 const ballSize = 10;
@@ -150,15 +151,16 @@ export default function Game() {
   }, []);
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <h1>Pong game</h1>
-      <canvas
-        ref={canvasRef}
-        id="pong"
-        width={800}
-        height={500}
-        style={{ background: "black", display: "block", margin: "0 auto" }}
-      />
-    </div>
+  <div className="flex flex-col items-center mt-8">
+    <h1 className="text-3xl font-extrabold text-cyan-300 drop-shadow-[0_0_10px_cyan] tracking-widest uppercase mb-6">Pong Game</h1>
+    <canvas
+      ref={canvasRef}
+      id="pong"
+      width={800}
+      height={500}
+      className="rounded-xl shadow-lg border-4 border-cyan-400 bg-black"
+      style={{ display: "block", margin: "0 auto" }}
+    />
+  </div>
   );
 }

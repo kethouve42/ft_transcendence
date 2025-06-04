@@ -11,6 +11,7 @@ services:
       - backend/.env
     volumes:
       - ./backend/data:/app/data
+      - ./backend/logs:/app/logs
     restart: unless-stopped
 
   frontend:
@@ -23,3 +24,49 @@ services:
       - ./frontend:/app
       - /app/node_modules
     restart: unless-stopped
+    
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.4
+    container_name: logstash
+    volumes:
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./backend/logs:/usr/share/logstash/logs
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+
+  kibana:
+    build:
+      context: ./elk/kibana
+      dockerfile: Dockerfile
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+
+volumes:
+  esdata:
+
+networks:
+  elk:
+    driver: bridge
