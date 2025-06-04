@@ -26,7 +26,8 @@ db.serialize(() => {
       email TEXT UNIQUE NOT NULL,
       tfa_enabled BOOLEAN DEFAULT 0,
       tfa_code TEXT,
-      tfa_expires INTEGER
+      tfa_expires INTEGER,
+	  last_seen INTEGER
     )
   `);
 

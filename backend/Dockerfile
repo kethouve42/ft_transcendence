@@ -12,7 +12,7 @@ RUN npm install bcrypt
 RUN npm install -D @types/bcrypt
 RUN npm install jsonwebtoken
 RUN npm install -D @types/jsonwebtoken
-#RUN npm install fastify-multipart avatar
+RUN npm install fastify-multipart
 
 
 # Copier la config et le code
