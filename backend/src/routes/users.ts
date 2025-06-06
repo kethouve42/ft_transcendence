@@ -4,8 +4,8 @@ import bcrypt from 'bcrypt';
 import { signToken } from '../utils/jwt';
 import { authMiddleware } from '../middlewares/auth';
 import { generate2FACode } from '../utils/2fa';
-/*import path from 'path';
-import fs from 'fs';*/
+import path from 'path';
+import fs from 'fs';
 
 export default async function userRoutes(app: FastifyInstance)
 {
@@ -281,32 +281,62 @@ export default async function userRoutes(app: FastifyInstance)
 		}
 	});
 
-	//Upload d'avatar
-	/*app.post('/upload-avatar', { preHandler: authMiddleware }, async (req, reply) => {
-	const user = (req as any).user;
-	const parts = req.parts();
-
-	for await (const part of parts) {
-		if (part.type === 'file') {
-			const fileExt = path.extname(part.filename);
-			const fileName = `avatar_${user.id}_${Date.now()}${fileExt}`;
-			const uploadPath = path.join(__dirname, '../../uploads/avatars', fileName);
-
-			await new Promise((resolve, reject) => {
-				const stream = fs.createWriteStream(uploadPath);
-				part.file.pipe(stream);
-				part.file.on('end', resolve);
-				part.file.on('error', reject);
-			});
-
-			// Sauvegarde le chemin relatif ou URL dans la DB
-			db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(`/uploads/avatars/${fileName}`, user.id);
-
-			return reply.send({ success: true, url: `/uploads/avatars/${fileName}` });
+	// Ping de l'user (met à jour last_seen)
+	app.get('/ping', { preHandler: [authMiddleware] }, async (req, reply) =>
+	{
+		const user = (req as any).user;
+		try
+		{
+			const result = db.prepare(`UPDATE users SET last_seen = ? WHERE id = ?`).run(Date.now(), user.id);
+			if (result.changes === 0)
+				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			return { success: true };
 		}
-	}
+		catch (err: any)
+		{
+			console.error('Erreur lors du ping :', err);
+			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+		}
+	});
 
-	return reply.status(400).send({ error: 'Aucun fichier reçu' });
-	});*/
+	//Upload d'avatar
+	app.post('/upload-avatar', { preHandler: authMiddleware }, async (req, reply) =>
+	{
+		const user = (req as any).user;
+		const parts = req.parts();
+
+		let uploaded = false;
+
+		for await (const part of parts)
+		{
+			if (part.type === 'file')
+			{
+				const fileExt = path.extname(part.filename);
+				const fileName = `avatar_${user.id}_${Date.now()}${fileExt}`;
+				const uploadDir = path.resolve(process.cwd(), 'uploads/avatars');
+				const uploadPath = path.join(uploadDir, fileName);
+
+				// Crée le dossier si besoin
+				fs.mkdirSync(uploadDir, { recursive: true });
+
+				await new Promise((resolve, reject) =>
+				{
+					const stream = fs.createWriteStream(uploadPath);
+					part.file.pipe(stream);
+					part.file.on('end', resolve);
+					part.file.on('error', reject);
+				});
+
+				// Sauvegarde le chemin relatif ou URL dans la DB
+				db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(`/uploads/avatars/${fileName}`, user.id);
+
+				uploaded = true;
+				return reply.send({ success: true, url: `/uploads/avatars/${fileName}` });
+			}
+		}
+
+		if (!uploaded)
+			return reply.status(400).send({ error: 'Aucun fichier reçu' });
+	});
 
 }
