@@ -3,6 +3,7 @@ import { paddleHeight, paddleWidth, leftPaddle, rightPaddle, drawRectangle, init
 import { ballSize, speed, ball, drawBall, resetBall } from './ball.js'
 import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
+import { updatePowerUps, drawPowerUp } from "./power_up.js"
 import './css/style.css'
 
 let mode: 'local' | 'ai' = 'local'
@@ -28,6 +29,7 @@ export default function Game() {
     player2Down: "ArrowDown",}) // Constante pour stocke les bind choisis par les utilisateurs.
   const [pendingBinding, setPendingBinding] = useState<"player1Up" | "player1Down" | "player2Up" | "player2Down" | null>(null) // Savoir pendant la config, quelle action se font bind.
   let   [scoreMod, setScoreMod] = useState(score_df) // Variable qui permet de modifier le score maximal du match.
+  const [showRule, setShowRule] = useState(false)
   let   animationId: number // Stocke l'identifant de requestAnimationFrame
 
   useEffect(() => {
@@ -199,9 +201,6 @@ export default function Game() {
       nextTargetY = rightPaddle.y
     }
 
-    // Elle gère : le déplacement des paddles (local ou IA), la mise à jour de la position de la balle, 
-    // les collisions avec le haut/bas ou les raquettes, le scoring (quand la balle sort du canvas), 
-    // la fin de match (timer écoulé ou points max atteints).
     function update(): void {
       if (mode === 'local') {
         if (keys[keyBinding.player2Up] && rightPaddle.y > 0) {
@@ -221,6 +220,9 @@ export default function Game() {
       if (keys[keyBinding.player1Down] && leftPaddle.y < canvas!.height - paddleHeight) {
         leftPaddle.y += speed
       }
+
+      const now = Date.now()
+      updatePowerUps(now, canvas!.height, canvas!.width, ball)
 
       ball.x += ball.vx
       ball.y += ball.vy
@@ -284,6 +286,7 @@ export default function Game() {
       drawRectangle(ctx, leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight)
       drawRectangle(ctx, rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight)
       drawBall(ctx)
+      drawPowerUp(ctx)
       drawScore(ctx, canvas!)
       drawTimer(ctx, canvas!)
     }
@@ -305,15 +308,16 @@ export default function Game() {
       window.removeEventListener("keyup", keyUp);
       cancelAnimationFrame(animationId)
     }
-  }, [showMenu, easyMod, timerMod, ballSpeed, scoreMod, showKeyConfig])
+  }, [showMenu, easyMod, timerMod, ballSpeed, scoreMod, showKeyConfig, showRule])
 
   return (
     <div className="app-container">
       <h1 className="title">Pong game</h1>
-      {showMenu && !showSettings && !showMenuAI && !showKeyConfig && (
+      {showMenu && !showSettings && !showMenuAI && !showKeyConfig && !showRule && (
         <div id="menu" className="menu">
           <button className="menu-btn" onClick={() => { mode = 'local'; setShowKeyConfig(true)}}>Local</button>
           <button className="menu-btn" onClick={() => { mode = 'ai'; setShowMenuAI(true)}}>AI</button>
+          <button className="menu-btn" onClick={() => setShowRule(true)}>Rules</button>
           <button className="menu-btn" onClick={() => setShowSettings(true)}>Settings</button>
         </div>
       )}
@@ -423,6 +427,38 @@ export default function Game() {
         </div>
       </div>
       )}
+      {showRule && (
+      <div className="rules-panel">
+        <h2>Règles du jeu</h2>
+        <ul className="rules-list">
+         <li>
+          <strong>Power-ups</strong> apparaissent aléatoirement toutes les <em>5 à 10 secondes</em> :
+          <ul>
+            <li>
+              <span className="speed-up"></span>  
+              → La balle passe à <strong>+25%</strong> de vitesse pendant <strong>5s</strong>.
+            </li>
+            <li>
+              <span className="speed-down"></span> 
+              → La balle passe à <strong>75%</strong> de sa vitesse normale pendant <strong>5s</strong>.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Apparition</strong> :  
+          un nouveau power-up spawn <em>5–10 s</em> (intervalle aléatoire) après le précédent.
+        </li>
+        <li>
+          <strong>Collecte</strong> :  
+          la balle ramasse le carré au contact, déclenche l’effet, puis le power-up disparaît.
+        </li>
+        <li>
+          <strong>Durée de l’effet</strong> :  
+          exactement <strong>5 secondes</strong>, puis la balle retrouve sa vitesse initiale.
+        </li>
+      </ul>
+    </div>
+    )}
       {!showMenu && (
       <canvas
         ref={canvasRef}

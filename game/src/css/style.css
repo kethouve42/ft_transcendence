@@ -138,3 +138,68 @@
     font-size: 1.5rem;
   }
 }
+
+.rules-panel {
+  background: #1f1f23;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 2rem auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  font-family: "Segoe UI", sans-serif;
+  color: #e5e5e5;
+  text-align: left;
+}
+
+.rules-panel h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rules-list > li {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.rules-list li ul {
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+  list-style: disc;
+}
+
+.rules-list li ul li {
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.rules-list strong {
+  color: #38bdf8;
+}
+
+.rules-list span {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  border-radius: 0.2rem;
+}
+
+.rules-list span.speed-up {
+  background-color: lime;
+}
+.rules-list span.speed-down {
+  background-color: orange;
+}
