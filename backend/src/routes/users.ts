@@ -260,7 +260,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});*/
 
 	//Permet de savoir id et le login de la personne connecter
-	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>
+	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>  //<= Appeler ceci plutot que get/user pour les infos perso (avec plus d'info)
 	{
 		const user = (req as any).user;
 		return { id: user.id, login: user.login };
