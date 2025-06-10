@@ -13,7 +13,7 @@ export default async function userRoutes(app: FastifyInstance)
 	app.get('/', async () => 
 	{
 		const users = db.prepare(`
-			SELECT id, login, alias, avatar
+			SELECT id, login, alias, avatar, last_seen
 			FROM users
 		`).all();
 		return users;
@@ -24,7 +24,7 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const { id } = req.params as any;
 		const user = db.prepare(`
-			SELECT id, login, alias, avatar
+			SELECT id, login, alias, avatar, last_seen
 			FROM users WHERE id = ?
 		`).get(id);
 
@@ -38,7 +38,7 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const { login } = req.params as any;
 		const user = db.prepare(`
-			SELECT id, login, alias, avatar
+			SELECT id, login, alias, avatar, last_seen
 			FROM users WHERE login = ?
 		`).get(login);
 	
@@ -260,7 +260,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});*/
 
 	//Permet de savoir id et le login de la personne connecter
-	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>
+	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>  //<= Appeler ceci plutot que get/user pour les infos perso (avec plus d'info)
 	{
 		const user = (req as any).user;
 		return { id: user.id, login: user.login };
@@ -286,7 +286,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	// Ping de l'user (met à jour last_seen)
-	app.get('/ping', { preHandler: [authMiddleware] }, async (req, reply) =>
+	app.put('/ping', { preHandler: [authMiddleware] }, async (req, reply) =>
 	{
 		const user = (req as any).user;
 		try
