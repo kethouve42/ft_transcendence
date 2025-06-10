@@ -25,6 +25,7 @@ export default function Navbar({ userData }: { userData: User | null }) {
           <div className="flex gap-10 items-center">
             <Link to="/" className={`text-lg ${isActive('/')} font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition`}>Accueil</Link>
             <Link to="/game" className={`text-lg ${isActive('/game')} font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition`}>Jeu</Link>
+            <Link to="/rpg-idle" className={`text-lg ${isActive('/rpg-idle')} font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition`}>RPG Idle</Link>
           </div>
           <div className="flex gap-8 items-center">
             {isLogged ? (

@@ -11,6 +11,7 @@ import Register from "../pages/register";
 import PublicRoute from "../auth/PublicRoute";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import Profile from "./profile";
+import RpgIdle from "../rpgIdle/rpgIdle";
 import { isTokenExpired } from "../auth/token";
 
 type User = {
@@ -54,6 +55,7 @@ export default function App() {
         <div className="w-full rounded-2xl bg-white/5 backdrop-blur-md shadow-2xl border border-cyan-400/20 p-8">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/rpg-idle" element={<RpgIdle />} />
             <Route path="/game" element={<Game />} />
             <Route path="/login" element={<PublicRoute><Login refreshUserData={refreshUserData} /></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
