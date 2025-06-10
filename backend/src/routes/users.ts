@@ -13,7 +13,7 @@ export default async function userRoutes(app: FastifyInstance)
 	app.get('/', async () => 
 	{
 		const users = db.prepare(`
-			SELECT id, login, email, alias, avatar
+			SELECT id, login, alias, avatar
 			FROM users
 		`).all();
 		return users;
@@ -24,7 +24,7 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const { id } = req.params as any;
 		const user = db.prepare(`
-			SELECT id, login, email, alias, avatar
+			SELECT id, login, alias, avatar
 			FROM users WHERE id = ?
 		`).get(id);
 
@@ -38,7 +38,7 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const { login } = req.params as any;
 		const user = db.prepare(`
-			SELECT id, login, email, alias, avatar
+			SELECT id, login, alias, avatar
 			FROM users WHERE login = ?
 		`).get(login);
 	
@@ -77,34 +77,38 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//Met a jour les infos utilisateur
-	app.put('/:id', { preHandler: authMiddleware }, async (req, reply) => {
-	const { id } = req.params as any;
-	const user = (req as any).user;
+	app.put('/:id', { preHandler: authMiddleware }, async (req, reply) =>
+	{
+		const { id } = req.params as any;
+		const user = (req as any).user;
 
-	if (parseInt(id) !== user.id)
-		return reply.status(403).send({ error: "Accès interdit" });
+		if (parseInt(id) !== user.id)
+			return reply.status(403).send({ error: "Accès interdit" });
 
-	const { login, email, alias, avatar } = req.body as any;
+		const { login, email, alias, avatar } = req.body as any;
 
-	/*if (!login || !email)
-		return reply.status(400).send({ error: 'login et email sont requis' });*/
+		/*if (!login || !email)
+			return reply.status(400).send({ error: 'login et email sont requis' });*/
 
-	try {
-		const stmt = db.prepare(`
-			UPDATE users
-			SET login = ?, email = ?, alias = ?, avatar = ?
-			WHERE id = ?
-		`);
-		const result = stmt.run(login, email, alias || null, avatar || null, id);
+		try
+		{
+			const stmt = db.prepare(`
+				UPDATE users
+				SET login = ?, email = ?, alias = ?, avatar = ?
+				WHERE id = ?
+			`);
+			const result = stmt.run(login, email, alias || null, avatar || null, id);
 
-		if (result.changes === 0)
-			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			if (result.changes === 0)
+				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
 
-		return { success: true };
-	} catch (err: any) {
-		console.error('Erreur lors de la mise à jour :', err);
-		return reply.status(500).send({ error: 'Erreur interne', message: err.message });
-	}
+			return { success: true };
+		}
+		catch (err: any)
+		{
+			console.error('Erreur lors de la mise à jour :', err);
+			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+		}
 	});
 
 	//changer le mot de passe utilisateur
@@ -241,7 +245,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 	//supprimer tous les utilisateurs (SuperAdmin)
 	//!!!!!!!!!!   Rajout de la vérification Admin nécessaire   !!!!!!!!!!!!
-	app.delete('/', { preHandler: authMiddleware }, async (req, reply) =>
+	/*app.delete('/', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		try
 		{
@@ -253,7 +257,7 @@ export default async function userRoutes(app: FastifyInstance)
 			console.error('Erreur lors de la suppression des utilisateurs :', err);
 			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
 		}
-	});
+	});*/
 
 	//Permet de savoir id et le login de la personne connecter
 	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>

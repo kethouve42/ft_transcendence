@@ -117,6 +117,12 @@ export default async function matchsRoutes(app: FastifyInstance)
 		//compte des matchs
 		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { total: number };
 
+		//Temps de jeu total
+		const gameTime = db.prepare(`SELECT SUM(duration) as total_time FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { total_time: number | null };
+
+		//Temps de jeu vs IA
+		const iaGameTime = db.prepare(`SELECT SUM(duration) as total_ia_time FROM matchs WHERE user1_id = ? AND user2_id IS null`).get(user_id) as { total_ia_time: number | null };
+
 		//victoires total
 		const totalWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ?`).get(user_id) as { wins: number };
 
@@ -160,21 +166,24 @@ export default async function matchsRoutes(app: FastifyInstance)
 				wins: totalWins.wins,
 				losses: totalLosses,
 				winRate: globalWinRate,
-				averageDuration: Math.round(avgDuration.average_duration ?? 0)
+				averageDuration: Math.round(avgDuration.average_duration ?? 0),
+				totalGameTime: gameTime.total_time ?? 0
 			},
 			vsAI:
 			{
 				matches: aiMatches.total,
 				wins: aiWins.wins,
 				losses: aiLosses,
-				winRate: aiWinsRate
+				winRate: aiWinsRate,
+				totalIaTime: iaGameTime.total_ia_time ?? 0
 			},
 			vsPlayer:
 			{
 				matches: pvpMatches.total,
 				wins: pvpWins.wins,
 				losses: pvpLosses,
-				winRate: pvpWinRate
+				winRate: pvpWinRate,
+				totalMultiTime: (gameTime.total_time ?? 0) - (iaGameTime.total_ia_time ?? 0)
 			}
 		};
 	});
