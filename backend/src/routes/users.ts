@@ -234,15 +234,15 @@ export default async function userRoutes(app: FastifyInstance)
 
 		if (parseInt(id) !== user.id)
 			return reply.status(403).send({ error: "Accès interdit" });
+		
+		const stmt2 = db.prepare('DELETE FROM matchs WHERE user1_id = ? OR user2_id = ?');
+		stmt2.run(id, id);
+
+		const stmt3 = db.prepare('DELETE FROM friends WHERE user_id = ? OR friend_id = ?');
+		stmt3.run(id, id);
 
 		const stmt = db.prepare('DELETE FROM users WHERE id = ?');
 		const result = stmt.run(id);
-
-		const stmt2 = db.prepare('DELETE FROM matchs WHERE user1_id = ? OR user2_id = ?');
-		stmt2.run(id);
-
-		const stmt3 = db.prepare('DELETE FROM friends WHERE user_id = ? OR friend_id = ?');
-		stmt3.run(id);
 
 		if (result.changes === 0)
 			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
