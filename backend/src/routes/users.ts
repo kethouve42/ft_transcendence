@@ -277,8 +277,8 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const user = (req as any).user;
 
-		const data = db.prepare(`SELECT id, login, email, alias, avatar WHERE id = ?`).get(user.id);
-		return { data };
+		const data = db.prepare(`SELECT id, login, email, alias, avatar FROM users WHERE id = ?`).get(user.id);
+		return data;
 	});
 
 	// Activer le 2FA pour l'utilisateur connecté

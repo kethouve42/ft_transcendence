@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from "react";
 import Navbar from "../Navbar";
 import Dashboard from "../pages/dashboard";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import fetchUserId from "../auth/authHelpers";
 import Home from "../pages/home";
 import Game from "../pages/game";
 import Error from "../pages/error";
@@ -12,7 +11,6 @@ import PublicRoute from "../auth/PublicRoute";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import Profile from "./profile";
 import RpgIdle from "../rpgIdle/rpgIdle";
-import { isTokenExpired } from "../auth/token";
 
 type User = {
   id: number;
@@ -29,24 +27,46 @@ export default function App() {
   const refreshUserData = useCallback(async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const userId = await fetchUserId(token);
-    if (!userId) return;
-    const res = await fetch(`/api/users/${userId}`);
+    const res = await fetch('/api/users/profil', {      
+      method: "GET",
+      headers: { 
+        "Authorization": `Bearer ${token}`
+      }
+    })
     const data = await res.json();
     setUserData(data);
   }, []);
 
-  // Rafraîchit au chargement ou quand le token change
   useEffect(() => {
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-    if (!token || isTokenExpired(token)) {
-      localStorage.removeItem("token");
+    if (!token) {
       navigate("/login");
       return;
     }
     refreshUserData();
   }, [refreshUserData]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    const interval = setInterval(() => {
+      fetch('/api/users/ping', {      
+        method: "PUT",
+        headers: { 
+          "Authorization": `Bearer ${token}`
+        }
+      })
+      .then(res => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      });
+    }, 10000);
+
+  return () => clearInterval(interval);
+}, [navigate]);
 
   return (
     <>

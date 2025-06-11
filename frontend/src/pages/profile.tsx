@@ -104,13 +104,6 @@ export default function Profile({ userData }: { userData: User | null }) {
             >
               Ajouter comme ami
             </button>
-
-            <button
-              className="bg-red-600 hover:bg-red-400 text-white px-4 py-2 rounded-lg shadow transition"
-              onClick={handleRemoveFriend}
-            >
-              Retirer des amis
-            </button>
             </>
           )}
         </div>
