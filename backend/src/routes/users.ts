@@ -238,6 +238,12 @@ export default async function userRoutes(app: FastifyInstance)
 		const stmt = db.prepare('DELETE FROM users WHERE id = ?');
 		const result = stmt.run(id);
 
+		const stmt2 = db.prepare('DELETE FROM matchs WHERE user1_id = ? OR user2_id = ?');
+		stmt2.run(id);
+
+		const stmt3 = db.prepare('DELETE FROM friends WHERE user_id = ? OR friend_id = ?');
+		stmt3.run(id);
+
 		if (result.changes === 0)
 			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
 		return { success: true };
@@ -270,7 +276,9 @@ export default async function userRoutes(app: FastifyInstance)
 	app.get('/profil', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const user = (req as any).user;
-		return { id: user.id, login: user.login , alias: user.alias, email: user.email, avatar: user.avatar};
+
+		const data = db.prepare(`SELECT id, login, email, alias, avatar WHERE id = ?`).get(user.id);
+		return { data };
 	});
 
 	// Activer le 2FA pour l'utilisateur connecté
