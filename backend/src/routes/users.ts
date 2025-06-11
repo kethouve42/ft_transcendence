@@ -260,10 +260,17 @@ export default async function userRoutes(app: FastifyInstance)
 	});*/
 
 	//Permet de savoir id et le login de la personne connecter
-	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>  //<= Appeler ceci plutot que get/user pour les infos perso (avec plus d'info)
+	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const user = (req as any).user;
 		return { id: user.id, login: user.login };
+	});
+
+	//Permet de récupérer ses infos
+	app.get('/profil', { preHandler: authMiddleware }, async (req, reply) =>
+	{
+		const user = (req as any).user;
+		return { id: user.id, login: user.login , alias: user.alias, email: user.email, avatar: user.avatar};
 	});
 
 	// Activer le 2FA pour l'utilisateur connecté
@@ -286,7 +293,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	// Ping de l'user (met à jour last_seen)
-	app.put('/ping', { preHandler: [authMiddleware] }, async (req, reply) =>
+	app.put('/ping', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const user = (req as any).user;
 		try

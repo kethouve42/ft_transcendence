@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import db from '../db';
+import { authMiddleware } from '../middlewares/auth';
 
 export default async function matchsRoutes(app: FastifyInstance)
 {
@@ -84,13 +85,16 @@ export default async function matchsRoutes(app: FastifyInstance)
 	});
 
 	//Match d'un joueur
-	app.get('/user/:user_id', async (req, reply) =>
+	app.get('/user/:user_id', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const { user_id } = req.params as any;
+		const user = (req as any).user;
+		if (parseInt(user_id) !== user.id)
+			return reply.status(403).send({ error: "Accès interdit" });
 
-		// Vérifie que l'utilisateur existe
-		const user = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
-		if (!user)
+		//vérifie que l'utilisateur existe
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+		if (!userExists)
 			return reply.status(404).send({ error: "Utilisateur non trouvé" });
 
 		// Récupère tous les matchs où l'utilisateur a participé
@@ -105,13 +109,15 @@ export default async function matchsRoutes(app: FastifyInstance)
 	});
 
 	//Obtenir les stats d'un joueur
-	app.get('/user/:user_id/stats', async (requestAnimationFrame, reply) =>
-	{
-		const { user_id } = requestAnimationFrame.params as any;
+	app.get('/user/:user_id/stats', { preHandler: authMiddleware }, async (req, reply) => {
+		const { user_id } = req.params as any;
+		const user = (req as any).user;
+		if (parseInt(user_id) !== user.id)
+			return reply.status(403).send({ error: "Accès interdit" });
 
 		//vérifie que l'utilisateur existe
-		const user = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
-		if (!user)
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+		if (!userExists)
 			return reply.status(404).send({ error: "Utilisateur non trouvé" });
 		
 		//compte des matchs
