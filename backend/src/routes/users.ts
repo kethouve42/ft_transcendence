@@ -234,6 +234,22 @@ export default async function userRoutes(app: FastifyInstance)
 
 		if (parseInt(id) !== user.id)
 			return reply.status(403).send({ error: "Accès interdit" });
+
+		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(id) as any;
+		if (userData?.avatar)
+		{
+  			try
+			{
+    			fs.unlinkSync(path.resolve(process.cwd(), '.' + userData.avatar));
+  			}
+			catch (e)
+			{
+				if (e instanceof Error)
+					console.warn('Avatar non trouvé ou déjà supprimé:', e.message);
+				else
+					console.warn('Avatar non trouvé ou déjà supprimé:', e);
+  			}
+		}
 		
 		const stmt2 = db.prepare('DELETE FROM matchs WHERE user1_id = ? OR user2_id = ?');
 		stmt2.run(id, id);
@@ -356,6 +372,31 @@ export default async function userRoutes(app: FastifyInstance)
 
 		if (!uploaded)
 			return reply.status(400).send({ error: 'Aucun fichier reçu' });
+	});
+
+	//Exporter ses propre données
+	app.get('/:id/export', { preHandler: authMiddleware }, async (req, reply) =>
+	{
+		const { id } = req.params as any;
+		const user = (req as any).user;
+
+		if (parseInt(id) !== user.id)
+			return reply.status(403).send({ error: "Accès interdit" });
+
+		// Récupère les infos utilisateur
+		const userData = db.prepare('SELECT id, login, email, alias, avatar, last_seen FROM users WHERE id = ?').get(id);
+
+		// Récupère les matchs
+		const matchs = db.prepare('SELECT * FROM matchs WHERE user1_id = ? OR user2_id = ?').all(id, id);
+
+		// Récupère les amis
+		const friends = db.prepare('SELECT * FROM friends WHERE user_id = ? OR friend_id = ?').all(id, id);
+
+		return {
+			user: userData,
+			matchs,
+			friends
+		};
 	});
 
 }
