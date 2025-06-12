@@ -85,7 +85,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	});
 
 	//Match d'un joueur
-	app.get('/user/:user_id', { preHandler: authMiddleware }, async (req, reply) =>
+	app.get('/user/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const { user_id } = req.params as any;
 		const user = (req as any).user;
@@ -109,7 +109,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	});
 
 	//Obtenir les stats d'un joueur
-	app.get('/user/:user_id/stats', { preHandler: authMiddleware }, async (req, reply) => {
+	app.get('/user/me/stats', { preHandler: authMiddleware }, async (req, reply) => {
 		const { user_id } = req.params as any;
 		const user = (req as any).user;
 		if (parseInt(user_id) !== user.id)
