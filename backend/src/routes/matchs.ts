@@ -87,13 +87,12 @@ export default async function matchsRoutes(app: FastifyInstance)
 	//Match d'un joueur
 	app.get('/user/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const { user_id } = req.params as any;
 		const user = (req as any).user;
-		if (parseInt(user_id) !== user.id)
+		if (parseInt(user.id) !== user.id)
 			return reply.status(403).send({ error: "Accès interdit" });
 
 		//vérifie que l'utilisateur existe
-		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id);
 		if (!userExists)
 			return reply.status(404).send({ error: "Utilisateur non trouvé" });
 
@@ -103,34 +102,33 @@ export default async function matchsRoutes(app: FastifyInstance)
 			FROM matchs
 			WHERE user1_id = ? OR user2_id = ?
 			ORDER BY date DESC
-		`).all(user_id, user_id);
+		`).all(user.id, user.id);
 
 		return matchs;
 	});
 
 	//Obtenir les stats d'un joueur
 	app.get('/user/me/stats', { preHandler: authMiddleware }, async (req, reply) => {
-		const { user_id } = req.params as any;
 		const user = (req as any).user;
-		if (parseInt(user_id) !== user.id)
+		if (parseInt(user.id) !== user.id)
 			return reply.status(403).send({ error: "Accès interdit" });
 
 		//vérifie que l'utilisateur existe
-		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id);
 		if (!userExists)
 			return reply.status(404).send({ error: "Utilisateur non trouvé" });
 		
 		//compte des matchs
-		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { total: number };
+		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user.id, user.id) as { total: number };
 
 		//Temps de jeu total
-		const gameTime = db.prepare(`SELECT SUM(duration) as total_time FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { total_time: number | null };
+		const gameTime = db.prepare(`SELECT SUM(duration) as total_time FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user.id, user.id) as { total_time: number | null };
 
 		//Temps de jeu vs IA
-		const iaGameTime = db.prepare(`SELECT SUM(duration) as total_ia_time FROM matchs WHERE user1_id = ? AND user2_id IS null`).get(user_id) as { total_ia_time: number | null };
+		const iaGameTime = db.prepare(`SELECT SUM(duration) as total_ia_time FROM matchs WHERE user1_id = ? AND user2_id IS null`).get(user.id) as { total_ia_time: number | null };
 
 		//victoires total
-		const totalWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ?`).get(user_id) as { wins: number };
+		const totalWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ?`).get(user.id) as { wins: number };
 
 		//défaites total
 		const totalLosses = totalMatches.total - totalWins.wins;
@@ -139,13 +137,13 @@ export default async function matchsRoutes(app: FastifyInstance)
 		const globalWinRate = totalMatches.total > 0 ? Math.round((totalWins.wins / totalMatches.total) * 100) : 0;
 
 		//Durée moyenne des matchs
-		const avgDuration = db.prepare(`SELECT AVG(duration) as average_duration FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user_id, user_id) as { average_duration: number | null };
+		const avgDuration = db.prepare(`SELECT AVG(duration) as average_duration FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user.id, user.id) as { average_duration: number | null };
 
 		//stats contre l'IA (user2_id = null)
-		const aiMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? AND user2_id IS NULL`).get(user_id) as { total: number };
+		const aiMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? AND user2_id IS NULL`).get(user.id) as { total: number };
 
 		//Victoire contre l'IA
-		const aiWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ? AND (user1_id = ? AND user2_id IS NULL)`).get(user_id, user_id) as { wins: number };
+		const aiWins = db.prepare(`SELECT COUNT(*) as wins FROM matchs WHERE winner_id = ? AND (user1_id = ? AND user2_id IS NULL)`).get(user.id, user.id) as { wins: number };
 		
 		//Défaite contre l'IA
 		const aiLosses = aiMatches.total - aiWins.wins;
@@ -154,10 +152,10 @@ export default async function matchsRoutes(app: FastifyInstance)
 		const aiWinsRate = aiMatches.total > 0 ? Math.round((aiWins.wins / aiMatches.total) * 100) : 0;
 
 		//Stats contre un autre joueur
-		const pvpMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE (user1_id = ? OR user2_id = ?) AND user1_id IS NOT NULL AND user2_id IS NOT NULL`).get(user_id, user_id) as { total: number };
+		const pvpMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE (user1_id = ? OR user2_id = ?) AND user1_id IS NOT NULL AND user2_id IS NOT NULL`).get(user.id, user.id) as { total: number };
 
 		//Victoire contre d'autre joueur
-		const pvpWins = db.prepare(`SELECT COUNT (*) as wins FROM matchs WHERE (winner_id = ? AND user1_id IS NOT NULL AND user2_id IS NOT NULL)`).get(user_id) as { wins: number };
+		const pvpWins = db.prepare(`SELECT COUNT (*) as wins FROM matchs WHERE (winner_id = ? AND user1_id IS NOT NULL AND user2_id IS NOT NULL)`).get(user.id) as { wins: number };
 
 		//Défaite en PvP
 		const pvpLosses = pvpMatches.total - pvpWins.wins;
