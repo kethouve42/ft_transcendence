@@ -77,13 +77,9 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//Met a jour les infos utilisateur
-	app.put('/:id', { preHandler: authMiddleware }, async (req, reply) =>
+	app.put('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const { id } = req.params as any;
 		const user = (req as any).user;
-
-		if (parseInt(id) !== user.id)
-			return reply.status(403).send({ error: "Accès interdit" });
 
 		const { login, email, alias, avatar } = req.body as any;
 
@@ -97,7 +93,7 @@ export default async function userRoutes(app: FastifyInstance)
 				SET login = ?, email = ?, alias = ?, avatar = ?
 				WHERE id = ?
 			`);
-			const result = stmt.run(login, email, alias || null, avatar || null, id);
+			const result = stmt.run(login, email, alias || null, avatar || null, user.id);
 
 			if (result.changes === 0)
 				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
@@ -112,13 +108,9 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//changer le mot de passe utilisateur
-	app.patch('/:id/password', { preHandler: authMiddleware }, async (req, reply) =>
+	app.patch('/me/password', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const { id } = req.params as any;
 		const user = (req as any).user;
-
-		if (parseInt(id) !== user.id)
-			return reply.status(403).send({ error: "Accès interdit" });
 
 		const { newPassword } = req.body as any;
 		const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -129,7 +121,7 @@ export default async function userRoutes(app: FastifyInstance)
 		try
 		{
 			const stmt = db.prepare(`UPDATE users SET password = ? WHERE id = ?`);
-			const result = stmt.run(hashedPassword, id);
+			const result = stmt.run(hashedPassword, user.id);
 
 			if (result.changes === 0)
 				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
@@ -227,15 +219,11 @@ export default async function userRoutes(app: FastifyInstance)
 
 
 	// Supprimer un utilisateur
-	app.delete('/:id', { preHandler: authMiddleware }, async (req, reply) =>
+	app.delete('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const { id } = req.params as any;
 		const user = (req as any).user;
 
-		if (parseInt(id) !== user.id)
-			return reply.status(403).send({ error: "Accès interdit" });
-
-		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(id) as any;
+		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as any;
 		if (userData?.avatar)
 		{
   			try
@@ -252,13 +240,13 @@ export default async function userRoutes(app: FastifyInstance)
 		}
 		
 		const stmt2 = db.prepare('DELETE FROM matchs WHERE user1_id = ? OR user2_id = ?');
-		stmt2.run(id, id);
+		stmt2.run(user.id, user.id);
 
 		const stmt3 = db.prepare('DELETE FROM friends WHERE user_id = ? OR friend_id = ?');
-		stmt3.run(id, id);
+		stmt3.run(user.id, user.id);
 
 		const stmt = db.prepare('DELETE FROM users WHERE id = ?');
-		const result = stmt.run(id);
+		const result = stmt.run(user.id);
 
 		if (result.changes === 0)
 			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
@@ -375,22 +363,18 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//Exporter ses propre données
-	app.get('/:id/export', { preHandler: authMiddleware }, async (req, reply) =>
+	app.get('/me/export', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const { id } = req.params as any;
 		const user = (req as any).user;
 
-		if (parseInt(id) !== user.id)
-			return reply.status(403).send({ error: "Accès interdit" });
-
 		// Récupère les infos utilisateur
-		const userData = db.prepare('SELECT id, login, email, alias, avatar, last_seen FROM users WHERE id = ?').get(id);
+		const userData = db.prepare('SELECT id, login, email, alias, avatar, last_seen FROM users WHERE id = ?').get(user.id);
 
 		// Récupère les matchs
-		const matchs = db.prepare('SELECT * FROM matchs WHERE user1_id = ? OR user2_id = ?').all(id, id);
+		const matchs = db.prepare('SELECT * FROM matchs WHERE user1_id = ? OR user2_id = ?').all(user.id, user.id);
 
 		// Récupère les amis
-		const friends = db.prepare('SELECT * FROM friends WHERE user_id = ? OR friend_id = ?').all(id, id);
+		const friends = db.prepare('SELECT * FROM friends WHERE user_id = ? OR friend_id = ?').all(user.id, user.id);
 
 		return {
 			user: userData,
