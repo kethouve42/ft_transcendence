@@ -203,3 +203,7 @@
 .rules-list span.speed-down {
   background-color: orange;
 }
+
+.hidden {
+  display: none !important;
+}

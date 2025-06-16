@@ -1,11 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <title>Pong Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
-<body>
-  <div id="root"></div>
-  <script src="src/main.tsx" type="module"></script>
+<body class="bg-gray-900 text-white">
+
+  <div class="app-container text-center">
+    <h1 class="title">Pong game</h1>
+
+    <!-- MENU PRINCIPAL -->
+    <div id="menu" class="menu">
+      <button id="btn-local" class="menu-btn">Local</button>
+      <button id="btn-ai" class="menu-btn">AI</button>
+      <button id="btn-rules" class="menu-btn">Rules</button>
+      <button id="btn-settings" class="menu-btn">Settings</button>
+    </div>
+
+    <!-- PANEL SETTINGS -->
+    <div id="panel-settings" class="settings-panel hidden">
+      <h1>Settings</h1>
+      <div class="settings-grid">
+        <div class="settings-ball">
+          <label class="settings-label">
+            Vitesse de la balle: <span id="display-ball-speed">10</span>
+          </label>
+          <input
+            type="range"
+            id="input-ball-speed"
+            min="1" max="20"
+            class="w-full"
+          />
+        </div>
+        <div class="settings-timer">
+          <label class="settings-label"></label>
+          Le temps en seconde du match: <span id="display-timer-mod">60</span>
+          <input
+            type="number"
+            id="input-timer-mod"
+            min="10" max="300"
+            class="ml-2 w-20 p-1 bg-gray-800 rounded"
+          />
+        </div>
+        <div class="settings-score">
+          <label class="settings-label"></label>
+          Le nombre de points pour finir: <span id="display-score-mod">10</span>
+          <input
+            type="number"
+            id="input-score-mod"
+            min="1"
+            class="ml-2 w-20 p-1 bg-gray-800 rounded"
+          />
+        </div>
+      </div>
+      <div class="settings-actions">
+        <button id="btn-save-settings" class="menu-btn save-btn">Save</button>
+        <button id="btn-close-settings" class="menu-btn save-btn">Close</button>
+      </div>
+    </div>
+
+    <!-- PANEL AI -->
+    <div id="panel-ai" class="settings-panel hidden">
+      <div class="settings-grid">
+        <label class="settings-label">Difficulté de l'AI</label>
+        <select id="select-ai-difficulty" class="menu-btn save-btn">
+          <option value="easy">Facile</option>
+          <option value="medium">Moyenne</option>
+          <option value="hard">Difficile</option>
+        </select>
+      </div>
+      <div class="settings-actions">
+        <button id="btn-start-ai" class="menu-btn save-btn">Start</button>
+        <button id="btn-close-ai" class="menu-btn save-btn">Close</button>
+      </div>
+    </div>
+
+    <!-- PANEL CONFIGURATION TOUCHES -->
+    <div id="panel-keyconfig" class="settings-panel hidden">
+      <h1>Configuration des touches - Mode Local</h1>
+      <p>Cliquez sur un bouton, puis appuyez sur la touche de votre choix.</p>
+      <div class="settings-grid">
+        <div>
+          <label>Joueur 1 : Monter</label>
+          <button id="btn-bind-p1-up" class="menu-btn save-btn">
+            <span id="bind-p1-up-display">W</span>
+          </button>
+        </div>
+        <div>
+          <label>Joueur 1 : Descendre</label>
+          <button id="btn-bind-p1-down" class="menu-btn save-btn">
+            <span id="bind-p1-down-display">S</span>
+          </button>
+        </div>
+        <div>
+          <label>Joueur 2 : Monter</label>
+          <button id="btn-bind-p2-up" class="menu-btn save-btn">
+            <span id="bind-p2-up-display">ArrowUp</span>
+          </button>
+        </div>
+        <div>
+          <label>Joueur 2 : Descendre</label>
+          <button id="btn-bind-p2-down" class="menu-btn save-btn">
+            <span id="bind-p2-down-display">ArrowDown</span>
+          </button>
+        </div>
+      </div>
+      <div class="settings-actions">
+        <button id="btn-start-local" class="menu-btn">Start</button>
+        <button id="btn-cancel-keyconfig" class="menu-btn">Cancel</button>
+      </div>
+    </div>
+
+    <!-- PANEL RULES -->
+    <div id="panel-rules" class="rules-panel hidden">
+      <h2>Règles du jeu</h2>
+      <ul class="rules-list">
+        <li>
+          <strong>Power-ups</strong> apparaissent aléatoirement toutes les
+          <em>5 à 10 secondes</em> :
+          <ul>
+            <li>
+              <span class="speed-up"></span>
+              → La balle passe à <strong>+25 %</strong> de vitesse pendant
+              <strong>5 s</strong>.
+            </li>
+            <li>
+              <span class="speed-down"></span>
+              → La balle passe à <strong>75 %</strong> de sa vitesse normale
+              pendant <strong>5 s</strong>.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Apparition</strong> :
+          un nouveau power-up spawn <em>5–10 s</em> (intervalle aléatoire)
+          après le précédent.
+        </li>
+        <li>
+          <strong>Collecte</strong> :
+          la balle ramasse le carré au contact, déclenche l’effet, puis le
+          power-up disparaît.
+        </li>
+        <li>
+          <strong>Durée de l’effet</strong> :
+          exactement <strong>5 secondes</strong>, puis la balle retrouve sa
+          vitesse initiale.
+        </li>
+      </ul>
+    </div>
+
+    <!-- CANVAS DU JEU -->
+    <canvas
+      id="pong"
+      class="pong-canvas hidden"
+      width="800"
+      height="500"
+    ></canvas>
+  </div>
+
+  <script type="module" src="/src/game.ts"></script>
 </body>
 </html>
