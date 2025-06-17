@@ -6,6 +6,7 @@ import userRoutes from './routes/users';
 import matchsRoutes from './routes/matchs';
 import friendsRoutes from './routes/friends';
 import fastifyMultipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static'
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.get('/ping', async (req, reply) => {
   return { pong: 'it works!' };
 });
 
+app.register(fastifyStatic,{root: path.join(process.cwd(), 'uploads'), prefix: '/uploads/',});
 app.register(fastifyMultipart);
 app.register(userRoutes, { prefix: '/api/users' });
 app.register(matchsRoutes, { prefix: '/api/matchs' });
