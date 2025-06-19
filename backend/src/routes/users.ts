@@ -170,6 +170,7 @@ export default async function userRoutes(app: FastifyInstance)
 				return reply.send({
 					success: true,
 					step: '2fa_required',
+					identifier,
 					message: 'Un code 2FA a été envoyé à votre adresse e-mail. ',
 					stayConnected: stayConnected ?? false,
 				});
@@ -273,7 +274,8 @@ export default async function userRoutes(app: FastifyInstance)
 	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const user = (req as any).user;
-		return { id: user.id, login: user.login };
+		const data = db.prepare(`SELECT id, login, tfa_enabled FROM users WHERE id = ?`).get(user.id);
+		return data;
 	});
 
 	//Permet de récupérer ses infos
@@ -281,7 +283,7 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const user = (req as any).user;
 
-		const data = db.prepare(`SELECT id, login, email, alias, avatar FROM users WHERE id = ?`).get(user.id);
+		const data = db.prepare(`SELECT id, login, email, alias, avatar, tfa_enabled FROM users WHERE id = ?`).get(user.id);
 		return data;
 	});
 

@@ -1,8 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: initial;
+}
+
+.max-h-\[600px\]::-webkit-scrollbar {
+  width: 8px;
+  background: #232526;
+}
+.max-h-\[600px\]::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+  border-radius: 8px;
 }
 
 .card, .panel, .dashboard-panel {

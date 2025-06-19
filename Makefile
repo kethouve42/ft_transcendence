@@ -11,9 +11,8 @@ down:
 	docker-compose down
 
 restart:
-	docker-compose down
-	docker-compose up -d
-	@echo "Containers are restarted"
+	docker-compose restart frontend
+	@echo "frontend are restarted"
 re: down up
 
 logs:

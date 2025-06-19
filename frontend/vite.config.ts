@@ -1,12 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// filepath: c:\Users\thiba\Documents\project\ft_transcendence\frontend\vite.config.ts
+import { defineConfig } from "vite";
 
-// https://vite.dev/config/
 export default defineConfig({
-    plugins: [react()],
-    server: {
+  server: {
     proxy: {
-      '/api': 'http://backend:3000',
+      '/api': 'http://localhost:3000', // adapte si besoin
     },
   },
-})
+});
