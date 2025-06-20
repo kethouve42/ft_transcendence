@@ -94,6 +94,7 @@ export function attachLoginEvents() {
         body: JSON.stringify({ identifier: login, password }),
       });
       const data = await res.json();
+	  console.log("Infos utilisateur récupérées :", data);
       if (data.step === "2fa_required") {
         if (field2fa) field2fa.style.display = "";
         identifierFor2FA = data.identifier;

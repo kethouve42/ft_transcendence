@@ -149,7 +149,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 		try
 		{
-			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean };
+			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; avatar: string };
 
 
 			const validPassword = await bcrypt.compare(password, user.password);
@@ -178,7 +178,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 			const token = stayConnected ? signToken(user, '30d') : signToken(user); // par défaut 2h
 
-			return { success: true, token, UserId: user.id, email: user.email, login: user.login };
+			return { success: true, token, UserId: user.id, email: user.email, login: user.login, avatar: user.avatar };
 		}
 		catch (err: any)
 		{
@@ -199,7 +199,7 @@ export default async function userRoutes(app: FastifyInstance)
 		if (!identifier || !code)
 			return reply.status(400).send({ error: 'Champs requis manquants' });
 
-		const user = db.prepare(`SELECT id, login, email, tfa_code, tfa_expires FROM users WHERE email = ? OR login = ?`).get(identifier, identifier)as { id: number; login: string; email: string; tfa_code: string; tfa_expires: number };
+		const user = db.prepare(`SELECT * FROM users WHERE email = ? OR login = ?`).get(identifier, identifier)as { id: number; login: string; email: string; tfa_code: string; tfa_expires: number; avatar: string };
 
 		if (!user)
 			return reply.status(401).send({ error: 'Utilisateur inconnu' });
@@ -215,7 +215,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 		const token = stayConnected ? signToken(user, '30d') : signToken(user); // par défaut 2h
 
-		return { success: true,	token, UserId: user.id,	email: user.email, login: user.login };
+		return { success: true,	token, UserId: user.id,	email: user.email, login: user.login, avatar: user.avatar };
 	});
 
 
@@ -306,6 +306,25 @@ export default async function userRoutes(app: FastifyInstance)
 		}
 	});
 
+	// Désactiver le 2FA pour l'utilisateur connecté
+    app.post('/disable-2fa', { preHandler: authMiddleware }, async (req, reply) =>
+    {
+        const user = (req as any).user;
+
+        try {
+            const result = db.prepare(`UPDATE users SET tfa_enabled = 0, tfa_code = NULL, tfa_expires = NULL WHERE id = ?`).run(user.id);
+
+            if (result.changes === 0)
+                return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+
+            return { success: true, message: '2FA désactivé avec succès' };
+        }
+        catch (err: any) {
+            console.error('Erreur lors de la désactivation du 2FA :', err);
+            return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+        }
+    });
+
 	// Ping de l'user (met à jour last_seen)
 	app.put('/ping', { preHandler: authMiddleware }, async (req, reply) =>
 	{
@@ -353,10 +372,10 @@ export default async function userRoutes(app: FastifyInstance)
 				});
 
 				// Sauvegarde le chemin relatif ou URL dans la DB
-				db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(`/uploads/avatars/${fileName}`, user.id);
+				db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(`http://localhost:3000/uploads/avatars/${fileName}`, user.id);
 
 				uploaded = true;
-				return reply.send({ success: true, url: `/uploads/avatars/${fileName}` });
+				return reply.send({ success: true, url: `http://localhost:3000/uploads/avatars/${fileName}` });
 			}
 		}
 
