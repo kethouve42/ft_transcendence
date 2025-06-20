@@ -35,7 +35,7 @@ export function attachDashboardViewEvents() {
       const info = document.getElementById("profile-info");
       if (info) {
         info.innerHTML = `
-          <img src="${user.avatar || "../uploads/avatars/default-avatar.png"}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />
+          <img src="${user.avatar || "http://localhost:3000/uploads/avatars/default-avatar.png"}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />
           <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-2">${user.login}</h2>
           <div class="flex gap-6 text-cyan-100 text-lg">
             <span><b>Alias :</b> ${user.alias || '<span class="italic text-cyan-400">Aucun</span>'}</span>

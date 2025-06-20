@@ -27,11 +27,11 @@ export function navbarView(): string {
             ? `
               <a href="/dashboard" class="flex items-center gap-2 font-semibold text-cyan-200 hover:text-cyan-400 transition">
                 <span class="inline-block w-9 h-9 rounded-full bg-cyan-900 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg overflow-hidden">
-                  ${
-                    userAvatar
-                      ? `<img src="${userAvatar || '../uploads/avatars/default-avatar.png'}" alt="avatar" class="w-10 h-10 rounded-full border border-cyan-400" />`
-                      : `<span class="flex items-center justify-center h-full text-cyan-300 font-bold text-xl">${userLogin?.[0]?.toUpperCase() || "?"}</span>`
-                  }
+                <img
+                  src="${userAvatar || 'http://localhost:3000/uploads/avatars/default-avatar.png'}"
+                  alt="avatar"
+                  class="w-9 h-9 rounded-full border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg object-cover bg-cyan-900"
+                />
                 </span>
                 <span class="uppercase tracking-wider">${userAlias || userLogin || "Profil"}</span>
               </a>

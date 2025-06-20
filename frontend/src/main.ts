@@ -3,8 +3,6 @@ import { loginView, attachLoginEvents } from "./views/login";
 import { dashboardMainView, attachDashboardMainEvents } from "./views/dashboard";
 import { registerView, attachRegisterEvents } from "./views/register";
 import { homeView, attachHomeEvents } from "./views/home";
-import { dashboardView, attachDashboardViewEvents } from "./views/dashboard_view";
-import { dashboardEditView, attachDashboardEditEvents } from "./views/dashboard_edit";
 import { profileView, attachProfileEvents } from "./views/profile";
 import { navbarView, attachNavbarEvents } from "./views/navbar";
 import { renderError, attachErrorEvents } from "./views/error";
@@ -16,12 +14,8 @@ const routes: Record<string, RouteHandler> = {
   "/": homeView,
   "/login": loginView,
   "/dashboard": dashboardMainView,
-  "/dashboard/view": dashboardView,
-  "/dashboard/edit": dashboardEditView,
   "/register": registerView,
   "/error": renderError,
-  // Route dynamique pour le profil utilisateur (ex: /profile/123)
-  // On gère ça dans render()
 };
 
 function pingUser() {
@@ -49,9 +43,24 @@ function render(route: string) {
   const app = document.getElementById("app");
   if (!app) return;
 
-  // Affiche la navbar sur toutes les pages
+    const protectedRoutes = [
+    "/dashboard",
+  ];
+  const token = localStorage.getItem("token");
+  if (protectedRoutes.includes(route) && !token) {
+    navigateTo("/login");
+    return;
+  }
+
+  const protectedRoutes_lr = [
+    "/login",
+    "/register",
+  ];
+  if (protectedRoutes_lr.includes(route) && token) {
+    navigateTo("/dashboard");
+    return;
+  }
   app.innerHTML = navbarView();
-  // Gestion des routes dynamiques (profil utilisateur)
   if (route.startsWith("/profile/")) {
     const userId = route.split("/")[2];
     app.innerHTML += profileView(userId);
@@ -61,7 +70,6 @@ function render(route: string) {
     return;
   }
 
-  // Route classique
   const handler = routes[route] || (() => {navigateTo("/error"); return "";});
   Promise.resolve(handler()).then(html => {
     app.innerHTML += html;
@@ -75,8 +83,6 @@ function attachEvents(route: string) {
   if (route === "/") attachHomeEvents();
   if (route === "/login") attachLoginEvents();
   if (route === "/dashboard") attachDashboardMainEvents();
-  if (route === "/dashboard/view") attachDashboardViewEvents();
-  if (route === "/dashboard/edit") attachDashboardEditEvents();
   if (route === "/register") attachRegisterEvents();
   if (route === "/error") attachErrorEvents();
 }

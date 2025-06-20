@@ -76,6 +76,7 @@ export function attachLoginEvents() {
         localStorage.setItem("userLogin", data.login || "");
         localStorage.setItem("userAlias", data.alias || "");
         localStorage.setItem("userAvatar", data.avatar || "");
+        localStorage.removeItem("2fa_identifier");
         navigateTo("/dashboard");
       } catch (err: any) {
         msg!.textContent = "Erreur lors de la connexion 2FA : " + err.message;
@@ -111,6 +112,7 @@ export function attachLoginEvents() {
       localStorage.setItem("userLogin", data.login || "");
       localStorage.setItem("userAlias", data.alias || "");
       localStorage.setItem("userAvatar", data.avatar || "");
+      localStorage.removeItem("2fa_identifier");
       navigateTo("/dashboard");
     } catch (err: any) {
       msg!.textContent = "Erreur lors de la connexion : " + err.message;
