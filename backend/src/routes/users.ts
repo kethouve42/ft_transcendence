@@ -6,6 +6,22 @@ import { authMiddleware } from '../middlewares/auth';
 import { generate2FACode } from '../utils/2fa';
 import path from 'path';
 import fs from 'fs';
+import { FastifyRequest } from "fastify";
+
+interface AuthUser
+{
+	id: number;
+	login: string;
+	alias: string;
+	avatar: string;
+	last_seen: number;
+	email: string;
+	tfa_enable: boolean;
+	tfa_expires: number;
+	tfa_code: string
+}
+
+type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
 export default async function userRoutes(app: FastifyInstance)
 {
@@ -22,7 +38,7 @@ export default async function userRoutes(app: FastifyInstance)
 	// Récupérer un utilisateur par ID
 	app.get('/:id', async (req, reply) =>
 	{
-		const { id } = req.params as any;
+		const { id } = req.params as { id: number };
 		const user = db.prepare(`
 			SELECT id, login, alias, avatar, last_seen
 			FROM users WHERE id = ?
@@ -36,7 +52,7 @@ export default async function userRoutes(app: FastifyInstance)
 	// Récupérer un utilisateur par login
 	app.get('/by-login/:login', async (req, reply) =>
 	{
-		const { login } = req.params as any;
+		const { login } = req.params as { login: string };
 		const user = db.prepare(`
 			SELECT id, login, alias, avatar, last_seen
 			FROM users WHERE login = ?
@@ -50,7 +66,7 @@ export default async function userRoutes(app: FastifyInstance)
 	// Ajouter un utilisateur
 	app.post('/', async (req, reply) =>
 	{
-		const { login, email, password, alias, avatar } = req.body as any;
+		const { login, email, password, alias, avatar } = req.body as { login: string, email: string, password: string, alias: string, avatar: string};
 
 		// Champs obligatoires
 		if (!login || !email || !password)
@@ -79,9 +95,9 @@ export default async function userRoutes(app: FastifyInstance)
 	//Met a jour les infos utilisateur
 	app.put('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 
-		const { login, email, alias, avatar } = req.body as any;
+		const { login, email, alias, avatar } = req.body as { login: string, email: string, alias: string, avatar: string};
 
 		/*if (!login || !email)
 			return reply.status(400).send({ error: 'login et email sont requis' });*/
@@ -110,9 +126,9 @@ export default async function userRoutes(app: FastifyInstance)
 	//changer le mot de passe utilisateur
 	app.patch('/me/password', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 
-		const { newPassword } = req.body as any;
+		const { newPassword } = req.body as { newPassword: string };
 		const hashedPassword = await bcrypt.hash(newPassword, 10);
 
 		if (!newPassword)
@@ -222,9 +238,9 @@ export default async function userRoutes(app: FastifyInstance)
 	// Supprimer un utilisateur
 	app.delete('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 
-		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as any;
+		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as { avatar: string };
 		if (userData?.avatar)
 		{
   			try
@@ -273,7 +289,7 @@ export default async function userRoutes(app: FastifyInstance)
 	//Permet de savoir id et le login de la personne connecter
 	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 		const data = db.prepare(`SELECT id, login, tfa_enabled FROM users WHERE id = ?`).get(user.id);
 		return data;
 	});
@@ -281,7 +297,7 @@ export default async function userRoutes(app: FastifyInstance)
 	//Permet de récupérer ses infos
 	app.get('/profil', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 
 		const data = db.prepare(`SELECT id, login, email, alias, avatar, tfa_enabled FROM users WHERE id = ?`).get(user.id);
 		return data;
@@ -290,7 +306,7 @@ export default async function userRoutes(app: FastifyInstance)
 	// Activer le 2FA pour l'utilisateur connecté
 	app.post('/enable-2fa', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 
 		try {
 			const result = db.prepare(`UPDATE users SET tfa_enabled = 1 WHERE id = ?`).run(user.id);
@@ -309,7 +325,7 @@ export default async function userRoutes(app: FastifyInstance)
 	// Désactiver le 2FA pour l'utilisateur connecté
     app.post('/disable-2fa', { preHandler: authMiddleware }, async (req, reply) =>
     {
-        const user = (req as any).user;
+        const user = (req as AuthenticatedRequest).user;
 
         try {
             const result = db.prepare(`UPDATE users SET tfa_enabled = 0, tfa_code = NULL, tfa_expires = NULL WHERE id = ?`).run(user.id);
@@ -328,7 +344,7 @@ export default async function userRoutes(app: FastifyInstance)
 	// Ping de l'user (met à jour last_seen)
 	app.put('/ping', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 		try
 		{
 			const result = db.prepare(`UPDATE users SET last_seen = ? WHERE id = ?`).run(Date.now(), user.id);
@@ -346,7 +362,7 @@ export default async function userRoutes(app: FastifyInstance)
 	//Upload d'avatar
 	app.post('/upload-avatar', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 		const parts = req.parts();
 
 		let uploaded = false;
@@ -386,7 +402,7 @@ export default async function userRoutes(app: FastifyInstance)
 	//Exporter ses propre données
 	app.get('/me/export', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 
 		// Récupère les infos utilisateur
 		const userData = db.prepare('SELECT id, login, email, alias, avatar, last_seen FROM users WHERE id = ?').get(user.id);

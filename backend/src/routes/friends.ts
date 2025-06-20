@@ -1,14 +1,30 @@
 import { FastifyInstance } from "fastify";
 import db from '../db';
 import { authMiddleware } from '../middlewares/auth';
+import { FastifyRequest } from "fastify";
+
+interface AuthUser
+{
+	id: number;
+	login: string;
+	alias: string;
+	avatar: string;
+	last_seen: number;
+	email: string;
+	tfa_enable: boolean;
+	tfa_expires: number;
+	tfa_code: string
+}
+
+type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
 export default async function friendsRoutes(app: FastifyInstance)
 {
 	// Rajout d'un ami
 	app.post('/', { preHandler: authMiddleware }, async (req, reply) => 
 	{
-		const user = (req as any).user;
-		const { friend_id } = req.body as any;
+		const user = (req as AuthenticatedRequest).user;
+		const { friend_id } = req.body as { friend_id: number};
 		const user_id = user.id; // On prend l'id du token
 
 		if (!friend_id)
@@ -41,8 +57,8 @@ export default async function friendsRoutes(app: FastifyInstance)
 	// Suppression d'un ami
 	app.delete('/', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
-		const { friend_id } = req.body as any;
+		const user = (req as AuthenticatedRequest).user;
+		const { friend_id } = req.body as { friend_id: number };
 		const user_id = user.id;
 
 		if (!friend_id)
@@ -75,7 +91,7 @@ export default async function friendsRoutes(app: FastifyInstance)
 	// Affiche les amis d’un utilisateur
 	app.get('/me/friends', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
+		const user = (req as AuthenticatedRequest).user;
 		const id = user.id;
 
 		const friends = db.prepare(`

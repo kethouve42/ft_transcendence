@@ -1,6 +1,22 @@
 import { FastifyInstance } from "fastify";
 import db from '../db';
 import { authMiddleware } from '../middlewares/auth';
+import { FastifyRequest } from "fastify";
+
+interface AuthUser
+{
+	id: number;
+	login: string;
+	alias: string;
+	avatar: string;
+	last_seen: number;
+	email: string;
+	tfa_enable: boolean;
+	tfa_expires: number;
+	tfa_code: string
+}
+
+type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
 export default async function matchsRoutes(app: FastifyInstance)
 {
@@ -15,7 +31,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	//Rajout d'un match
 	app.post('/', async (req, reply) => 
 	{
-		const { date, duration, user1_id, user2_id, winner_id, score } = req.body as any;
+		const { date, duration, user1_id, user2_id, winner_id, score } = req.body as { date: string, duration: number, user1_id: number, user2_id: number, winner_id: number, score: string };
 
 		if (!date || !duration || !user1_id || !score)
 			return reply.status(400).send({ error: "Données du match incomplétes" });
@@ -66,7 +82,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	//Trouver un match par id
 	app.get('/:id', async (req, reply) =>
 	{
-		const { id } = req.params as any;
+		const { id } = req.params as { id: number };
 		const match = db.prepare(`SELECT * FROM matchs WHERE id = ?`).get(id);
 
 		if (!match)
@@ -77,7 +93,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	//Suppression d'un match par son id
 	app.delete('/:id', async (req, reply) =>
 	{
-		const { id } = req.params as any;
+		const { id } = req.params as { id: number };
 		const result = db.prepare(`DELETE FROM matchs WHERE id = ?`).run(id);
 		if (result.changes === 0)
 			return reply.status(404).send({ error: "Match introuvable" });
@@ -87,9 +103,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	//Match d'un joueur
 	app.get('/user/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
-		const user = (req as any).user;
-		if (parseInt(user.id) !== user.id)
-			return reply.status(403).send({ error: "Accès interdit" });
+		const user = (req as AuthenticatedRequest).user;
 
 		//vérifie que l'utilisateur existe
 		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id);
@@ -109,9 +123,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 
 	//Obtenir les stats d'un joueur
 	app.get('/user/me/stats', { preHandler: authMiddleware }, async (req, reply) => {
-		const user = (req as any).user;
-		if (parseInt(user.id) !== user.id)
-			return reply.status(403).send({ error: "Accès interdit" });
+		const user = (req as AuthenticatedRequest).user;
 
 		//vérifie que l'utilisateur existe
 		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id);
