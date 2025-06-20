@@ -149,7 +149,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 		try
 		{
-			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; avatar: string };
+			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; alias: string; avatar: string };
 
 
 			const validPassword = await bcrypt.compare(password, user.password);
@@ -178,7 +178,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 			const token = stayConnected ? signToken(user, '30d') : signToken(user); // par défaut 2h
 
-			return { success: true, token, UserId: user.id, email: user.email, login: user.login, avatar: user.avatar };
+			return { success: true, token, UserId: user.id, email: user.email, login: user.login, alias: user.alias, avatar: user.avatar };
 		}
 		catch (err: any)
 		{
@@ -199,7 +199,7 @@ export default async function userRoutes(app: FastifyInstance)
 		if (!identifier || !code)
 			return reply.status(400).send({ error: 'Champs requis manquants' });
 
-		const user = db.prepare(`SELECT * FROM users WHERE email = ? OR login = ?`).get(identifier, identifier)as { id: number; login: string; email: string; tfa_code: string; tfa_expires: number; avatar: string };
+		const user = db.prepare(`SELECT * FROM users WHERE email = ? OR login = ?`).get(identifier, identifier)as { id: number; login: string; email: string; tfa_code: string; tfa_expires: number; alias: string; avatar: string };
 
 		if (!user)
 			return reply.status(401).send({ error: 'Utilisateur inconnu' });
@@ -215,7 +215,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 		const token = stayConnected ? signToken(user, '30d') : signToken(user); // par défaut 2h
 
-		return { success: true,	token, UserId: user.id,	email: user.email, login: user.login, avatar: user.avatar };
+		return { success: true,	token, UserId: user.id,	email: user.email, login: user.login, alias: user.alias, avatar: user.avatar };
 	});
 
 
