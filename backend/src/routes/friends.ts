@@ -11,6 +11,7 @@ interface AuthUser
 	avatar: string;
 	last_seen: number;
 	email: string;
+	clicker_score: bigint;
 	tfa_enable: boolean;
 	tfa_expires: number;
 	tfa_code: string

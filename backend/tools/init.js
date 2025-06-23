@@ -24,6 +24,7 @@ db.serialize(() => {
       alias TEXT,
       avatar TEXT,
       email TEXT UNIQUE NOT NULL,
+      clicker_score BIGINT DEFAULT 0,
       tfa_enabled BOOLEAN DEFAULT 0,
       tfa_code TEXT,
       tfa_expires INTEGER,
