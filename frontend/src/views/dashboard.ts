@@ -1,13 +1,14 @@
 import { dashboardView, attachDashboardViewEvents } from "./dashboard_view";
 import { dashboardEditView, attachDashboardEditEvents } from "./dashboard_edit";
 import { dashboardFriendsView, attachDashboardFriendsEvents } from "./dashboard_friends";
-import {attachLinkHandlers} from "../main"
+import { attachLinkHandlers } from "../main";
+import { t } from "../i18n";
 
 // Liste des sections disponibles
 const sections = [
-  { key: "view", label: "Voir" },
-  { key: "edit", label: "Éditer" },
-  { key: "friends", label: "Friends" },
+  { key: "view", label: t("dashboard.view") },
+  { key: "edit", label: t("dashboard.edit") },
+  { key: "friends", label: t("dashboard.friends") },
 ];
 
 // Vue principale du dashboard avec navigation simple (sans React)

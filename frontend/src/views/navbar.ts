@@ -1,4 +1,5 @@
 import { navigateTo } from "../main";
+import { t, getLang, setLang, LANG_NAMES } from "../i18n";
 export function navbarView(): string {
   const isLogged = !!localStorage.getItem("token");
   const userLogin = localStorage.getItem("userLogin");
@@ -17,11 +18,16 @@ export function navbarView(): string {
   return `
     <nav class="w-full px-6 md:px-32 py-4 bg-cyan-950/80 flex items-center justify-between shadow-lg z-50">
       <div class="flex items-center gap-10">
-        <a href="/" class="${linkClass("/", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">Accueil</a>
-        <a href="/game" class="${linkClass("/game", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">Jeu</a>
-        <a href="/rpg-idle" class="${linkClass("/rpg-idle", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">RPG Idle</a>
-      </div>
+        <a href="/" class="${linkClass("/", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.home")}</a>
+        <a href="/game" class="${linkClass("/game", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.game")}</a>
+        <a href="/clicker" class="${linkClass("/clicker", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.clicker")}</a>      </div>
       <div class="flex items-center gap-6">
+        <!-- Ajoute le sélecteur de langue -->
+        <select id="lang-switcher" class="bg-cyan-900 border border-cyan-400 text-cyan-200 rounded px-2 py-1">
+          ${Object.entries(LANG_NAMES).map(([k, v]) =>
+            `<option value="${k}" ${getLang() === k ? "selected" : ""}>${v}</option>`
+          ).join("")}
+        </select>
         ${
           isLogged
             ? `
@@ -36,12 +42,12 @@ export function navbarView(): string {
                 <span class="uppercase tracking-wider">${userAlias || userLogin || "Profil"}</span>
               </a>
               <button id="logout-btn" class="bg-cyan-700/80 text-white border border-cyan-400 px-5 py-2 rounded-full font-semibold shadow-cyan-400/30 shadow-md hover:bg-cyan-500/80 hover:text-black transition">
-                Déconnexion
+                ${t("nav.logout")}
               </button>
             `
             : `
-              <a href="/login" class="${linkClass("/login", "text-lg font-semibold text-cyan-200 hover:text-cyan-400 transition")}">Connexion</a>
-              <a href="/register" class="${linkClass("/register", "text-lg font-semibold text-cyan-200 hover:text-cyan-400 transition")}">Inscription</a>
+              <a href="/login" class="${linkClass("/login", "text-lg font-semibold text-cyan-200 hover:text-cyan-400 transition")}">${t("nav.login")}</a>
+              <a href="/register" class="${linkClass("/register", "text-lg font-semibold text-cyan-200 hover:text-cyan-400 transition")}">${t("nav.register")}</a>
             `
         }
       </div>
@@ -60,5 +66,9 @@ export function attachNavbarEvents() {
       localStorage.removeItem("userId");
       navigateTo("/login");
     });
+  }
+  const langSel = document.getElementById("lang-switcher") as HTMLSelectElement | null;
+  if (langSel) {
+    langSel.onchange = () => setLang(langSel.value as any);
   }
 }

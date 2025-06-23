@@ -1,21 +1,22 @@
 import { navigateTo } from "../main";
+import { t } from "../i18n";
 
 export function loginView(): string {
   return `
     <div class="max-w-md mx-auto mt-12 bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 backdrop-blur-md">
-      <h2 class="text-2xl font-bold mb-6 text-cyan-300 tracking-widest uppercase">Connexion</h2>
+      <h2 class="text-2xl font-bold mb-6 text-cyan-300 tracking-widest uppercase">${t("login.title")}</h2>
       <form id="login-form" class="flex flex-col gap-6">
         <input
           type="text"
           name="login"
-          placeholder="Login/Email"
+          placeholder="${t("login.username")}"
           required
           class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
         />
         <input
           type="password"
           name="password"
-          placeholder="Mot de passe"
+          placeholder="${t("login.password")}"
           required
           class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
         />
@@ -23,7 +24,7 @@ export function loginView(): string {
           <input
             type="text"
             name="code2fa"
-            placeholder="Code 2FA"
+            placeholder="${t("login.code2fa")}"
             maxlength="6"
             class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow mt-2"
           />
@@ -32,11 +33,11 @@ export function loginView(): string {
           type="submit"
           class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition"
         >
-          Se connecter
+          ${t("login.submit")}
         </button>
         <div id="login-message" class="text-red-400"></div>
       </form>
-      <a href="/register" class="text-cyan-400 underline mt-4 inline-block">Créer un compte</a>
+      <a href="/register" class="text-cyan-400 underline mt-4 inline-block">${t("login.register")}</a>
     </div>
   `;
 }
@@ -58,7 +59,7 @@ export function attachLoginEvents() {
       const code = (form.code2fa as HTMLInputElement).value;
       const identifier = identifierFor2FA || localStorage.getItem("2fa_identifier");
       if (!identifierFor2FA || identifier === "undefined") {
-        msg!.textContent = "Erreur interne : identifiant manquant.";
+        msg!.textContent = t("login.error_internal");
         return;
       }
       try {
@@ -69,7 +70,7 @@ export function attachLoginEvents() {
         });
         const data = await res.json();
         if (!res.ok || !data.token) {
-          msg!.textContent = data.error || "Code 2FA incorrect";
+          msg!.textContent = data.error || t("login.error_2fa");
           return;
         }
         localStorage.setItem("token", data.token);
@@ -79,7 +80,7 @@ export function attachLoginEvents() {
         localStorage.removeItem("2fa_identifier");
         navigateTo("/dashboard");
       } catch (err: any) {
-        msg!.textContent = "Erreur lors de la connexion 2FA : " + err.message;
+        msg!.textContent = t("login.error_2fa_connexion") + " " + err.message;
       }
       return;
     }
@@ -95,16 +96,15 @@ export function attachLoginEvents() {
         body: JSON.stringify({ identifier: login, password }),
       });
       const data = await res.json();
-	  console.log("Infos utilisateur récupérées :", data);
       if (data.step === "2fa_required") {
         if (field2fa) field2fa.style.display = "";
         identifierFor2FA = data.identifier;
         localStorage.setItem("2fa_identifier", data.identifier);
-        msg!.textContent = "Veuillez entrer le code 2FA reçu.";
+        msg!.textContent = t("login.need2fa");
         return;
       }
       if (!res.ok || !data.token) {
-        msg!.textContent = data.error || "Identifiants incorrects";
+        msg!.textContent = data.error || t("login.error");
         return;
       }
       // Connexion classique
@@ -115,7 +115,7 @@ export function attachLoginEvents() {
       localStorage.removeItem("2fa_identifier");
       navigateTo("/dashboard");
     } catch (err: any) {
-      msg!.textContent = "Erreur lors de la connexion : " + err.message;
+      msg!.textContent = t("login.error_connexion") + " " + err.message;
     }
   };
 }

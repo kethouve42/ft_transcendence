@@ -1,8 +1,10 @@
+import { t } from "../i18n";
+
 export function profileView(userId: string | number): string {
   return `
     <div class="w-full min-h-screen px-8 md:px-32">
       <div class="w-full max-w-3xl mx-auto bg-cyan-900/60 border-2 border-cyan-400/30 rounded-2xl shadow-2xl p-10 backdrop-blur-md mt-16">
-        <div id="profile-content">Chargement du profil...</div>
+        <div id="profile-content">${t("profile.loading")}</div>
         <div id="profile-action-msg" class="mt-4 text-cyan-200"></div>
       </div>
     </div>
@@ -20,7 +22,7 @@ export function attachProfileEvents(userId: string | number) {
     .then(res => res.json())
     .then(user => {
       if (!user || user.error) {
-        content.innerHTML = `<div>Utilisateur introuvable.</div>`;
+        content.innerHTML = `<div>${t("profile.not_found")}</div>`;
         return;
       }
 
@@ -34,12 +36,12 @@ export function attachProfileEvents(userId: string | number) {
               : `<span class="flex items-center justify-center h-full text-cyan-300 font-bold text-3xl">${user.login[0]?.toUpperCase() || "?"}</span>`
             }
             ${isOnline ? `
-              <span class="absolute bottom-1 right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center text-xs font-bold text-white shadow" title="En ligne">●</span>
+              <span class="absolute bottom-1 right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center text-xs font-bold text-white shadow" title="${t("profile.online")}">●</span>
             ` : ""}
           </span>
           <div>
             <div class="text-2xl font-bold text-cyan-200">${user.alias || user.login}</div>
-            ${isOnline ? `<div class="text-green-400 text-sm font-semibold mt-1">En ligne</div>` : ""}
+            ${isOnline ? `<div class="text-green-400 text-sm font-semibold mt-1">${t("profile.online")}</div>` : ""}
           </div>
         </div>
         <div id="profile-actions"></div>
@@ -53,9 +55,9 @@ export function attachProfileEvents(userId: string | number) {
 
 function checkFriendStatus(profileId: number, currentUserId: string | null, content: HTMLElement, actionMsg: HTMLElement | null) {
   if (!currentUserId) return;
-    fetch("/api/friends/me/friends", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
+  fetch("/api/friends/me/friends", {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+  })
     .then(res => res.json())
     .then(data => {
       const isFriend = Array.isArray(data) && data.some((u: any) => String(u.id) === String(profileId));
@@ -64,7 +66,7 @@ function checkFriendStatus(profileId: number, currentUserId: string | null, cont
       if (isFriend) {
         actionsDiv.innerHTML = `
           <button id="remove-friend-btn" class="bg-red-600 hover:bg-red-400 text-white px-4 py-2 rounded-lg shadow transition">
-            Retirer des amis
+            ${t("profile.remove_friend")}
           </button>
         `;
         const btn = document.getElementById("remove-friend-btn");
@@ -82,20 +84,20 @@ function checkFriendStatus(profileId: number, currentUserId: string | null, cont
             if (res.ok) {
               actionsDiv.innerHTML = `
                 <button id="add-friend-btn" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-2 rounded-lg shadow transition">
-                  Ajouter comme ami
+                  ${t("profile.add_friend")}
                 </button>
               `;
-              actionMsg!.textContent = "Ami retiré.";
+              actionMsg!.textContent = t("profile.friend_removed");
               attachAddFriendBtn(profileId, currentUserId, actionsDiv, actionMsg);
             } else {
-              actionMsg!.textContent = "Erreur lors de la suppression.";
+              actionMsg!.textContent = t("profile.error_remove");
             }
           });
         }
       } else {
         actionsDiv.innerHTML = `
           <button id="add-friend-btn" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-2 rounded-lg shadow transition">
-            Ajouter comme ami
+            ${t("profile.add_friend")}
           </button>
         `;
         attachAddFriendBtn(profileId, currentUserId, actionsDiv, actionMsg);
@@ -110,40 +112,40 @@ function attachAddFriendBtn(profileId: number, currentUserId: string, actionsDiv
       actionMsg!.textContent = "";
       const res = await fetch("/api/friends", {
         method: "POST",
-        headers: {"Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}`, },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: JSON.stringify({ friend_id: profileId }),
       });
       if (res.ok) {
         actionsDiv.innerHTML = `
           <button id="remove-friend-btn" class="bg-red-600 hover:bg-red-400 text-white px-4 py-2 rounded-lg shadow transition">
-            Retirer des amis
+            ${t("profile.remove_friend")}
           </button>
         `;
-        actionMsg!.textContent = "Ami ajouté !";
+        actionMsg!.textContent = t("profile.friend_added");
         const removeBtn = document.getElementById("remove-friend-btn");
         if (removeBtn) {
           removeBtn.addEventListener("click", async () => {
             actionMsg!.textContent = "";
             const res = await fetch("/api/friends/", {
               method: "DELETE",
-              headers: {"Content-Type": "application/json",Authorization: `Bearer ${localStorage.getItem("token")}`,},
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
               body: JSON.stringify({ friend_id: profileId }),
             });
             if (res.ok) {
               actionsDiv.innerHTML = `
                 <button id="add-friend-btn" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-2 rounded-lg shadow transition">
-                  Ajouter comme ami
+                  ${t("profile.add_friend")}
                 </button>
               `;
-              actionMsg!.textContent = "Ami retiré.";
+              actionMsg!.textContent = t("profile.friend_removed");
               attachAddFriendBtn(profileId, currentUserId, actionsDiv, actionMsg);
             } else {
-              actionMsg!.textContent = "Erreur lors de la suppression.";
+              actionMsg!.textContent = t("profile.error_remove");
             }
           });
         }
       } else {
-        actionMsg!.textContent = "Erreur lors de l'ajout.";
+        actionMsg!.textContent = t("profile.error_add");
       }
     });
   }

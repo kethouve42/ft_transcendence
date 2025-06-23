@@ -6,6 +6,7 @@ import { homeView, attachHomeEvents } from "./views/home";
 import { profileView, attachProfileEvents } from "./views/profile";
 import { navbarView, attachNavbarEvents } from "./views/navbar";
 import { renderError, attachErrorEvents } from "./views/error";
+import { clickerView, clickerEvent } from "./views/clicker/clicker";
 
 // Ajoute ici toutes les routes de ton app
 type RouteHandler = (params?: any) => string | Promise<string>;
@@ -16,6 +17,7 @@ const routes: Record<string, RouteHandler> = {
   "/dashboard": dashboardMainView,
   "/register": registerView,
   "/error": renderError,
+  "/clicker": clickerView,
 };
 
 function pingUser() {
@@ -85,6 +87,7 @@ function attachEvents(route: string) {
   if (route === "/dashboard") attachDashboardMainEvents();
   if (route === "/register") attachRegisterEvents();
   if (route === "/error") attachErrorEvents();
+  if (route === "/clicker") clickerEvent();
 }
 
 export function attachLinkHandlers() {
