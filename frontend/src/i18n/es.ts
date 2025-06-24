@@ -106,4 +106,48 @@ export default {
     no_friends: "Aún no tienes amigos.",
     view_profile: "Ver perfil",
   },
+  menu: {
+    play_local: "Jugar localmente",
+    play_ai: "Jugar contra la IA",
+    rules: "Reglas",
+    settings: "Configuración",
+  },
+  local: {
+    title: "Configuración de teclas",
+    ex: "Haz clic en un botón y luego pulsa la tecla que desees.",
+    up1: "Jugador 1: Subir",
+    down1: "Jugador 1: Bajar",
+    up2: "Jugador 2: Subir",
+    down2: "Jugador 2: Bajar",
+    start: "Jugar",
+    cancel: "Cerrar",
+  },
+  ai: {
+    title: "Dificultad de la IA",
+    easy: "Fácil",
+    mid: "Media",
+    hard: "Difícil",
+    start: "Jugar",
+    close: "Cerrar",
+  },
+  rules: {
+    title: "Reglas del juego",
+    power_up: "<strong>Power-ups</strong> aparecen aleatoriamente cada <em>5 a 10 segundos</em>:",
+    effects: {
+      faster: "→ La bola acelera un <strong>+25 %</strong> durante <strong>5 s</strong>.",
+      slower: "→ La bola reduce su velocidad al <strong>75 %</strong> de lo normal durante <strong>5 s</strong>.",
+    },
+    spawn: "<strong>Aparición</strong>: un nuevo power-up aparece <em>5–10 s</em> después del anterior (intervalo aleatorio).",
+    collect: "<strong>Recogida</strong>: la bola recoge el cuadrado al contacto, activa el efecto y luego el power-up desaparece.",
+    duration: "<strong>Duración del efecto</strong>: exactamente <em>5</em> segundos, luego la bola vuelve a su velocidad inicial.",
+    cancel: "Cerrar",
+  },
+  settings: {
+    title: "Configuración de la partida",
+    speed: "Velocidad de la bola: ",
+    time: "Duración del partido (s): ",
+    points: "Puntos para ganar: ",
+    save: "Guardar",
+    cancel: "Cerrar",
+  }  
 };

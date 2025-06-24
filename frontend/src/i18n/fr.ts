@@ -106,4 +106,48 @@ export default {
     no_friends: "Aucun ami pour le moment.",
     view_profile: "Voir profil",
   },
+  menu: {
+    play_local: "Jouer en local",
+    play_ai: "Jouer contre l'IA",
+    rules: "Règle",
+    settings: "Paramètres",
+  },
+  local: {
+    title: "Configuration des touches",
+    ex: "Cliquez sur un bouton, puis appuyez sur la touche de votre choix.",
+    up1: "Joueur 1 : Monter",
+    down1: "Joueur 1 : Descendre",
+    up2: "Joueur 2 : Monter",
+    down2: "Joueur 2 : Descendre",
+    start: "Jouer",
+    cancel: "Fermer",
+  },
+  ai: {
+    title: "Difficulté de l'IA",
+    easy: "Facile",
+    mid: "Moyenne",
+    hard: "Difficile",
+    start: "Jouer",
+    close: "Fermer",
+  },
+  rules: {
+    title: "Règles du jeu",
+    power_up: "<strong>Les augmentations</strong> apparaissent aléatoirement toutes les <em>5 à 10 secondes</em> :",
+    effects: {
+      faster: "→ La balle passe à <strong>+25 %</strong> de vitesse pendant <strong>5 s</strong>.",
+      slower: "→ La balle passe à <strong>75 %</strong> de sa vitesse normale pendant <strong>5 s</strong>."
+    },
+    spawn: "<strong>Apparition</strong> : une nouvelle augmentation apparait toutes les <em>5–10 s</em> (intervalle aléatoire) après le précédent.",
+    collect: "<strong>Collecte</strong> : la balle ramasse le carré au contact, déclenche l’effet, puis le power-up disparaît.",
+    duration: "<strong>Durée de l’effet</strong> : exactement <em>5</em> secondes, puis la balle retrouve sa vitesse initiale. ",
+    cancel: "Fermer",
+  },
+  settings: {
+    title: "Paramètres du match",
+    speed: "Vitesse de la balle: ",
+    time: "Le temps en seconde du match: ",
+    points: "Le nombre de points pour finir: ",
+    save: "Sauvegarder",
+    cancel: "Fermer",
+  }
 };

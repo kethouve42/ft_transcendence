@@ -106,4 +106,48 @@ export default {
     no_friends: "No friends yet.",
     view_profile: "View profile",
   },
+  menu: {
+    play_local: "Play locally",
+    play_ai: "Play against the AI",
+    rules: "Rules",
+    settings: "Settings",
+  },
+  local: {
+    title: "Key Configuration",
+    ex: "Click a button, then press the key of your choice.",
+    up1: "Player 1: Up",
+    down1: "Player 1: Down",
+    up2: "Player 2: Up",
+    down2: "Player 2: Down",
+    start: "Play",
+    cancel: "Close",
+  },
+  ai: {
+    title: "AI Difficulty",
+    easy: "Easy",
+    mid: "Medium",
+    hard: "Hard",
+    start: "Play",
+    close: "Close",
+  },
+  rules: {
+    title: "Game Rules",
+    power_up: "<strong>Power-ups</strong> appear randomly every <em>5 to 10 seconds</em>:",
+    effects: {
+      faster: "→ The ball speeds up by <strong>+25 %</strong> for <strong>5 s</strong>.",
+      slower: "→ The ball slows down to <strong>75 %</strong> of its normal speed for <strong>5 s</strong>.",
+    },
+    spawn: "<strong>Spawn</strong>: a new power-up appears <em>5–10 s</em> after the previous one (random interval).",
+    collect: "<strong>Collect</strong>: the ball picks up the square on contact, triggers the effect, then the power-up disappears.",
+    duration: "<strong>Effect duration</strong>: exactly <em>5</em> seconds, then the ball returns to its initial speed.",
+    cancel: "Close",
+  },
+  settings: {
+    title: "Match Settings",
+    speed: "Ball speed: ",
+    time: "Match duration: ",
+    points: "Points to win: ",
+    save: "Save",
+    cancel: "Close",
+  }
 };
