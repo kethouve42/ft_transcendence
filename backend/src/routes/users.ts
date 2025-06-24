@@ -7,6 +7,7 @@ import { generate2FACode } from '../utils/2fa';
 import path from 'path';
 import fs from 'fs';
 import { FastifyRequest } from "fastify";
+import nodemailer from 'nodemailer';
 
 interface AuthUser
 {
@@ -26,6 +27,16 @@ interface AuthUser
 }
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
+
+// Crée un transporteur SMTP de test (Ethereal)
+const transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+        user: process.env.ETHEREAL_USER,
+        pass: process.env.ETHEREAL_PASS
+    }
+});
 
 export default async function userRoutes(app: FastifyInstance)
 {
@@ -171,21 +182,29 @@ export default async function userRoutes(app: FastifyInstance)
 		{
 			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; alias: string; avatar: string };
 
+			if (!user)
+        		return reply.status(401).send({ error: 'Email ou mot de passe incorrect' });
 
 			const validPassword = await bcrypt.compare(password, user.password);
-			if (!user || !validPassword || (user.email !== identifier && user.login !== identifier))
+			if (!validPassword || (user.email !== identifier && user.login !== identifier))
 				return reply.status(401).send({ error: 'Email ou mot de passe incorrect' });
 
 			if (user.tfa_enabled) {
 				const code = generate2FACode();
+				const hashedCode = await bcrypt.hash(code, 10);
 				const expires = Date.now() + 5 * 60 * 1000; // expire dans 5 min
 
 				// On stocke le code et son expiration
 				db.prepare(`UPDATE users SET tfa_code = ?, tfa_expires = ? WHERE id = ?`)
-					.run(code, expires, user.id);
-
-				// En dev : afficher dans les logs (dans le futur, envoi mail)
-				console.log(`Code 2FA pour ${user.login} : ${code}`);
+					.run(hashedCode, expires, user.id);
+				
+				// Envoie le mail
+				await transporter.sendMail({
+					from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+					to: user.email,
+					subject: 'Votre code 2FA',
+					text: `Votre code 2FA est : ${code}`
+				});
 
 				return reply.send({
 					success: true,
@@ -227,7 +246,8 @@ export default async function userRoutes(app: FastifyInstance)
 		if (!user.tfa_code || Date.now() > user.tfa_expires)
 			return reply.status(401).send({ error: 'Code 2FA expiré ou invalide' });
 
-		if (user.tfa_code !== code)
+		const isValid = await bcrypt.compare(code, user.tfa_code);
+		if (!isValid)
 			return reply.status(401).send({ error: 'Code 2FA incorrect' });
 
 		// On supprime le code 2FA et on retourne le success et le token
