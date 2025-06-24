@@ -12,6 +12,9 @@ interface AuthUser
 	last_seen: number;
 	email: string;
 	clicker_score: bigint;
+	clicker_cooler: number;
+  	clicker_coil: number;
+  	clicker_generator: number;
 	tfa_enable: boolean;
 	tfa_expires: number;
 	tfa_code: string

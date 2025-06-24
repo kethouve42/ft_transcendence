@@ -5,6 +5,7 @@ import fs from 'fs';
 import userRoutes from './routes/users';
 import matchsRoutes from './routes/matchs';
 import friendsRoutes from './routes/friends';
+import clickerRoutes from './routes/clicker';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static'
 
@@ -40,6 +41,7 @@ app.register(fastifyMultipart);
 app.register(userRoutes, { prefix: '/api/users' });
 app.register(matchsRoutes, { prefix: '/api/matchs' });
 app.register(friendsRoutes, { prefix: '/api/friends' });
+app.register(clickerRoutes, { prefix: '/api/clicker' });
 
 const start = async () => {
   try {
