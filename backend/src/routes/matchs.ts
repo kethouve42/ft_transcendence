@@ -2,23 +2,7 @@ import { FastifyInstance } from "fastify";
 import db from '../db';
 import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
-
-interface AuthUser
-{
-	id: number;
-	login: string;
-	alias: string;
-	avatar: string;
-	last_seen: number;
-	email: string;
-	clicker_score: bigint;
-	clicker_cooler: number;
-  	clicker_coil: number;
-  	clicker_generator: number;
-	tfa_enable: boolean;
-	tfa_expires: number;
-	tfa_code: string
-}
+import { AuthUser, Match, Friend } from '../types/interfaces';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -27,7 +11,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	// Recupére l'historique des matchs
 	app.get ('/', async () =>
 	{
-		const matchs = db.prepare(`SELECT id, date, duration, user1_id, user2_id, winner_id, score FROM matchs ORDER BY date DESC`).all();
+		const matchs = db.prepare(`SELECT id, date, duration, user1_id, user2_id, winner_id, score FROM matchs ORDER BY date DESC`).all() as Match[];
 		return matchs;
 
 	});
@@ -87,7 +71,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 	app.get('/:id', async (req, reply) =>
 	{
 		const { id } = req.params as { id: number };
-		const match = db.prepare(`SELECT * FROM matchs WHERE id = ?`).get(id);
+		const match = db.prepare(`SELECT * FROM matchs WHERE id = ?`).get(id) as Match;
 
 		if (!match)
 			return reply.status(404).send({ error: 'Match non trouvé' });
@@ -110,17 +94,17 @@ export default async function matchsRoutes(app: FastifyInstance)
 		const user = (req as AuthenticatedRequest).user;
 
 		//vérifie que l'utilisateur existe
-		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id);
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id) as {id: number };
 		if (!userExists)
 			return reply.status(404).send({ error: "Utilisateur non trouvé" });
 
 		// Récupère tous les matchs où l'utilisateur a participé
 		const matchs = db.prepare(`
-			SELECT id, date, duration, user1_id, user2_id, winner_id, score
+			SELECT *
 			FROM matchs
 			WHERE user1_id = ? OR user2_id = ?
 			ORDER BY date DESC
-		`).all(user.id, user.id);
+		`).all(user.id, user.id) as Match[];
 
 		return matchs;
 	});
@@ -130,7 +114,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		const user = (req as AuthenticatedRequest).user;
 
 		//vérifie que l'utilisateur existe
-		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id);
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id) as { id: number};
 		if (!userExists)
 			return reply.status(404).send({ error: "Utilisateur non trouvé" });
 		

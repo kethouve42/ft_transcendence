@@ -2,23 +2,7 @@ import { FastifyInstance } from "fastify";
 import db from '../db';
 import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
-
-interface AuthUser
-{
-	id: number;
-	login: string;
-	alias: string;
-	avatar: string;
-	last_seen: number;
-	email: string;
-	clicker_score: bigint;
-	clicker_cooler: number;
-  	clicker_coil: number;
-  	clicker_generator: number;
-	tfa_enable: boolean;
-	tfa_expires: number;
-	tfa_code: string
-}
+import { AuthUser, Match, Friend } from '../types/interfaces';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -103,7 +87,7 @@ export default async function friendsRoutes(app: FastifyInstance)
 			FROM friends
 			JOIN users ON users.id = friends.friend_id
 			WHERE friends.user_id = ?
-		`).all(id);
+		`).all(id) as Friend[];
 
 		return friends;
 	});

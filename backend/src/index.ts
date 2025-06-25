@@ -8,34 +8,40 @@ import friendsRoutes from './routes/friends';
 import clickerRoutes from './routes/clicker';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static'
+import fastifyRateLimit from '@fastify/rate-limit';
 
 dotenv.config();
+
 
 // Assure que le dossier logs existe
 const logsDir = path.resolve(__dirname, '../logs');
 if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
+	fs.mkdirSync(logsDir, { recursive: true });
 }
 
 // Fastify avec configuration de logger compatible
 const app = Fastify({
-  logger: {
-    transport: {
-      target: 'pino/file',
-      options: {
-        destination: path.join(logsDir, 'app.log'),
-        mkdir: true,
-      },
-    },
-    level: 'info',
-  },
+	logger: {
+		transport: {
+			target: 'pino/file',
+			options: {
+				destination: path.join(logsDir, 'app.log'),
+				mkdir: true,
+			},
+		},
+		level: 'info',
+	},
 });
 
 app.get('/ping', async (req, reply) => {
-  req.log.info('Ping reçu');
-  return { pong: 'it works!' };
+	req.log.info('Ping reçu');
+	return { pong: 'it works!' };
 });
 
+app.register(fastifyRateLimit/*, {
+  max: 100, // nombre max de requêtes
+  timeWindow: '1 minute' // par minute
+}*/);
 app.register(fastifyStatic,{root: path.join(process.cwd(), 'uploads'), prefix: '/uploads/',});
 app.register(fastifyMultipart);
 app.register(userRoutes, { prefix: '/api/users' });

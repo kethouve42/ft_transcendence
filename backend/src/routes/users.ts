@@ -8,23 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import { FastifyRequest } from "fastify";
 import nodemailer from 'nodemailer';
-
-interface AuthUser
-{
-	id: number;
-	login: string;
-	alias: string;
-	avatar: string;
-	last_seen: number;
-	email: string;
-	clicker_score: bigint;
-	clicker_cooler: number;
-  	clicker_coil: number;
-  	clicker_generator: number;
-	tfa_enable: boolean;
-	tfa_expires: number;
-	tfa_code: string
-}
+import { AuthUser, Match, Friend } from '../types/interfaces';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -46,7 +30,7 @@ export default async function userRoutes(app: FastifyInstance)
 		const users = db.prepare(`
 			SELECT id, login, alias, avatar, last_seen
 			FROM users
-		`).all();
+		`).all() as { id: number, login: string, alias: string, avatar: string, last_seen: number }[];
 		return users;
 	});
 
@@ -57,7 +41,7 @@ export default async function userRoutes(app: FastifyInstance)
 		const user = db.prepare(`
 			SELECT id, login, alias, avatar, last_seen
 			FROM users WHERE id = ?
-		`).get(id);
+		`).get(id) as { id: number, login: string, alias: string, avatar: string, last_seen: number };
 
 		if (!user)
 			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
@@ -71,7 +55,7 @@ export default async function userRoutes(app: FastifyInstance)
 		const user = db.prepare(`
 			SELECT id, login, alias, avatar, last_seen
 			FROM users WHERE login = ?
-		`).get(login);
+		`).get(login) as { id:number, login: string, alias: string, avatar: string, last_seen: number};
 	
 		if (!user)
 			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
@@ -79,7 +63,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	// Ajouter un utilisateur
-	app.post('/', async (req, reply) =>
+	app.post('/', { config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
 	{
 		const { login, email, password, alias, avatar } = req.body as { login: string, email: string, password: string, alias: string, avatar: string};
 
@@ -139,7 +123,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//changer le mot de passe utilisateur
-	app.patch('/me/password', { preHandler: authMiddleware }, async (req, reply) =>
+	app.patch('/me/password', { preHandler: authMiddleware, config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
 	{
 		const user = (req as AuthenticatedRequest).user;
 
@@ -165,7 +149,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//Authentification de l'utilisateur
-	app.post('/auth', async (req, reply) =>
+	app.post('/auth', { config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
 	{
 		const { identifier, password, stayConnected } = req.body as {identifier: string; password: string; stayConnected: boolean};
 
@@ -231,7 +215,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 
 	//Verification code 2FA pour la suite de l'authentification avec 2FA
-	app.post('/auth/2fa', async (req, reply) => 
+	app.post('/auth/2fa', { config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) => 
 	{
 		const { identifier, code, stayConnected} = req.body as { identifier: string; code: string; stayConnected: boolean};
 
@@ -314,7 +298,7 @@ export default async function userRoutes(app: FastifyInstance)
 	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const user = (req as AuthenticatedRequest).user;
-		const data = db.prepare(`SELECT id, login, tfa_enabled FROM users WHERE id = ?`).get(user.id);
+		const data = db.prepare(`SELECT id, login, tfa_enabled FROM users WHERE id = ?`).get(user.id) as { id: number, login: string, tfa_enable: boolean};
 		return data;
 	});
 
@@ -323,7 +307,7 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const user = (req as AuthenticatedRequest).user;
 
-		const data = db.prepare(`SELECT id, login, email, alias, avatar, tfa_enabled FROM users WHERE id = ?`).get(user.id);
+		const data = db.prepare(`SELECT id, login, email, alias, avatar, tfa_enabled FROM users WHERE id = ?`).get(user.id) as { id:number, login: string, email: string, alias: string, avatar: string, tfa_enable: boolean };
 		return data;
 	});
 
@@ -429,13 +413,13 @@ export default async function userRoutes(app: FastifyInstance)
 		const user = (req as AuthenticatedRequest).user;
 
 		// Récupère les infos utilisateur
-		const userData = db.prepare('SELECT id, login, email, alias, avatar, last_seen FROM users WHERE id = ?').get(user.id);
+		const userData = db.prepare('SELECT id, login, email, alias, avatar, last_seen FROM users WHERE id = ?').get(user.id) as { id: number, login: string, email: string, alias: string, avatar: string, last_seen: number };
 
 		// Récupère les matchs
-		const matchs = db.prepare('SELECT * FROM matchs WHERE user1_id = ? OR user2_id = ?').all(user.id, user.id);
+		const matchs = db.prepare('SELECT * FROM matchs WHERE user1_id = ? OR user2_id = ?').all(user.id, user.id) as Match[];
 
 		// Récupère les amis
-		const friends = db.prepare('SELECT * FROM friends WHERE user_id = ? OR friend_id = ?').all(user.id, user.id);
+		const friends = db.prepare('SELECT * FROM friends WHERE user_id = ? OR friend_id = ?').all(user.id, user.id) as Friend[];
 
 		return {
 			user: userData,
