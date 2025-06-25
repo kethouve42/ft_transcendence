@@ -257,7 +257,7 @@ function renderUI() {
   let html = ""
   switch (currentPanel) {
     case "menu":
-      html = renderGame()
+      html = gameViews()
       break
     case "settings":
       html = renderPanelSettings()
@@ -407,6 +407,32 @@ function resetGame(): void {
   nextTargetY = rightPaddle.y
 }
 
+function endGame() {
+  let winner: "left" | "right" | null = null;
+  if (score.left === scoreMod)
+    winner = "left";
+  else if (score.right === scoreMod)
+    winner = "right";
+
+  // Ne fonctionne pas encore, probleme soit de not found soit de cors.
+  fetch("api/matchs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      date: new Date().toISOString(),
+      duration: timerMod, // test
+      user1_id: 1, // test
+      user2_id: 2, // test
+      winner_id: 1, // test
+      score: `${score.left}-${score.right}`
+    })
+  }).catch(() => {});
+
+  alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right);
+  resetGame();
+  showOnly("menu");
+}
+
 function update() {
   if (mode === "local") 
   {
@@ -460,18 +486,14 @@ function update() {
     const remaining = Math.max(0, timer.duration - elapsed)
     if (remaining <= 0) {
       timer.isRunning = false
-      alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right)
-      resetGame()
-      showOnly("menu")
+      endGame()
       return
     }
   }
 
   if (score.left == scoreMod || score.right == scoreMod) {
     timer.isRunning = false
-    alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right)
-    resetGame()
-    showOnly("menu")
+    endGame()
     return
   }
 }
