@@ -415,7 +415,7 @@ function endGame() {
     winner = "right";
 
   // Ne fonctionne pas encore, probleme soit de not found soit de cors.
-  fetch("api/matchs", {
+  fetch("api/matchs/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
