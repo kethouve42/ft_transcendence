@@ -3,7 +3,8 @@ import { ballSize, speed as baseSpeed, ball, drawBall, resetBall } from './ball.
 import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
-import { t } from "../../../i18n"
+import { t } from "../../i18n"
+import "../../../css/style.css"
 
 type Panel =  "menu" | "settings" | "ai" | "keyConfig" | "rules" | "game"
 
@@ -34,7 +35,7 @@ let canvas: HTMLCanvasElement
 let ctx: CanvasRenderingContext2D
 
 // Prise en compte du DOM
-function renderMenu() {
+function gameViews() {
   return `
   <div id="menu" class="menu">
     <button id="btn-local" class="menu-btn">${t("menu.play_local")}</button>
@@ -188,17 +189,17 @@ function renderGame() {
   `
 }
 
-function bindUI() {
+function gameEvent() {
   const root = document.getElementById('app')!
 
   root.querySelector('#btn-local')?.addEventListener("click", () => showOnly("keyConfig"))
-  root.querySelector('#btn-ai')   ?.addEventListener("click", () => showOnly("ai"))
+  root.querySelector('#btn-ai')?.addEventListener("click", () => showOnly("ai"))
   root.querySelector('#btn-rules')?.addEventListener("click", () => showOnly("rules"))
   root.querySelector('#btn-settings')?.addEventListener("click", () => showOnly("settings"))
 
   root.querySelector('#btn-close-settings')?.addEventListener("click", () => showOnly("menu"))
-  root.querySelector('#btn-close-ai')      ?.addEventListener("click", () => showOnly("menu"))
-  root.querySelector('#btn-close-rules')   ?.addEventListener("click", () => showOnly("menu"))
+  root.querySelector('#btn-close-ai')?.addEventListener("click", () => showOnly("menu"))
+  root.querySelector('#btn-close-rules')?.addEventListener("click", () => showOnly("menu"))
   root.querySelector('#btn-cancel-keyconfig')?.addEventListener("click", () => showOnly("menu"))
 
   root.querySelector('#input-ball-speed')?.addEventListener("input", e => {
@@ -230,6 +231,7 @@ function bindUI() {
     pendingBinding = action
     window.addEventListener("keydown", onKeyDownDuringBinding)
   }
+
   root.querySelector('#btn-bind-p1-up')?.addEventListener("click", () => startKeyBind("player1Up"))
   root.querySelector('#btn-bind-p1-down')?.addEventListener("click", () => startKeyBind("player1Down"))
   root.querySelector('#btn-bind-p2-up')?.addEventListener("click", () => startKeyBind("player2Up"))
@@ -243,7 +245,6 @@ function bindUI() {
     canvas = document.getElementById("pong") as HTMLCanvasElement
     ctx = canvas.getContext("2d")!
   }
-
 }
 
 /*
@@ -256,7 +257,7 @@ function renderUI() {
   let html = ""
   switch (currentPanel) {
     case "menu":
-      html = renderMenu()
+      html = renderGame()
       break
     case "settings":
       html = renderPanelSettings()
@@ -275,7 +276,7 @@ function renderUI() {
       break
   }
   root.innerHTML = html
-  bindUI()
+  gameEvent()
 }
 
 function showOnly(panel: Panel) {
