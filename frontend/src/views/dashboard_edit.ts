@@ -36,6 +36,11 @@ export function dashboardEditView(): string {
         <button type="submit" class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition">${t("dashboard.save")}</button>
         <div id="edit-profile-message" class="mt-4 text-cyan-200"></div>
       </form>
+      <section>
+        <button onclick="toggleContrast()">Contraste élevé</button>
+        <button onclick="changeFontSize(2)">A+</button>
+        <button onclick="changeFontSize(-2)">A-</button>
+      </section>
       <a href="/dashboard" class="text-cyan-400 underline mt-4 inline-block">${t("dashboard.back_profile")}</a>
     </div>
   `;

@@ -19,8 +19,8 @@ export function navbarView(): string {
     <nav class="w-full px-6 md:px-32 py-4 bg-cyan-950/80 flex items-center justify-between shadow-lg z-50">
       <div class="flex items-center gap-10">
         <a href="/" class="${linkClass("/", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.home")}</a>
-        <a href="/game" class="${linkClass("/game", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.game")}</a>
-        <a href="/clicker" class="${linkClass("/clicker", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.clicker")}</a>      </div>
+        <a href="/pong" class="${linkClass("/game", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">pong</a>
+        <a href="/clicker" class="${linkClass("/clicker", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">clicker}</a>      </div>
       <div class="flex items-center gap-6">
         <!-- Ajoute le sélecteur de langue -->
         <select id="lang-switcher" class="bg-cyan-900 border border-cyan-400 text-cyan-200 rounded px-2 py-1">

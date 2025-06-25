@@ -7,6 +7,7 @@ import { profileView, attachProfileEvents } from "./views/profile";
 import { navbarView, attachNavbarEvents } from "./views/navbar";
 import { renderError, attachErrorEvents } from "./views/error";
 import { clickerView, clickerEvent } from "./views/clicker/clicker";
+import { gameViews, gameEvent} from "./views/game/game"
 
 // Ajoute ici toutes les routes de ton app
 type RouteHandler = (params?: any) => string | Promise<string>;
@@ -18,6 +19,7 @@ const routes: Record<string, RouteHandler> = {
   "/register": registerView,
   "/error": renderError,
   "/clicker": clickerView,
+  "/pong": gameViews,
 };
 
 function pingUser() {
@@ -34,7 +36,7 @@ function pingUser() {
       localStorage.removeItem("userLogin");
       localStorage.removeItem("userAlias");
       localStorage.removeItem("userAvatar");
-      window.location.href = "/login";
+      navigateTo("/login");
     }
   })
   .catch(() => {});
@@ -47,6 +49,7 @@ function render(route: string) {
 
     const protectedRoutes = [
     "/dashboard",
+    "/clicker",
   ];
   const token = localStorage.getItem("token");
   if (protectedRoutes.includes(route) && !token) {
@@ -88,6 +91,7 @@ function attachEvents(route: string) {
   if (route === "/register") attachRegisterEvents();
   if (route === "/error") attachErrorEvents();
   if (route === "/clicker") clickerEvent();
+  if (route === "/pong") gameEvent();
 }
 
 export function attachLinkHandlers() {
@@ -114,3 +118,16 @@ export function navigateTo(route: string) {
 
 window.onpopstate = () => render(location.pathname);
 render(location.pathname);
+
+let fontSize = 16;
+function changeFontSize(delta: number) {
+  fontSize = Math.max(12, fontSize + delta);
+  document.body.style.setProperty('--base-font-size', `${fontSize}px`);
+}
+
+function toggleContrast() {
+  document.body.classList.toggle('high-contrast');
+}
+
+(window as any).toggleContrast = toggleContrast;
+(window as any).changeFontSize = changeFontSize;

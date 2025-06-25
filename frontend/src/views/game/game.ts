@@ -4,7 +4,7 @@ import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
 import { t } from "../../i18n"
-import "../../../css/style.css"
+import "../../css/style.css"
 
 type Panel =  "menu" | "settings" | "ai" | "keyConfig" | "rules" | "game"
 
@@ -35,7 +35,7 @@ let canvas: HTMLCanvasElement
 let ctx: CanvasRenderingContext2D
 
 // Prise en compte du DOM
-function gameViews() {
+export function gameViews() {
   return `
   <div id="menu" class="menu">
     <button id="btn-local" class="menu-btn">${t("menu.play_local")}</button>
@@ -189,7 +189,7 @@ function renderGame() {
   `
 }
 
-function gameEvent() {
+export function gameEvent() {
   const root = document.getElementById('app')!
 
   root.querySelector('#btn-local')?.addEventListener("click", () => showOnly("keyConfig"))
@@ -502,7 +502,7 @@ function startMatch() {
   startTimer(timerMod)
   gameLoop()
 }
-
+/*
 window.addEventListener("load", () => {
   renderUI()
-})
+})*/
