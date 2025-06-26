@@ -63,7 +63,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	// Ajouter un utilisateur
-	app.post('/', { config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
+	app.post('/', { config: { rateLimit: { max: 20/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
 	{
 		const { login, email, password, alias, avatar } = req.body as { login: string, email: string, password: string, alias: string, avatar: string};
 
@@ -151,7 +151,7 @@ export default async function userRoutes(app: FastifyInstance)
 	//Authentification de l'utilisateur
 	app.post('/auth', { config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
 	{
-		const { identifier, password, stayConnected } = req.body as {identifier: string; password: string; stayConnected: boolean};
+		const { identifier, password, stayConnected, matchDuration } = req.body as {identifier: string; password: string; stayConnected: boolean, matchDuration?: number};
 
 		app.log.info(`Test2`); ///// <===== TEST LOG
 		
@@ -199,7 +199,11 @@ export default async function userRoutes(app: FastifyInstance)
 				});
     		}
 
-			const token = stayConnected ? signToken(user, '30d') : signToken(user); // par défaut 2h
+			let token: string;
+			if (matchDuration)
+				token = signToken(user, `${matchDuration + 10}s`); // ex: si le match dure 2 minute rentrer 120s
+			else
+				token = stayConnected ? signToken(user, '30d') : signToken(user); // par défaut 2h
 
 			return { success: true, token, UserId: user.id, email: user.email, login: user.login, alias: user.alias, avatar: user.avatar };
 		}
@@ -248,20 +252,22 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const user = (req as AuthenticatedRequest).user;
 
-		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as { avatar: string };
-		if (userData?.avatar)
+		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as { avatar: string | null };
+		if (userData?.avatar && userData.avatar.startsWith('http://localhost:3000/uploads/avatars/'))
 		{
-  			try
+			const oldPath = path.resolve(process.cwd(), '.' + userData.avatar.replace('http://localhost:3000', ''));
+			try
 			{
-    			fs.unlinkSync(path.resolve(process.cwd(), '.' + userData.avatar));
-  			}
+				if (fs.existsSync(oldPath))
+                    fs.unlinkSync(oldPath);
+			}
 			catch (e)
 			{
 				if (e instanceof Error)
 					console.warn('Avatar non trouvé ou déjà supprimé:', e.message);
 				else
 					console.warn('Avatar non trouvé ou déjà supprimé:', e);
-  			}
+			}
 		}
 		
 		const stmt2 = db.prepare('DELETE FROM matchs WHERE user1_id = ? OR user2_id = ?');
@@ -374,6 +380,7 @@ export default async function userRoutes(app: FastifyInstance)
 		const parts = req.parts();
 
 		let uploaded = false;
+		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as { avatar: string | null };
 
 		for await (const part of parts)
 		{
@@ -383,6 +390,21 @@ export default async function userRoutes(app: FastifyInstance)
 				const fileName = `avatar_${user.id}_${Date.now()}${fileExt}`;
 				const uploadDir = path.resolve(process.cwd(), 'uploads/avatars');
 				const uploadPath = path.join(uploadDir, fileName);
+
+				//Suprime l'ancien avatar si existant
+				if (userData?.avatar && userData.avatar.startsWith('http://localhost:3000/uploads/avatars/'))
+				{
+                	const oldPath = path.resolve(process.cwd(), '.' + userData.avatar.replace('http://localhost:3000', ''));
+                	try
+					{
+						if (fs.existsSync(oldPath))
+							fs.unlinkSync(oldPath);
+                	}
+					catch (e)
+					{
+                    	console.warn('Impossible de supprimer l\'ancien avatar :', e);
+                	}
+            }
 
 				// Crée le dossier si besoin
 				fs.mkdirSync(uploadDir, { recursive: true });

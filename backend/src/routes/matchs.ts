@@ -3,6 +3,7 @@ import db from '../db';
 import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
 import { AuthUser, Match, Friend } from '../types/interfaces';
+import { verifyToken } from '../utils/jwt';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -17,33 +18,36 @@ export default async function matchsRoutes(app: FastifyInstance)
 	});
 
 	//Rajout d'un match
-	app.post('/', async (req, reply) => 
+	app.post('/', { preHandler: authMiddleware }, async (req, reply) => 
 	{
-		const { date, duration, user1_id, user2_id, winner_id, score } = req.body as { date: string, duration: number, user1_id: number, user2_id: number, winner_id: number, score: string };
+		const user1 = (req as AuthenticatedRequest).user;
+		const { date, duration, winner_id, score, player2_token } = req.body as { date: string, duration: number, winner_id: number, score: string, player2_token: string };
 
-		if (!date || !duration || !user1_id || !score)
+		if (!date || !user1 || !duration || !user1.id || !score)
 			return reply.status(400).send({ error: "Données du match incomplétes" });
 
-		// Vérifie que les joueurs sont différents
-		if (user2_id && user1_id === user2_id) {
-		return reply.status(400).send({ error: "Un joueur ne peut pas jouer contre lui-même" });
+		//Si PVP, token player 2 existe et on le verifie
+		let user2: AuthUser | null = null;
+		if (player2_token)
+		{
+			try
+			{
+				const payload = verifyToken(player2_token);
+				user2 = payload as AuthUser;
+			}
+			catch (err)
+			{
+				return reply.status(401).send({ error: "Token du joueur 2 invalide" });
+			}
 		}
 
-		// Vérifie que les joueurs existent
-		const getUser = db.prepare(`SELECT id FROM users WHERE id = ?`);
-
-		if (!getUser.get(user1_id)) {
-		return reply.status(404).send({ error: "Joueur 1 non trouvé" });
-		}
-
-		if (user2_id && !getUser.get(user2_id)) {
-		return reply.status(404).send({ error: "Joueur 2 non trouvé" });
-		}
+		// Vérifie que les joueurs sont différents en PVP
+		if (user2 && user1.id === user2.id)
+			return reply.status(400).send({ error: "Un joueur ne peut pas jouer contre lui-même" });
 
 		// Vérifie que le gagnant est l'un des deux
-		if (winner_id !== user1_id && winner_id !== user2_id && winner_id !== null) {
-		return reply.status(400).send({ error: "Le gagnant doit être l’un des deux joueurs" });
-		}
+		if (winner_id !== user1.id && (!user2 || winner_id !== user2.id) && winner_id !== null)
+			return reply.status(400).send({ error: "Le gagnant doit être l’un des deux joueurs" });
 
 		try
 		{
@@ -53,8 +57,8 @@ export default async function matchsRoutes(app: FastifyInstance)
 			const result = stmt.run(
 									date,
 									duration,
-									user1_id,
-									user2_id === undefined || user2_id === 0 ? null : user2_id,
+									user1.id,
+									user2 ? user2.id : null,
 									winner_id === undefined || winner_id === 0 ? null : winner_id,
 									score
 									);

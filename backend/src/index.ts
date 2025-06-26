@@ -38,10 +38,7 @@ app.get('/ping', async (req, reply) => {
 	return { pong: 'it works!' };
 });
 
-app.register(fastifyRateLimit/*, {
-  max: 100, // nombre max de requêtes
-  timeWindow: '1 minute' // par minute
-}*/);
+app.register(fastifyRateLimit);
 app.register(fastifyStatic,{root: path.join(process.cwd(), 'uploads'), prefix: '/uploads/',});
 app.register(fastifyMultipart);
 app.register(userRoutes, { prefix: '/api/users' });
