@@ -18,9 +18,9 @@ export function dashboardEditView(): string {
           <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.alias")}</label>
           <input name="alias" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" />
         </div>
+        <input type="hidden" name="avatar">
         <div class="mb-6">
           <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.avatar")}</label>
-          <input name="avatar" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" />
           <input type="file" id="avatar-upload" accept="image/*" class="mt-2" />
           <img id="avatar-preview" src="" alt="${t("dashboard.avatar_preview")}" class="mt-2 w-20 h-20 rounded-full border border-cyan-400" style="display:none;" />
         </div>
@@ -110,34 +110,10 @@ export function attachDashboardEditEvents() {
       avatarInput.onchange = async () => {
         const file = avatarInput.files?.[0];
         if (!file) return;
-        // Affiche un aperçu
         avatarPreview.src = URL.createObjectURL(file);
         avatarPreview.style.display = "block";
-
-        // Envoie le fichier au backend
-        const formData = new FormData();
-        formData.append("avatar", file);
-
-        const token = localStorage.getItem("token");
-        const res = await fetch("/api/users/upload-avatar", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        } as any);
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.url) {
-            (document.querySelector('input[name="avatar"]') as HTMLInputElement).value = data.url;
-            localStorage.setItem("userAvatar", data.url);
-          }
-        } else {
-          const text = await res.text();
-          alert(t("dashboard.error_avatar_upload") + text);
-        }
-      };
+      }
     }
-    // Gestion de la soumission du formulaire
     const form = document.getElementById("edit-profile-form") as HTMLFormElement | null;
     if (form) {
       form.onsubmit = async (e) => {
@@ -145,9 +121,31 @@ export function attachDashboardEditEvents() {
         const login = (form.login as HTMLInputElement).value;
         const alias = (form.alias as HTMLInputElement).value;
         const email = (form.email as HTMLInputElement).value;
-        const avatar = (form.avatar as HTMLInputElement).value;
-        const msg = document.getElementById("edit-profile-message");
+        let avatar = (form.avatar as HTMLInputElement).value;
 
+        const file = avatarInput.files?.[0];
+        if (file) {
+          const formData = new FormData();
+          formData.append("avatar", file);
+          const token = localStorage.getItem("token");
+          const res = await fetch("/api/users/upload-avatar", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData,
+          } as any);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.url) {
+              avatar = data.url;
+            }
+          } else {
+            const text = await res.text();
+            alert(t("dashboard.error_avatar_upload") + text);
+            return;
+          }
+        }
+
+        const msg = document.getElementById("edit-profile-message");
         try {
           const res = await fetch("/api/users/me", {
             method: "PUT",

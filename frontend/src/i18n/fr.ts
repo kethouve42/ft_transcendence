@@ -26,7 +26,8 @@ export default {
     error_2fa: "Code 2FA incorrect",
     error_2fa_connexion: "Erreur lors de la connexion 2FA :",
     error_connexion: "Erreur lors de la connexion :",
-    register: "Créer un compte"
+    register: "Créer un compte",
+    stayConnected: "Rester connecté",
   },
   register: {
     title: "Inscription",

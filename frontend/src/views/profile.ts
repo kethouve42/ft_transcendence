@@ -31,10 +31,7 @@ export function attachProfileEvents(userId: string | number) {
       content.innerHTML = `
         <div class="flex items-center gap-6 mb-8">
           <span class="inline-block w-20 h-20 rounded-full bg-cyan-900 border-2 border-cyan-400 overflow-hidden relative">
-            ${user.avatar
-              ? `<img src="${user.avatar}" alt="avatar" class="w-20 h-20 object-cover rounded-full border border-cyan-400" />`
-              : `<span class="flex items-center justify-center h-full text-cyan-300 font-bold text-3xl">${user.login[0]?.toUpperCase() || "?"}</span>`
-            }
+            <img src="${user.avatar || "http://localhost:3000/uploads/default-avatar.png"}" alt="avatar" class="w-20 h-20 object-cover rounded-full border border-cyan-400" />
             ${isOnline ? `
               <span class="absolute bottom-1 right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center text-xs font-bold text-white shadow" title="${t("profile.online")}">●</span>
             ` : ""}

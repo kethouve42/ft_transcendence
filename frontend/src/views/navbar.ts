@@ -20,10 +20,14 @@ export function navbarView(): string {
       <div class="flex items-center gap-10">
         <a href="/" class="${linkClass("/", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.home")}</a>
         <a href="/pong" class="${linkClass("/game", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">pong</a>
-        <a href="/clicker" class="${linkClass("/clicker", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">clicker}</a>      </div>
+        <a href="/clicker" class="${linkClass("/clicker", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">clicker</a>
+      </div>
       <div class="flex items-center gap-6">
-        <!-- Ajoute le sélecteur de langue -->
-        <select id="lang-switcher" class="bg-cyan-900 border border-cyan-400 text-cyan-200 rounded px-2 py-1">
+        <select
+          id="lang-switcher"
+          aria-label="Language selector"
+          class="bg-cyan-900 border border-cyan-400 text-cyan-200 rounded mb-[0em] px-2 py-1 h-9 self-center focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
+        >
           ${Object.entries(LANG_NAMES).map(([k, v]) =>
             `<option value="${k}" ${getLang() === k ? "selected" : ""}>${v}</option>`
           ).join("")}
@@ -34,7 +38,7 @@ export function navbarView(): string {
               <a href="/dashboard" class="flex items-center gap-2 font-semibold text-cyan-200 hover:text-cyan-400 transition">
                 <span class="inline-block w-9 h-9 rounded-full bg-cyan-900 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg overflow-hidden">
                 <img
-                  src="${userAvatar || 'http://localhost:3000/uploads/avatars/default-avatar.png'}"
+                  src="${userAvatar || 'http://localhost:3000/uploads/default-avatar.png'}"
                   alt="avatar"
                   class="w-9 h-9 rounded-full border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg object-cover bg-cyan-900"
                 />

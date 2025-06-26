@@ -26,7 +26,8 @@ export default {
     error_2fa: "Incorrect 2FA code",
     error_2fa_connexion: "Error during 2FA login:",
     error_connexion: "Error during login:",
-    register: "Create an account"
+    register: "Create an account",
+    stayConnected: "Stay signed in",
   },
   register: {
     title: "Inscription",

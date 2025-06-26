@@ -29,6 +29,17 @@ export function loginView(): string {
             class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow mt-2"
           />
         </div>
+        <div class="flex gap-2 min-h-[1.25rem]">
+          <input
+            type="checkbox"
+            id="stayConnected"
+            name="stayConnected"
+            class="accent-cyan-500 w-5 h-5 border border-cyan-400 rounded focus:ring-2 focus:ring-cyan-400"
+          />
+          <label for="stayConnected" class="text-cyan-200 cursor-pointer select-none h-5 flex items-center">
+            ${t("login.stayConnected")}
+          </label>
+        </div>
         <button
           type="submit"
           class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition"
@@ -88,12 +99,13 @@ export function attachLoginEvents() {
     // Sinon, tentative de connexion classique
     const login = (form.login as HTMLInputElement).value;
     const password = (form.password as HTMLInputElement).value;
+    const stayConnected = (form.stayConnected as HTMLInputElement).checked;
 
     try {
       const res = await fetch("/api/users/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: login, password }),
+        body: JSON.stringify({ identifier: login, password, stayConnected }),
       });
       const data = await res.json();
       if (data.step === "2fa_required") {
