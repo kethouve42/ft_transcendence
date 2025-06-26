@@ -32,55 +32,88 @@ export function clickerView(): string {
       <div class="flex gap-6 mt-10">
         <div class="flex flex-col items-center">
           <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler">
-            Acheter refroidisseur
+          Acheter refroidisseur
           </button>
           <span id="cooler-count" class="mt-2 text-2xl font-bold text-amber-400">0</span>
-        </div>
-        <div class="flex flex-col items-center">
+          </div>
+          <div class="flex flex-col items-center">
           <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator">
-            Acheter generateur
+          Acheter generateur
           </button>
           <span id="generator-count" class="mt-2 text-2xl font-bold text-lime-400">0</span>
         </div>
         <div class="flex flex-col items-center">
           <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil">
-            Acheter bobines
+          Acheter bobines
           </button>
           <span id="coil-count" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
-        </div>
+          </div>
       </div>
-    </div>
-  `;
-}
+      <!-- Bouton Mode Versus -->
+      <button
+        id="versus-btn"
+        class="fixed top-4 right-4 bg-pink-600 hover:bg-pink-400 text-white px-4 py-2 rounded shadow-lg z-50"
+      >
+        Mode Versus
+      </button>
+      </div>
+      `;
+    }
 
 export function clickerEvent(): void {
-  // Variables pour la jauge de chaleur
+
+  // Initialisation de la chaleur et des variables
   let heat = 0;
+  let overheated = false;
   const maxHeat = 100;
+
+  // Elements de la page
   const heatBar = document.getElementById("heat-bar");
   const heatValue = document.getElementById("heat-value");
   const clickBtn = document.getElementById("click-btn");
+  const pointCount = document.getElementById("point-count");
+  const coolerCount = document.getElementById("cooler-count");
+  const buyCoolerBtn = document.getElementById("buy-cooler");
+  const generatorCount = document.getElementById("generator-count");
+  const buyGeneratorBtn = document.getElementById("buy-generator");
+  const coilCount = document.getElementById("coil-count");
+  const buyCoilBtn = document.getElementById("buy-coil");
+  const versusBtn = document.getElementById("versus-btn");
+  
+  // Verification de l'etat de surchauffe
+  if (localStorage.getItem("overheated") == "true")
+  {
+    (clickBtn as HTMLButtonElement).disabled = true;
+    clickBtn!.classList.add("opacity-50", "cursor-not-allowed");
+    clickBtn!.textContent = "Surchauffe !";
+  }
+  updateHeatBar();
 
   // Fonction pour mettre à jour la jauge visuellement
-  function updateHeatBar() {
+  function updateHeatBar() 
+  {
     if (heatBar && heatValue) {
-      const percent = Math.max(0, Math.min(100, (heat / maxHeat) * 100));
+      const percent = Math.max(0, Math.min(100, (Number(localStorage.getItem("heat")) / maxHeat) * 100));
       heatBar.style.height = percent + "%";
-      heatValue.textContent = heat.toString();
+      heatValue.textContent = localStorage.getItem("heat") || "0";
       heatBar.className = "w-full transition-all duration-300 " +
         (percent > 80 ? "bg-red-700" : percent > 50 ? "bg-orange-400" : "bg-green-400");
-      }
     }
+  }
 
-  // La chaleur diminue avec le temps
+  // Les actions de la fonction du temps
   setInterval(() => {
-    if (heat > 0) 
+
+    // Refroidissement du réacteur
+    if (Number(localStorage.getItem("heat")) > 0) 
     {
-      heat = Math.max(0, heat - 1); // Par exemple -1 toutes les 200ms
+      heat = Math.max(0, Number(localStorage.getItem("heat")) - 1); // Par exemple -1 toutes les 200ms
+      localStorage.setItem("heat", heat.toString());
       updateHeatBar();
     }
 
-    if ((clickBtn as HTMLButtonElement).disabled == false)
+    // Production d'energie des generateurs secondaires
+    if (localStorage.getItem("overheated") == "false")
     {
       fetch("/api/clicker/generator", {
         method: "POST",
@@ -100,26 +133,30 @@ export function clickerEvent(): void {
         });
     }
 
-    if ((clickBtn as HTMLButtonElement).disabled == true && heat <= 5)
+    // Vérification de la fin de surchauffe
+    if ((clickBtn as HTMLButtonElement).disabled == true && Number(localStorage.getItem("heat")) <= 5)
     {
       (clickBtn as HTMLButtonElement).disabled = false;
+      localStorage.setItem("overheated", "false");
       clickBtn!.classList.remove("opacity-50", "cursor-not-allowed");
       clickBtn!.textContent = "Clique !";
     }
   }, 200);
 
   // Bouton principal (incrément du score)
-  const pointCount = document.getElementById("point-count");
   if (clickBtn && pointCount) {
     clickBtn.addEventListener("click", () => {
       
       // Incrémenter la temperature du réacteur
-      heat = Math.min(maxHeat, heat + 10); // +10 heat à chaque clic
+      heat = Math.min(maxHeat, Number(localStorage.getItem("heat")) + 10);
+      localStorage.setItem("heat", heat.toString());
       updateHeatBar();
-      // === SURCHAUFFE ===
-      if (heat >= maxHeat) {
-        //alert("🔥 Surchauffe ! Le réacteur a explosé !");
+
+      // Tester et appliquer la surchauffe
+      if (Number(localStorage.getItem("heat")) >= maxHeat)
+      {
         (clickBtn as HTMLButtonElement).disabled = true;
+        localStorage.setItem("overheated", "true");
         clickBtn.classList.add("opacity-50", "cursor-not-allowed");
         clickBtn.textContent = "Surchauffe !";
 
@@ -128,7 +165,7 @@ export function clickerEvent(): void {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
-      })
+        })
         .then(res => {
           if (!res.ok) throw new Error("Erreur lors de la mise à jour du score.");
           return res.json();
@@ -142,8 +179,8 @@ export function clickerEvent(): void {
 
         return;
       }
-      // =================
 
+      // Incrémenter le score via la route
       fetch("/api/clicker/update", {
         method: "POST",
         headers: {
@@ -163,10 +200,7 @@ export function clickerEvent(): void {
     });
   }
 
-
   // Bouton "Acheter cooler" (buyCooler)
-  const coolerCount = document.getElementById("cooler-count");
-  const buyCoolerBtn = document.getElementById("buy-cooler");
   if (buyCoolerBtn) {
     buyCoolerBtn.addEventListener("click", () => {
       fetch("/api/clicker/buyCooler", {
@@ -182,8 +216,6 @@ export function clickerEvent(): void {
         .then(data => {
           pointCount!.textContent = data.newScore;
           coolerCount!.textContent = data.newCooler;
-          // Optionnel : afficher la nouvelle valeur ou un message
-          //alert("Cooler acheté ! Nouveau total : " + data.newCooler);
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -192,8 +224,6 @@ export function clickerEvent(): void {
   }
 
   // Bouton "Acheter generateur" (buyGenerator)
-  const generatorCount = document.getElementById("generator-count");
-  const buyGeneratorBtn = document.getElementById("buy-generator");
   if (buyGeneratorBtn) {
     buyGeneratorBtn.addEventListener("click", () => {
       fetch("/api/clicker/buyGenerator", {
@@ -209,8 +239,6 @@ export function clickerEvent(): void {
         .then(data => {
           pointCount!.textContent = data.newScore;
           generatorCount!.textContent = data.newGenerator;
-          // Optionnel : afficher la nouvelle valeur ou un message
-          //alert("Cooler acheté ! Nouveau total : " + data.newCooler);
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -219,8 +247,6 @@ export function clickerEvent(): void {
   }
 
   // Bouton "Acheter bobine" (buyCoil)
-  const coilCount = document.getElementById("coil-count");
-  const buyCoilBtn = document.getElementById("buy-coil");
   if (buyCoilBtn) {
     buyCoilBtn.addEventListener("click", () => {
       fetch("/api/clicker/buyCoil", {
@@ -236,8 +262,6 @@ export function clickerEvent(): void {
         .then(data => {
           pointCount!.textContent = data.newScore;
           coilCount!.textContent = data.newCoil;
-          // Optionnel : afficher la nouvelle valeur ou un message
-          //alert("Cooler acheté ! Nouveau total : " + data.newCooler);
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -245,8 +269,15 @@ export function clickerEvent(): void {
     });
   }
 
-  updateHeatBar();
+  // Bouton "Mode Versus"
+  /*if (versusBtn) {
+  versusBtn.addEventListener("click", () => {
+    document.getElementById("app")!.innerHTML = versusView();
+    versusEvent();
+  });
+  }*/
 
+  // Récupération des stats initiales
   fetch("/api/clicker/stats", {
       method: "GET",
       headers: {
