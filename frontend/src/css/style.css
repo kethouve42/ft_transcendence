@@ -16,7 +16,7 @@
   padding: 10%;
   box-shadow: 0 4px 24px #0003;
   display: inline-block;
-  margin-top: 2rem;
+  margin: 3rem auto;
 }
 
 .menu-btn {
@@ -68,7 +68,7 @@
   border-radius: 1rem;
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
-  background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+  background: linear-gradient(90deg, #04445f, #0a6d9c);
 }
 
 .settings-grid {
@@ -127,7 +127,7 @@
 .pong-canvas {
   background: black;
   display: block;
-  margin: 0 auto;
+  margin: 3rem auto;
 }
 
 @media (max-width: 600px) {

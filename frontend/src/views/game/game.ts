@@ -3,6 +3,7 @@ import { ballSize, speed as baseSpeed, ball, drawBall, resetBall } from './ball.
 import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
+import { navbarView, attachNavbarEvents } from '../navbar.js'
 import { t } from "../../i18n"
 import "../../css/style.css"
 
@@ -254,29 +255,30 @@ Pour chacun des menus, on inverse le flag correspondant.
 */
 function renderUI() {
   const root = document.getElementById('app')!
-  let html = ""
+  let html = navbarView()
   switch (currentPanel) {
     case "menu":
-      html = gameViews()
+      html += gameViews()
       break
     case "settings":
-      html = renderPanelSettings()
+      html += renderPanelSettings()
       break
     case "ai":
-      html = renderPanelAI()
+      html += renderPanelAI()
       break
     case "keyConfig": 
-      html = renderPanelKeys()
+      html += renderPanelKeys()
       break
     case "rules":
-      html = renderPanelRules()
+      html += renderPanelRules()
       break
     case "game":
-      html = renderGame()
+      html += renderGame()
       break
   }
   root.innerHTML = html
   gameEvent()
+  attachNavbarEvents()
 }
 
 function showOnly(panel: Panel) {
@@ -290,7 +292,10 @@ function onKeyDownDuringBinding(e: KeyboardEvent) {
   keyBinding[pendingBinding] = e.key
   pendingBinding = null
   window.removeEventListener("keydown", onKeyDownDuringBinding)
-  renderUI() // met à jour l’affichage des touches
+  document.getElementById("bind-p1-up-display")!.textContent = keyBinding.player1Up
+  document.getElementById("bind-p1-down-display")!.textContent = keyBinding.player1Down
+  document.getElementById("bind-p2-up-display")!.textContent = keyBinding.player2Up
+  document.getElementById("bind-p2-down-display")!.textContent = keyBinding.player2Down
 }
 
 /*
@@ -410,20 +415,18 @@ function resetGame(): void {
 function endGame() {
   let winner: "left" | "right" | null = null;
   if (score.left === scoreMod)
-    winner = "left";
+    winner = "left"
   else if (score.right === scoreMod)
-    winner = "right";
-
-  // Ne fonctionne pas encore, probleme soit de not found soit de cors.
-  fetch("api/matchs/", {
+    winner = "right"
+  fetch("/api/matchs/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       date: new Date().toISOString(),
-      duration: timerMod, // test
-      user1_id: 1, // test
-      user2_id: 2, // test
-      winner_id: 1, // test
+      duration: timerMod,
+      user1_id: 1,
+      user2_id: 2,
+      winner_id: 1,
       score: `${score.left}-${score.right}`
     })
   }).catch(() => {});
@@ -521,7 +524,8 @@ function startMatch() {
   initPaddle(canvas!)
   resetBall(canvas!)
   resetTimer()
-  startTimer(timerMod)
+  const timerGame = Math.max(10, timerMod)
+  startTimer(timerGame)
   gameLoop()
 }
 /*
