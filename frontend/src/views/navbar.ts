@@ -55,11 +55,6 @@ export function navbarView(): string {
             `
         }
       </div>
-      <a href="/loginUser2?redirect=${encodeURIComponent(window.location.pathname)}"
-        class="${linkClass("/loginUser2", "text-lg font-semibold text-cyan-200 hover:text-cyan-400 transition")}"
-      >
-        Login Player 2
-      </a>
     </nav>
   `;
 }
