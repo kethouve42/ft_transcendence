@@ -120,5 +120,6 @@ export function attachLoginPlayer2Events() {
 
 function getRedirectUrl() {
   const params = new URLSearchParams(window.location.search);
+  console.log(params.get("redirect") || "/");
   return params.get("redirect") || "/";
 }

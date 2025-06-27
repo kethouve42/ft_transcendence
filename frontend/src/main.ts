@@ -33,7 +33,6 @@ function pingUser() {
   })
   .then(res => {
     if (res.status === 401) {
-      // Token expiré ou invalide : on nettoie tout et on redirige
       localStorage.removeItem("token");
       localStorage.removeItem("userLogin");
       localStorage.removeItem("userAlias");
@@ -101,7 +100,6 @@ function attachEvents(route: string) {
 
 export function attachLinkHandlers() {
   document.querySelectorAll("a[href]").forEach(link => {
-    // On clone le lien pour supprimer tous les anciens listeners
     const newLink = link.cloneNode(true) as HTMLAnchorElement;
     link.parentNode?.replaceChild(newLink, link);
 
@@ -110,7 +108,8 @@ export function attachLinkHandlers() {
       if (href && href.startsWith("/")) {
         e.preventDefault();
         history.pushState({}, "", href);
-        render(href);
+        const url = new URL(href, window.location.origin);
+        render(url.pathname);
       }
     });
   });
