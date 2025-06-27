@@ -8,6 +8,7 @@ import { navbarView, attachNavbarEvents } from "./views/navbar";
 import { renderError, attachErrorEvents } from "./views/error";
 import { clickerView, clickerEvent } from "./views/clicker/clicker";
 import { gameViews, gameEvent} from "./views/game/game"
+import { loginPlayer2View, attachLoginPlayer2Events } from "./views/login_player2"
 
 // Ajoute ici toutes les routes de ton app
 type RouteHandler = (params?: any) => string | Promise<string>;
@@ -20,6 +21,7 @@ const routes: Record<string, RouteHandler> = {
   "/error": renderError,
   "/clicker": clickerView,
   "/pong": gameViews,
+  "/loginUser2": loginPlayer2View,
 };
 
 function pingUser() {
@@ -50,6 +52,7 @@ function render(route: string) {
     const protectedRoutes = [
     "/dashboard",
     "/clicker",
+    "/game",
   ];
   const token = localStorage.getItem("token");
   if (protectedRoutes.includes(route) && !token) {
@@ -60,6 +63,7 @@ function render(route: string) {
   const protectedRoutes_lr = [
     "/login",
     "/register",
+    "/loginUser2",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");
@@ -92,6 +96,7 @@ function attachEvents(route: string) {
   if (route === "/error") attachErrorEvents();
   if (route === "/clicker") clickerEvent();
   if (route === "/pong") gameEvent();
+  if (route === "/loginUser2") attachLoginPlayer2Events();
 }
 
 export function attachLinkHandlers() {
