@@ -38,7 +38,7 @@ export function navbarView(): string {
               <a href="/dashboard" class="flex items-center gap-2 font-semibold text-cyan-200 hover:text-cyan-400 transition">
                 <span class="inline-block w-9 h-9 rounded-full bg-cyan-900 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg overflow-hidden">
                 <img
-                  src="${userAvatar || 'http://localhost:3000/uploads/default-avatar.png'}"
+                  src="${userAvatar && userAvatar.trim() !== '' ? userAvatar : '/uploads/default-avatar.png'}"
                   alt="avatar"
                   class="w-9 h-9 rounded-full border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg object-cover bg-cyan-900"
                 />

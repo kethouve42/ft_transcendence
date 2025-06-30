@@ -24,4 +24,12 @@ export function t(path: string): string {
   return obj || path;
 }
 
+export function tObj(path: string): any {
+  const lang = getLang();
+  const keys = path.split(".");
+  let obj: any = LANGS[lang];
+  for (const key of keys) obj = obj?.[key];
+  return obj;
+}
+
 export { LANGS, LANG_NAMES };

@@ -106,6 +106,23 @@ export default {
     loading_friends: "Cargando amigos...",
     no_friends: "Aún no tienes amigos.",
     view_profile: "Ver perfil",
+    gdpr_title: "Privacidad y GDPR",
+    gdpr_anonymize: "Anonimizar mis datos",
+    gdpr_export: "Exportar mis datos",
+    gdpr_delete: "Eliminar mi cuenta",
+    gdpr_policy: "Política de privacidad",
+    gdpr_confirm_anonymize: "¿Realmente desea anonimizar sus datos?",
+    gdpr_anonymized: "✅ Datos anonimizados.",
+    gdpr_error_anonymize: "❌ Error durante la anonimización.",
+    gdpr_exported: "✅ Datos exportados.",
+    gdpr_error_export: "❌ Error durante la exportación.",
+    gdpr_export_filename: "mis_datos.json",
+    gdpr_confirm_delete: "Esta acción es irreversible. ¿Eliminar su cuenta?",
+    gdpr_confirm_delete2: "Esta acción es irreversible. ¿Estás seguro?",
+    gdpr_confirm_delete3: "Esta acción es irreversible. ¿Realmente seguro?",
+    gdpr_confirm_delete4: "¡Última oportunidad!",
+    gdpr_deleted: "✅ Cuenta eliminada.",
+    gdpr_error_delete: "❌ Error durante la eliminación.",
   },
   menu: {
     play_local: "Jugar localmente",
@@ -150,5 +167,41 @@ export default {
     points: "Puntos para ganar: ",
     save: "Guardar",
     cancel: "Cerrar",
-  }  
+  },
+  privacy: {
+    title: "Política de privacidad",
+    intro: "Esta aplicación cumple con el Reglamento General de Protección de Datos (RGPD) europeo. Nos comprometemos a proteger su información personal y a ofrecerle herramientas para gestionar sus datos.",
+    collected: "¿Qué datos se recopilan?",
+    collected_list: [
+      "Credenciales de inicio de sesión (login, email, contraseña cifrada)",
+      "Alias y avatar",
+      "Estadísticas de juego (puntuaciones, partidas, victorias, derrotas, tiempo de juego...)",
+      "Historial de partidas e interacciones sociales (amigos, invitaciones...)",
+      "Configuraciones locales (idioma, preferencias, configuración de teclas... almacenadas en su navegador)"
+    ],
+    usage: "¿Cómo se usan sus datos?",
+    usage_list: [
+      "Para permitir la autenticación y la gestión de su cuenta",
+      "Para mostrar su perfil, avatar, estadísticas e historial de juego",
+      "Para el funcionamiento de los juegos (puntuaciones, progreso, clasificación...)",
+      "Para mejorar la experiencia del usuario (idioma, preferencias locales...)"
+    ],
+    rights: "¿Cuáles son sus derechos?",
+    rights_list: [
+      "Acceder a sus datos personales",
+      "Modificar o corregir su información",
+      "Anonimizar sus datos (reemplazo de su información por valores anónimos)",
+      "Exportar sus datos (descarga en formato JSON)",
+      "Eliminar permanentemente su cuenta y todos sus datos"
+    ],
+    rights_info: "Puede ejercer estos derechos en cualquier momento desde su panel, en la sección \"Privacidad y GDPR\".",
+    storage: "¿Dónde se almacenan sus datos?",
+    storage_list: [
+      "Los datos de la cuenta y del juego se almacenan en nuestros servidores seguros (el PC donde ves el sitio).",
+      "Las preferencias locales (idioma, configuración) se almacenan solo en su navegador (localStorage)."
+    ],
+    contact: "Contacto",
+    contact_info: "Para cualquier pregunta o solicitud sobre sus datos personales, pregunte a su izquierda o derecha, estamos aquí",
+    back_home: "Volver al inicio"
+  },
 };

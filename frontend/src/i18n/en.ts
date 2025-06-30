@@ -106,6 +106,23 @@ export default {
     loading_friends: "Loading friends...",
     no_friends: "No friends yet.",
     view_profile: "View profile",
+    gdpr_title: "Privacy & GDPR",
+    gdpr_anonymize: "Anonymize my data",
+    gdpr_export: "Export my data",
+    gdpr_delete: "Delete my account",
+    gdpr_policy: "Privacy policy",
+    gdpr_confirm_anonymize: "Do you really want to anonymize your data?",
+    gdpr_anonymized: "✅ Data anonymized.",
+    gdpr_error_anonymize: "❌ Error during anonymization.",
+    gdpr_exported: "✅ Data exported.",
+    gdpr_error_export: "❌ Error during export.",
+    gdpr_export_filename: "my_data.json",
+    gdpr_confirm_delete: "This action is irreversible. Delete your account?",
+    gdpr_confirm_delete2: "This action is irreversible. Are you sure?",
+    gdpr_confirm_delete3: "This action is irreversible. Really sure?",
+    gdpr_confirm_delete4: "Last chance!",
+    gdpr_deleted: "✅ Account deleted.",
+    gdpr_error_delete: "❌ Error during deletion.",
   },
   menu: {
     play_local: "Play locally",
@@ -150,5 +167,41 @@ export default {
     points: "Points to win: ",
     save: "Save",
     cancel: "Close",
-  }
+  },
+  privacy: {
+    title: "Privacy Policy",
+    intro: "This application complies with the European General Data Protection Regulation (GDPR). We are committed to protecting your personal information and providing you with tools to manage your data.",
+    collected: "What data is collected?",
+    collected_list: [
+      "Login credentials (login, email, encrypted password)",
+      "Alias and avatar",
+      "Game statistics (scores, matches, wins, losses, play time...)",
+      "Match history and social interactions (friends, invitations...)",
+      "Local settings (language, preferences, key configuration... stored in your browser)"
+    ],
+    usage: "How is your data used?",
+    usage_list: [
+      "To enable authentication and manage your account",
+      "To display your profile, avatar, statistics, and game history",
+      "For game functionality (scores, progression, ranking...)",
+      "To improve user experience (language, local preferences...)"
+    ],
+    rights: "What are your rights?",
+    rights_list: [
+      "Access your personal data",
+      "Modify or correct your information",
+      "Anonymize your data (replace your info with anonymous values)",
+      "Export your data (download as JSON)",
+      "Permanently delete your account and all your data"
+    ],
+    rights_info: "You can exercise these rights at any time from your dashboard, in the \"Privacy & GDPR\" section.",
+    storage: "Where is your data stored?",
+    storage_list: [
+      "Account and game data are stored on our secure servers (the PC where you see the site).",
+      "Local preferences (language, configuration) are stored only in your browser (localStorage)."
+    ],
+    contact: "Contact",
+    contact_info: "For any questions or requests regarding your personal data, ask to your left or right, we are here",
+    back_home: "Back to home"
+  },
 };

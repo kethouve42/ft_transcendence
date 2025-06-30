@@ -17,6 +17,16 @@ export function dashboardView(): string {
           <div id="stats"></div>
         </div>
       </div>
+      <div class="w-full max-w-[1800px] mx-auto mt-10 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-6">
+        <h3 class="text-xl font-bold text-cyan-200 mb-4">${t("dashboard.gdpr_title") || "Vie privée & GDPR"}</h3>
+        <div class="flex flex-col md:flex-row gap-4">
+          <button id="gdpr-anonymize" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition">${t("dashboard.gdpr_anonymize") || "Anonymiser mes données"}</button>
+          <button id="gdpr-export" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">${t("dashboard.gdpr_export") || "Exporter mes données"}</button>
+          <button id="gdpr-delete" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">${t("dashboard.gdpr_delete") || "Supprimer mon compte"}</button>
+          <a href="/privacy" class="text-cyan-400 underline self-center">${t("dashboard.gdpr_policy") || "Politique de confidentialité"}</a>
+        </div>
+        <div id="gdpr-message" class="mt-4 text-center"></div>
+      </div>
       <a href="/" class="text-cyan-400 underline mt-8 inline-block">${t("dashboard.back_home")}</a>
     </div>
   `;
@@ -29,7 +39,70 @@ export function attachDashboardViewEvents() {
     return;
   }
 
-  // 1. Récupère infos utilisateur
+  setTimeout(() => {
+    const token = localStorage.getItem("token");
+    const msg = document.getElementById("gdpr-message");
+
+    const anonymBtn = document.getElementById("gdpr-anonymize");
+    if (anonymBtn) {
+      anonymBtn.addEventListener("click", async () => {
+        if (!confirm(t("dashboard.gdpr_confirm_anonymize"))) return;
+        const res = await fetch("/api/users/me/anonymize", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          msg!.textContent = t("dashboard.gdpr_anonymized");
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          msg!.textContent = t("dashboard.gdpr_error_anonymize");
+        }
+      });
+    }
+
+    const exportBtn = document.getElementById("gdpr-export");
+    if (exportBtn) {
+      exportBtn.addEventListener("click", async () => {
+        const res = await fetch("/api/users/me/export", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = t("dashboard.gdpr_export_filename");
+          a.click();
+          msg!.textContent = t("dashboard.gdpr_exported");
+        } else {
+          msg!.textContent = t("dashboard.gdpr_error_export");
+        }
+      });
+    }
+
+    const deleteBtn = document.getElementById("gdpr-delete");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", async () => {
+        if (!confirm(t("dashboard.gdpr_confirm_delete"))) return;
+        if (!confirm(t("dashboard.gdpr_confirm_delete2"))) return;
+        if (!confirm(t("dashboard.gdpr_confirm_delete3"))) return;
+        if (!confirm(t("dashboard.gdpr_confirm_delete4"))) return;
+        const res = await fetch("/api/users/me", {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          localStorage.clear();
+          msg!.textContent = t("dashboard.gdpr_deleted");
+          setTimeout(() => navigateTo("/"), 1500);
+        } else {
+          msg!.textContent = t("dashboard.gdpr_error_delete");
+        }
+      });
+    }
+  }, 0);
+  
   fetch("/api/users/profil", {
     headers: { Authorization: `Bearer ${token}` }
   })
@@ -38,7 +111,7 @@ export function attachDashboardViewEvents() {
       const info = document.getElementById("profile-info");
       if (info) {
         info.innerHTML = `
-          <img src="${user.avatar || "http://localhost:3000/uploads/default-avatar.png"}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />
+          <img src="${user.avatar || "/uploads/default-avatar.png"}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />
           <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-2">${user.login}</h2>
           <div class="flex gap-6 text-cyan-100 text-lg">
             <span><b>${t("dashboard.alias")} :</b> ${user.alias || `<span class="italic text-cyan-400">${t("dashboard.none")}</span>`}</span>
