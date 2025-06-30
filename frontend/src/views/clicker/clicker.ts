@@ -165,6 +165,8 @@ export function clickerView(): string {
 
 export function clickerEvent(): void {
 
+//#region mode solo
+
   // Initialisation de la chaleur et des variables
   let heat = 0;
   let overheated = false;
@@ -182,8 +184,11 @@ export function clickerEvent(): void {
   const coilCount = document.getElementById("coil-count");
   const buyCoilBtn = document.getElementById("buy-coil");
   const versusBtn = document.getElementById("versus-btn");
-  
+
   // Verification de l'etat de surchauffe
+  if (localStorage.getItem("overheated") === null) {
+  localStorage.setItem("overheated", "false");
+  }
   if (localStorage.getItem("overheated") == "true")
   {
     (clickBtn as HTMLButtonElement).disabled = true;
@@ -218,10 +223,13 @@ export function clickerEvent(): void {
     // Production d'energie des generateurs secondaires
     if (localStorage.getItem("overheated") == "false")
     {
+      const token = localStorage.getItem("token");
+
+      if (token) {
       fetch("/api/clicker/generator", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         }
       })
         .then(res => {
@@ -234,6 +242,7 @@ export function clickerEvent(): void {
         .catch(err => {
           console.error("❌ Erreur :", err.message);
         });
+      }
     }
 
     // Vérification de la fin de surchauffe
@@ -372,14 +381,6 @@ export function clickerEvent(): void {
     });
   }
 
-  // Bouton "Mode Versus"
-  if (versusBtn) {
-  versusBtn.addEventListener("click", () => {
-    
-    navigateTo(`/loginUser2?redirect=${encodeURIComponent(window.location.pathname)}`)
-  });
-  }
-
   // Récupération des stats initiales
   fetch("/api/clicker/stats", {
       method: "GET",
@@ -387,17 +388,118 @@ export function clickerEvent(): void {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       }
     })
-      .then(res => {
+    .then(res => {
         if (!res.ok) throw new Error("Erreur lors de la recuperation des donnees.");
         return res.json();
-      })
-      .then(data => {
+    })
+    .then(data => {
         pointCount!.textContent = data.score;
         coolerCount!.textContent = data.cooler;
         generatorCount!.textContent = data.generator;
         coilCount!.textContent = data.coil
-      })
-      .catch(err => {
-        console.error("❌ Erreur :", err.message);
+    })
+    .catch(err => {
+      console.error("❌ Erreur :", err.message);
+    });
+
+//#endregion
+
+//#region mode versus
+
+// Bouton "Mode Versus"
+  if (versusBtn){
+  versusBtn.addEventListener("click", () => {
+  
+    // Page de connection pour le second joueur
+    navigateTo(`/loginUser2?redirect=${encodeURIComponent(window.location.pathname)}`);
+  
+    // Initialisation des variables pour le versus
+    ["1", "2"].forEach((n) => {
+    if (localStorage.getItem(`vs_${n}score`) === null) localStorage.setItem(`vs_${n}score`, "0");
+    if (localStorage.getItem(`vs_${n}heat`) === null) localStorage.setItem(`vs_${n}heat`, "0");
+    if (localStorage.getItem(`vs_${n}cooler`) === null) localStorage.setItem(`vs_${n}cooler`, "0");
+    if (localStorage.getItem(`vs_${n}generator`) === null) localStorage.setItem(`vs_${n}generator`, "0");
+    if (localStorage.getItem(`vs_${n}coil`) === null) localStorage.setItem(`vs_${n}coil`, "0");
+    if (localStorage.getItem(`vs_${n}overheated`) === null) localStorage.setItem(`vs_${n}overheated`, "false");
+    });
+  });
+  }
+  
+  if (localStorage.getItem("token_player2")) {
+
+  setInterval(() => {
+  ["1", "2"].forEach((n) => {
+    // Refroidissement du réacteur pour chaque joueur
+    let heat = Number(localStorage.getItem(`vs_${n}heat`)) || 0;
+    if (heat > 0) {
+      heat = Math.max(0, heat - 1);
+      localStorage.setItem(`vs_${n}heat`, heat.toString());
+    }
+
+    // Mise à jour de la jauge et de la valeur affichée
+    const heatBar = document.getElementById(`heat-bar-${n}`);
+    const heatValue = document.getElementById(`heat-value-${n}`);
+    const maxHeat = 100;
+    const percent = Math.max(0, Math.min(100, (heat / maxHeat) * 100));
+    if (heatBar) {
+      heatBar.style.height = percent + "%";
+      heatBar.className = "w-full transition-all duration-300 " +
+        (percent > 80 ? "bg-red-700" : percent > 50 ? "bg-orange-400" : "bg-green-400");
+    }
+    if (heatValue) heatValue.textContent = heat.toString();
+
+    // Vérification de la fin de surchauffe
+    const clickBtn = document.getElementById(`click-btn-${n}`) as HTMLButtonElement;
+    if (clickBtn && localStorage.getItem(`vs_${n}overheated`) === "true" && heat <= 5) {
+      clickBtn.disabled = false;
+      localStorage.setItem(`vs_${n}overheated`, "false");
+      clickBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      clickBtn.textContent = "Clique !";
+    }
+  });
+  }, 200);
+
+
+
+  // Bouton click
+  ["1", "2"].forEach((n) => {
+  const clickBtn = document.getElementById(`click-btn-${n}`) as HTMLButtonElement;
+  const pointCount = document.getElementById(`point-count-${n}`);
+    if (clickBtn) {
+      clickBtn.addEventListener("click", () => {
+        
+      // Incrémenter la temperature du réacteur
+      heat = Math.min(maxHeat, Number(localStorage.getItem(`vs_${n}heat`)) + 10);
+      localStorage.setItem(`vs_${n}heat`, heat.toString());
+      //updateHeatBar();
+
+      // Tester et appliquer la surchauffe
+      if (Number(localStorage.getItem(`vs_${n}heat`)) >= maxHeat)
+      {
+        (clickBtn as HTMLButtonElement).disabled = true;
+        localStorage.setItem(`vs_${n}overheated`, "true");
+        clickBtn.classList.add("opacity-50", "cursor-not-allowed");
+        clickBtn.textContent = "Surchauffe !";
+
+        const scoreStr = localStorage.getItem(`vs_${n}score`);
+        const scoreBigInt = scoreStr ? BigInt(scoreStr) : BigInt(0);
+        let currentScore = scoreBigInt * BigInt(75) / BigInt(100);
+        localStorage.setItem(`vs_${n}score`, currentScore.toString());
+        pointCount!.textContent = currentScore.toString();
+        return;
+      }
+
+      // Incrémenter le score
+        const scoreStr = localStorage.getItem(`vs_${n}score`);
+        const scoreBigInt = scoreStr ? BigInt(scoreStr) : BigInt(0);
+        let currentScore = scoreBigInt + BigInt(1);
+        localStorage.setItem(`vs_${n}score`, currentScore.toString());
+        pointCount!.textContent = currentScore.toString();
       });
+    }
+  });
+
+}
+//#endregion
+
 }
