@@ -64,7 +64,6 @@ function render(route: string) {
   const protectedRoutes_lr = [
     "/login",
     "/register",
-    "/loginUser2",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");

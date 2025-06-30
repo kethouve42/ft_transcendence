@@ -1,6 +1,108 @@
-import { score } from "../game/score";
+import { navigateTo } from "../../main";
 
 export function clickerView(): string {
+  if (localStorage.getItem("token_player2"))
+  {
+    return `
+      <div class="flex flex-row items-center justify-center min-h-[60vh] gap-16">
+        <!-- Joueur 1 -->
+        <div class="flex flex-col items-center bg-gray-900/30 p-6 rounded-xl shadow-lg">
+          <div class="flex flex-col items-center mb-4">
+            <div class="w-8 h-64 bg-gray-800 rounded-lg flex items-end overflow-hidden border-2 border-cyan-400">
+              <div id="heat-bar-1" class="w-full bg-red-500 transition-all duration-300" style="height: 0%"></div>
+            </div>
+            <span class="mt-2 text-cyan-300 font-bold">Chaleur</span>
+            <span id="heat-value-1" class="text-lg font-extrabold text-red-400">0</span>
+          </div>
+          <div class="relative flex items-center">
+            <img src="/Clicker/Reactor.jpg" alt="Cible" class="w-64 h-64 object-contain rounded-xl shadow-lg" />
+            <button
+              id="click-btn-1"
+              class="ml-4 bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition"
+            >
+              Clique !
+            </button>
+            <div class="ml-8 flex flex-col items-center">
+              <span class="text-lg text-cyan-300 font-bold">Points</span>
+              <span id="point-count-1" class="text-3xl font-extrabold mt-2">0</span>
+            </div>
+          </div>
+          <div class="flex gap-6 mt-10">
+            <div class="flex flex-col items-center">
+              <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler-1">
+                Acheter refroidisseur
+              </button>
+              <span id="cooler-count-1" class="mt-2 text-2xl font-bold text-amber-400">0</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator-1">
+                Acheter generateur
+              </button>
+              <span id="generator-count-1" class="mt-2 text-2xl font-bold text-lime-400">0</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil-1">
+                Acheter bobines
+              </button>
+              <span id="coil-count-1" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
+            </div>
+          </div>
+        </div>
+        <!-- Joueur 2 -->
+        <div class="flex flex-col items-center bg-gray-900/30 p-6 rounded-xl shadow-lg">
+          <div class="flex flex-col items-center mb-4">
+            <div class="w-8 h-64 bg-gray-800 rounded-lg flex items-end overflow-hidden border-2 border-cyan-400">
+              <div id="heat-bar-2" class="w-full bg-red-500 transition-all duration-300" style="height: 0%"></div>
+            </div>
+            <span class="mt-2 text-cyan-300 font-bold">Chaleur</span>
+            <span id="heat-value-2" class="text-lg font-extrabold text-red-400">0</span>
+          </div>
+          <div class="relative flex items-center">
+            <img src="/Clicker/Reactor.jpg" alt="Cible" class="w-64 h-64 object-contain rounded-xl shadow-lg" />
+            <button
+              id="click-btn-2"
+              class="ml-4 bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition"
+            >
+              Clique !
+            </button>
+            <div class="ml-8 flex flex-col items-center">
+              <span class="text-lg text-cyan-300 font-bold">Points</span>
+              <span id="point-count-2" class="text-3xl font-extrabold mt-2">0</span>
+            </div>
+          </div>
+          <div class="flex gap-6 mt-10">
+            <div class="flex flex-col items-center">
+              <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler-2">
+                Acheter refroidisseur
+              </button>
+              <span id="cooler-count-2" class="mt-2 text-2xl font-bold text-amber-400">0</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator-2">
+                Acheter generateur
+              </button>
+              <span id="generator-count-2" class="mt-2 text-2xl font-bold text-lime-400">0</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil-2">
+                Acheter bobines
+              </button>
+              <span id="coil-count-2" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
+            </div>
+          </div>
+        </div>
+        <!-- Bouton Quitter -->
+        <button
+          id="quit-versus-btn"
+          class="fixed top-4 right-4 bg-gray-700 hover:bg-gray-500 text-white px-4 py-2 rounded shadow-lg z-50"
+        >
+          Quitter
+        </button>
+      </div>
+    `;
+  }
+  else
+  {
   return `
     <div class="flex flex-row items-center justify-center min-h-[60vh]">
       <!-- Jauge de chaleur à gauche -->
@@ -59,6 +161,7 @@ export function clickerView(): string {
       </div>
       `;
     }
+}
 
 export function clickerEvent(): void {
 
@@ -270,12 +373,12 @@ export function clickerEvent(): void {
   }
 
   // Bouton "Mode Versus"
-  /*if (versusBtn) {
+  if (versusBtn) {
   versusBtn.addEventListener("click", () => {
-    document.getElementById("app")!.innerHTML = versusView();
-    versusEvent();
+    
+    navigateTo(`/loginUser2?redirect=${encodeURIComponent(window.location.pathname)}`)
   });
-  }*/
+  }
 
   // Récupération des stats initiales
   fetch("/api/clicker/stats", {
