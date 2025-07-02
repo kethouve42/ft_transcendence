@@ -5,6 +5,7 @@ import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
 import { navbarView, attachNavbarEvents } from '../navbar.js'
 import { t } from "../../i18n"
+import { navigateTo } from '../../main.js'
 import "../../css/style.css"
 
 type Panel =  "menu" | "settings" | "ai" | "keyConfig" | "rules" | "game"
@@ -37,6 +38,10 @@ let ctx: CanvasRenderingContext2D
 
 // Prise en compte du DOM
 export function gameViews() {
+  if (!localStorage.getItem("token")) {
+    navigateTo("/login")
+    return ""
+  }
   return `
   <div class="app-container">
     <div id="menu" class="menu">
@@ -195,7 +200,13 @@ function renderGame() {
 export function gameEvent() {
   const root = document.getElementById('app')!
 
-  root.querySelector('#btn-local')?.addEventListener("click", () => showOnly("keyConfig"))
+  root.querySelector('#btn-local')?.addEventListener("click", () => {
+    if (!localStorage.getItem("token_player2")) {
+      navigateTo("/loginUser2?redirect=/pong")
+      return
+    }
+    showOnly("keyConfig")
+  })
   root.querySelector('#btn-ai')?.addEventListener("click", () => showOnly("ai"))
   root.querySelector('#btn-rules')?.addEventListener("click", () => showOnly("rules"))
   root.querySelector('#btn-settings')?.addEventListener("click", () => showOnly("settings"))
@@ -420,16 +431,24 @@ function endGame() {
     winner = "left"
   else if (score.right === scoreMod)
     winner = "right"
+
+  const token1 = localStorage.getItem("token");
+  const token2 = localStorage.getItem("token_player2");
+
+  const winner_id = winner === "left" ? token1 : token2;
+
   fetch("/api/matchs/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
     body: JSON.stringify({
       date: new Date().toISOString(),
       duration: timerMod,
-      user1_id: 1,
-      user2_id: 2,
-      winner_id: 1,
-      score: `${score.left}-${score.right}`
+      winner_id,
+      score: `${score.left}-${score.right}`,
+      player2_token: token2
     })
   }).catch(() => {});
 
@@ -441,14 +460,14 @@ function endGame() {
 function update() {
   if (mode === "local") 
   {
-    if (keyPressed[keyBinding.player2Up]   && rightPaddle.y > 0)
+    if (keyPressed[keyBinding.player2Up] && rightPaddle.y > 0)
       rightPaddle.y -= baseSpeed
     if (keyPressed[keyBinding.player2Down] && rightPaddle.y < canvas!.height-paddleHeight)
       rightPaddle.y += baseSpeed
   } 
   else
     aiStep()
-  if (keyPressed[keyBinding.player1Up]   && leftPaddle.y > 0)
+  if (keyPressed[keyBinding.player1Up] && leftPaddle.y > 0)
     leftPaddle.y -= baseSpeed
   if (keyPressed[keyBinding.player1Down] && leftPaddle.y < canvas!.height-paddleHeight)
     leftPaddle.y += baseSpeed
