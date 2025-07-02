@@ -38,11 +38,13 @@ let ctx: CanvasRenderingContext2D
 // Prise en compte du DOM
 export function gameViews() {
   return `
-  <div id="menu" class="menu">
-    <button id="btn-local" class="menu-btn">${t("menu.play_local")}</button>
-    <button id="btn-ai" class="menu-btn">${t("menu.play_ai")}</button>
-    <button id="btn-rules" class="menu-btn">${t("menu.rules")}</button>
-    <button id="btn-settings" class="menu-btn">${t("menu.settings")}</button>
+  <div class="app-container">
+    <div id="menu" class="menu">
+      <button id="btn-local" class="menu-btn">${t("menu.play_local")}</button>
+      <button id="btn-ai" class="menu-btn">${t("menu.play_ai")}</button>
+      <button id="btn-rules" class="menu-btn">${t("menu.rules")}</button>
+      <button id="btn-settings" class="menu-btn">${t("menu.settings")}</button>
+    </div>
   </div>
   `
 }
