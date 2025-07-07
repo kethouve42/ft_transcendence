@@ -209,18 +209,31 @@ export function clickerEvent(): void {
     }
   }
 
-  // Les actions de la fonction du temps
+  // Gestion de la chaleur
   setInterval(() => {
 
     // Refroidissement du réacteur
     if (Number(localStorage.getItem("heat")) > 0) 
     {
-      heat = Math.max(0, Number(localStorage.getItem("heat")) - 1); // Par exemple -1 toutes les 200ms
+      let cooling = Math.round((2 + Number(coolerCount!.textContent)) - (Number(generatorCount!.textContent) * 0.5));
+      if (cooling < 0) cooling = 0;
+      heat = Math.max(0, Number(localStorage.getItem("heat")) - cooling);
       localStorage.setItem("heat", heat.toString());
       updateHeatBar();
     }
 
-    // Production d'energie des generateurs secondaires
+    // Vérification de la fin de surchauffe
+    if ((clickBtn as HTMLButtonElement).disabled == true && Number(localStorage.getItem("heat")) <= 5)
+    {
+      (clickBtn as HTMLButtonElement).disabled = false;
+      localStorage.setItem("overheated", "false");
+      clickBtn!.classList.remove("opacity-50", "cursor-not-allowed");
+      clickBtn!.textContent = "Clique !";
+    }
+  }, 500);
+
+  // Production d'energie des generateurs secondaires
+  setInterval(() => {
     if (localStorage.getItem("overheated") == "false")
     {
       const token = localStorage.getItem("token");
@@ -244,23 +257,16 @@ export function clickerEvent(): void {
         });
       }
     }
-
-    // Vérification de la fin de surchauffe
-    if ((clickBtn as HTMLButtonElement).disabled == true && Number(localStorage.getItem("heat")) <= 5)
-    {
-      (clickBtn as HTMLButtonElement).disabled = false;
-      localStorage.setItem("overheated", "false");
-      clickBtn!.classList.remove("opacity-50", "cursor-not-allowed");
-      clickBtn!.textContent = "Clique !";
-    }
-  }, 200);
+  }, 1000);
 
   // Bouton principal (incrément du score)
   if (clickBtn && pointCount) {
     clickBtn.addEventListener("click", () => {
       
       // Incrémenter la temperature du réacteur
-      heat = Math.min(maxHeat, Number(localStorage.getItem("heat")) + 10);
+      let heating = 5 + Number(coilCount!.textContent) - Math.round((Number(coolerCount!.textContent) * 0.5));
+      if (heating < 0) heating = 0;
+      heat = Math.min(maxHeat, Number(localStorage.getItem("heat")) + heating);
       localStorage.setItem("heat", heat.toString());
       updateHeatBar();
 
@@ -427,12 +433,57 @@ export function clickerEvent(): void {
   
   if (localStorage.getItem("token_player2")) {
 
+  // Crée et initialiser le timer versus
+  let timerDiv = document.getElementById("versus-timer");
+  if (!timerDiv) {
+    timerDiv = document.createElement("div");
+    timerDiv.id = "versus-timer";
+    timerDiv.className = "fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow-lg z-50 text-xl";
+    document.body.appendChild(timerDiv);
+  }
+  let timeLeft = 60; // secondes
+  timerDiv.textContent = `Temps restant : ${timeLeft}s`;
+
+  const quitBtn = document.getElementById("quit-versus-btn");
+
+  // Decrementer le timer
+  const versusTimer = setInterval(() => {
+    timeLeft--;
+    timerDiv!.textContent = `Temps restant : ${timeLeft}s`;
+    // Fin de la partie versus
+    if (timeLeft <= 0) {
+      clearInterval(versusTimer);
+      localStorage.removeItem("token_player2");
+
+      const score1 = localStorage.getItem("vs_1score") || "0";
+      const score2 = localStorage.getItem("vs_2score") || "0";
+      // Nettoyage des donnees versus
+      ["1", "2"].forEach((n) => {
+      localStorage.removeItem(`vs_${n}score`);
+      localStorage.removeItem(`vs_${n}heat`);
+      localStorage.removeItem(`vs_${n}cooler`);
+      localStorage.removeItem(`vs_${n}generator`);
+      localStorage.removeItem(`vs_${n}coil`);
+      localStorage.removeItem(`vs_${n}overheated`);
+      });
+
+      timerDiv!.textContent = "Fin de la partie !";
+      setTimeout(() => {
+        timerDiv!.remove();
+        navigateTo("/");
+      }, 2000);
+    }
+  }, 1000);
+
+  // Decrement chaleur et generateurs auxiliaires
   setInterval(() => {
   ["1", "2"].forEach((n) => {
     // Refroidissement du réacteur pour chaque joueur
     let heat = Number(localStorage.getItem(`vs_${n}heat`)) || 0;
     if (heat > 0) {
-      heat = Math.max(0, heat - 1);
+      let cooling = Math.round((2 + Number(localStorage.getItem(`vs_${n}cooler`))) - Number(localStorage.getItem(`vs_${n}generator`)) * 0.5);
+      if (cooling < 0) cooling = 0;
+      heat = Math.max(0, heat - cooling);
       localStorage.setItem(`vs_${n}heat`, heat.toString());
     }
 
@@ -456,10 +507,16 @@ export function clickerEvent(): void {
       clickBtn.classList.remove("opacity-50", "cursor-not-allowed");
       clickBtn.textContent = "Clique !";
     }
+
+    // Activation des generateurs secondaires
+    if (localStorage.getItem(`vs_${n}overheated`) === "false") {
+      let score = Number(localStorage.getItem(`vs_${n}score`)) + Number(localStorage.getItem(`vs_${n}generator`));
+      localStorage.setItem(`vs_${n}score`, score.toString());
+      const pointCount = document.getElementById(`point-count-${n}`);
+      pointCount!.textContent = score.toString();
+    }
   });
-  }, 200);
-
-
+  }, 1000);
 
   // Bouton click
   ["1", "2"].forEach((n) => {
@@ -469,9 +526,10 @@ export function clickerEvent(): void {
       clickBtn.addEventListener("click", () => {
         
       // Incrémenter la temperature du réacteur
-      heat = Math.min(maxHeat, Number(localStorage.getItem(`vs_${n}heat`)) + 10);
-      localStorage.setItem(`vs_${n}heat`, heat.toString());
-      //updateHeatBar();
+      let heating = 5 + Number(localStorage.getItem(`vs_${n}coil`)) - Math.round((Number(localStorage.getItem(`vs_${n}cooler`)) * 0.5));
+      if (heating < 0) heating = 0;
+      heat = Math.min(maxHeat, Number(localStorage.getItem(`vs_${n}heat`)) + heating);
+      localStorage.setItem("heat", heat.toString());
 
       // Tester et appliquer la surchauffe
       if (Number(localStorage.getItem(`vs_${n}heat`)) >= maxHeat)
@@ -492,11 +550,104 @@ export function clickerEvent(): void {
       // Incrémenter le score
         const scoreStr = localStorage.getItem(`vs_${n}score`);
         const scoreBigInt = scoreStr ? BigInt(scoreStr) : BigInt(0);
-        let currentScore = scoreBigInt + BigInt(1);
+        let currentScore = scoreBigInt + BigInt(1) + BigInt(Number(localStorage.getItem(`vs_${n}coil`)));
         localStorage.setItem(`vs_${n}score`, currentScore.toString());
         pointCount!.textContent = currentScore.toString();
       });
     }
+  });
+
+  // Boutons d'achats
+  ["1", "2"].forEach((n) => {
+  // Acheter refroidisseur
+  const pointCount = document.getElementById(`point-count-${n}`);
+  const buyCoolerBtn = document.getElementById(`buy-cooler-${n}`);
+  const coolerCount = document.getElementById(`cooler-count-${n}`);
+  if (buyCoolerBtn && coolerCount) {
+    buyCoolerBtn.addEventListener("click", () => {
+
+      // Calculer le coût du cooler en fonction de son niveau
+      let cooler_cost;
+      if (Number(localStorage.getItem(`vs_${n}cooler`)) == 0)
+        cooler_cost = 50;
+      else
+        cooler_cost = Math.round(50 * Math.pow(1.15, Number(localStorage.getItem(`vs_${n}cooler`))));
+
+      if (Number(localStorage.getItem(`vs_${n}score`)) >= cooler_cost)
+      {
+          let cooler = Number(localStorage.getItem(`vs_${n}cooler`)) + 1;
+          let score = Number(localStorage.getItem(`vs_${n}score`)) - cooler_cost;
+          localStorage.setItem(`vs_${n}cooler`, cooler.toString());
+          localStorage.setItem(`vs_${n}score`, score.toString());
+          coolerCount.textContent = cooler.toString();
+          pointCount!.textContent = score.toString();
+      }
+    });
+  }
+
+  // Acheter générateur
+  const buyGeneratorBtn = document.getElementById(`buy-generator-${n}`);
+  const generatorCount = document.getElementById(`generator-count-${n}`);
+  if (buyGeneratorBtn && generatorCount) {
+    buyGeneratorBtn.addEventListener("click", () => {
+
+      // Calculer le coût du generator en fonction de son niveau
+      let generator_cost;
+      if (Number(localStorage.getItem(`vs_${n}generator`)) == 0)
+        generator_cost = 150;
+      else
+        generator_cost = Math.round(150 * Math.pow(1.25, Number(localStorage.getItem(`vs_${n}generator`))));
+
+      if (Number(localStorage.getItem(`vs_${n}score`)) >= generator_cost)
+      {
+          let generator = Number(localStorage.getItem(`vs_${n}generator`)) + 1;
+          let score = Number(localStorage.getItem(`vs_${n}score`)) - generator_cost;
+          localStorage.setItem(`vs_${n}generator`, generator.toString());
+          localStorage.setItem(`vs_${n}score`, score.toString());
+          generatorCount.textContent = generator.toString();
+          pointCount!.textContent = score.toString();
+      }
+    });
+  }
+
+  // Acheter bobine
+  const buyCoilBtn = document.getElementById(`buy-coil-${n}`);
+  const coilCount = document.getElementById(`coil-count-${n}`);
+  if (buyCoilBtn && coilCount) {
+    buyCoilBtn.addEventListener("click", () => {
+
+      // Calculer le coût du coil en fonction de son niveau
+      let coil_cost;
+      if (Number(localStorage.getItem(`vs_${n}coil`)) == 0)
+        coil_cost = 75;
+      else
+        coil_cost = Math.round(75 * Math.pow(1.15, Number(localStorage.getItem(`vs_${n}coil`))));
+
+      if (Number(localStorage.getItem(`vs_${n}score`)) > coil_cost)
+      {
+          let coil = Number(localStorage.getItem(`vs_${n}coil`)) + 1;
+          let score = Number(localStorage.getItem(`vs_${n}score`)) - Number(localStorage.getItem(`vs_${n}coil`));
+          localStorage.setItem(`vs_${n}coil`, coil.toString());
+          localStorage.setItem(`vs_${n}score`, score.toString());
+          coilCount.textContent = coil.toString();
+          pointCount!.textContent = score.toString();
+      }
+    });
+  }
+  });
+
+  // Bouton Quitter
+  quitBtn!.addEventListener("click", () => {
+    // Nettoyage des donnees versus
+    localStorage.removeItem("token_player2");
+  ["1", "2"].forEach((n) => {
+    localStorage.removeItem(`vs_${n}score`);
+    localStorage.removeItem(`vs_${n}heat`);
+    localStorage.removeItem(`vs_${n}cooler`);
+    localStorage.removeItem(`vs_${n}generator`);
+    localStorage.removeItem(`vs_${n}coil`);
+    localStorage.removeItem(`vs_${n}overheated`);
+    });
   });
 
 }

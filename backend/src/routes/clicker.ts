@@ -3,6 +3,7 @@ import db from '../db';
 import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
 import { AuthUser, Match, Friend } from '../types/interfaces';
+import { verifyToken } from '../utils/jwt';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -19,8 +20,8 @@ export default async function clickerRoutes(app: FastifyInstance)
     {
       // Récupérer le score actuel
       const result = db.prepare(`
-        SELECT clicker_score FROM users WHERE id = ?
-      `).get(user.id) as { clicker_score: number};
+        SELECT clicker_score, clicker_coil FROM users WHERE id = ?
+      `).get(user.id) as { clicker_score: number, clicker_coil: number };
 
       if (!result)
       {
@@ -28,7 +29,7 @@ export default async function clickerRoutes(app: FastifyInstance)
       }
 
       // Incrémenter le score
-      let currentScore = BigInt(result.clicker_score ?? 0) + BigInt(1);
+      let currentScore = BigInt(result.clicker_score ?? 0) + BigInt(result.clicker_coil ?? 0) + BigInt(1);
 
       // Mettre à jour le score dans la base de données
       db.prepare(`
@@ -62,11 +63,18 @@ export default async function clickerRoutes(app: FastifyInstance)
         return reply.status(404).send({ error: "Utilisateur introuvable." });
       }
 
-      if( result.clicker_score > result.clicker_cooler)
+      // Calculer le coût du cooler en fonction de son niveau
+      let cooler_cost;
+      if (result.clicker_cooler == 0)
+        cooler_cost = 50;
+      else
+        cooler_cost = Math.round(50 * Math.pow(1.15, result.clicker_cooler));
+
+      if( result.clicker_score >= cooler_cost)
       {
         // Incrémenter la valeur du cooler et score
         let newCooler = Number(result.clicker_cooler ?? 0) + 1;
-        let newScore = Number(result.clicker_score ?? 0) - (result.clicker_cooler);
+        let newScore = Number(result.clicker_score ?? 0) - (cooler_cost);
 
         // Mettre à jour la valeur dans la base de données
         db.prepare(`
@@ -105,11 +113,19 @@ export default async function clickerRoutes(app: FastifyInstance)
         return reply.status(404).send({ error: "Utilisateur introuvable." });
       }
 
-      if( result.clicker_score > result.clicker_generator)
+
+      // Calculer le coût du generator en fonction de son niveau
+      let generator_cost;
+      if (result.clicker_generator == 0)
+        generator_cost = 150;
+      else
+        generator_cost = Math.round(150 * Math.pow(1.25, result.clicker_generator));
+
+      if( result.clicker_score >= generator_cost)
       {
         // Incrémenter la valeur du generator et score
         let newGenerator = Number(result.clicker_generator ?? 0) + 1;
-        let newScore = Number(result.clicker_score ?? 0) - (result.clicker_generator);
+        let newScore = Number(result.clicker_score ?? 0) - (generator_cost);
 
         // Mettre à jour la valeur dans la base de données
         db.prepare(`
@@ -148,11 +164,19 @@ export default async function clickerRoutes(app: FastifyInstance)
         return reply.status(404).send({ error: "Utilisateur introuvable." });
       }
 
-      if( result.clicker_score > result.clicker_coil)
+      // Calculer le coût du generator en fonction de son niveau
+      let coil_cost;
+      if (result.clicker_coil == 0)
+        coil_cost = 75;
+      else
+        coil_cost = Math.round(75 * Math.pow(1.15, result.clicker_coil));
+
+
+      if( result.clicker_score >= coil_cost)
       {
         // Incrémenter la valeur du coil et score
         let newCoil = Number(result.clicker_coil ?? 0) + 1;
-        let newScore = Number(result.clicker_score ?? 0) - (result.clicker_coil);
+        let newScore = Number(result.clicker_score ?? 0) - (coil_cost);
 
         // Mettre à jour la valeur dans la base de données
         db.prepare(`
@@ -224,7 +248,7 @@ export default async function clickerRoutes(app: FastifyInstance)
       }
 
       // Incrémenter le score
-      let currentScore = BigInt(result.clicker_score ?? 0) + BigInt(result.clicker_generator) * BigInt(10);
+      let currentScore = BigInt(result.clicker_score ?? 0) + BigInt(result.clicker_generator);
 
       // Mettre à jour le score dans la base de données
       db.prepare(`
@@ -275,4 +299,53 @@ export default async function clickerRoutes(app: FastifyInstance)
       return reply.status(500).send({ error: "Erreur interne du serveur." });
     }
   });
+
+  //Rajout d'un match
+	app.post('/versus', { preHandler: authMiddleware }, async (req, reply) => 
+	{
+		const user1 = (req as AuthenticatedRequest).user;
+		const { date, user1_score, user2_score, player2_token } = req.body as { date: string, user1_score: number, user2_score: number, player2_token: string };
+
+		if (!date || !user1_score || !user2_score || !user1.id)
+			return reply.status(400).send({ error: "Données du match incomplétes" });
+
+		//Si PVP, token player 2 existe et on le verifie
+		let user2: AuthUser | null = null;
+		if (player2_token)
+		{
+			try
+			{
+				const payload = verifyToken(player2_token);
+				user2 = payload as AuthUser;
+			}
+			catch (err)
+			{
+				return reply.status(401).send({ error: "Token du joueur 2 invalide" });
+			}
+		}
+
+		// Vérifie que les joueurs sont différents en versus
+		if (user2 && user1.id === user2.id)
+			return reply.status(400).send({ error: "Un joueur ne peut pas jouer contre lui-même" });
+
+		try
+		{
+			const stmt = db.prepare(`INSERT INTO clicker_matchs (date, user1_id, user2_id, user1_score, user2_score)
+									 VALUES (?, ?, ?, ?, ?)
+				`);
+			const result = stmt.run(
+									date,
+									user1.id,
+									user2 ? user2.id : null,
+									user1_score,
+                  user2_score
+									);
+
+			return { success: true, id: result.lastInsertRowid };
+		}
+		catch (err: any)
+		{
+			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+		}
+	});
 }

@@ -61,6 +61,19 @@ db.serialize(() => {
       FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE SET NULL
     )
   `);
+
+  db.run(`
+  CREATE TABLE IF NOT EXISTS clicker_matchs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      user1_id INTEGER NOT NULL,
+      user2_id INTEGER NOT NULL,
+      user1_score INTEGER NOT NULL,
+      user2_score INTEGER NOT NULL,
+      FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
 });
 
 // Vérifie le mode

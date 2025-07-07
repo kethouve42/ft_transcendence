@@ -8,7 +8,7 @@
 	  "esModuleInterop": true,            // Permet d'importer des modules CommonJS avec "import" au lieu de require()
 	  "resolveJsonModule": true           // Permet d'importer des fichiers .json en TS (import config from './config.json')
 	},
-	"include": ["src"],                   // Dossiers/fichiers que TypeScript doit compiler
+	"include": ["src", "../frontend"],                   // Dossiers/fichiers que TypeScript doit compiler
 	"exclude": ["node_modules"]           // Exclusions (par défaut, node_modules est toujours exclu)
   }
   

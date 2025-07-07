@@ -4,7 +4,7 @@ import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
 import { navbarView, attachNavbarEvents } from '../navbar.js'
-import { t } from "../../i18n"
+import { t } from "../../i18n/index.js"
 import { navigateTo } from '../../main.js'
 import "../../css/style.css"
 
