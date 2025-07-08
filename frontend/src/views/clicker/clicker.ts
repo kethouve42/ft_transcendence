@@ -171,6 +171,9 @@ export function clickerEvent(): void {
   let heat = 0;
   let overheated = false;
   const maxHeat = 100;
+  const versusBtn = document.getElementById("versus-btn");
+
+  if (!localStorage.getItem("token_player2")) {
 
   // Elements de la page
   const heatBar = document.getElementById("heat-bar");
@@ -183,7 +186,6 @@ export function clickerEvent(): void {
   const buyGeneratorBtn = document.getElementById("buy-generator");
   const coilCount = document.getElementById("coil-count");
   const buyCoilBtn = document.getElementById("buy-coil");
-  const versusBtn = document.getElementById("versus-btn");
 
   // Verification de l'etat de surchauffe
   if (localStorage.getItem("overheated") === null) {
@@ -223,6 +225,7 @@ export function clickerEvent(): void {
     }
 
     // Vérification de la fin de surchauffe
+    if (clickBtn)
     if ((clickBtn as HTMLButtonElement).disabled == true && Number(localStorage.getItem("heat")) <= 5)
     {
       (clickBtn as HTMLButtonElement).disabled = false;
@@ -253,7 +256,7 @@ export function clickerEvent(): void {
           pointCount!.textContent = data.newScore;
         })
         .catch(err => {
-          console.error("❌ Erreur :", err.message);
+          //console.error("❌ Erreur :", err.message);
         });
       }
     }
@@ -408,6 +411,21 @@ export function clickerEvent(): void {
       console.error("❌ Erreur :", err.message);
     });
 
+  // Verification et purge mode versus
+  if (!localStorage.getItem("token_player2"))
+  {
+      ["1", "2"].forEach((n) => {
+      localStorage.removeItem(`vs_${n}score`);
+      localStorage.removeItem(`vs_${n}heat`);
+      localStorage.removeItem(`vs_${n}cooler`);
+      localStorage.removeItem(`vs_${n}generator`);
+      localStorage.removeItem(`vs_${n}coil`);
+      localStorage.removeItem(`vs_${n}overheated`);
+      });
+  }
+
+  }
+
 //#endregion
 
 //#region mode versus
@@ -421,12 +439,12 @@ export function clickerEvent(): void {
   
     // Initialisation des variables pour le versus
     ["1", "2"].forEach((n) => {
-    if (localStorage.getItem(`vs_${n}score`) === null) localStorage.setItem(`vs_${n}score`, "0");
-    if (localStorage.getItem(`vs_${n}heat`) === null) localStorage.setItem(`vs_${n}heat`, "0");
-    if (localStorage.getItem(`vs_${n}cooler`) === null) localStorage.setItem(`vs_${n}cooler`, "0");
-    if (localStorage.getItem(`vs_${n}generator`) === null) localStorage.setItem(`vs_${n}generator`, "0");
-    if (localStorage.getItem(`vs_${n}coil`) === null) localStorage.setItem(`vs_${n}coil`, "0");
-    if (localStorage.getItem(`vs_${n}overheated`) === null) localStorage.setItem(`vs_${n}overheated`, "false");
+    localStorage.setItem(`vs_${n}score`, "0");
+    localStorage.setItem(`vs_${n}heat`, "0");
+    localStorage.setItem(`vs_${n}cooler`, "0");
+    localStorage.setItem(`vs_${n}generator`, "0");
+    localStorage.setItem(`vs_${n}coil`, "0");
+    localStorage.setItem(`vs_${n}overheated`, "false");
     });
   });
   }
@@ -445,6 +463,24 @@ export function clickerEvent(): void {
   timerDiv.textContent = `Temps restant : ${timeLeft}s`;
 
   const quitBtn = document.getElementById("quit-versus-btn");
+
+  // Fonction pour mettre à jour les jauges visuellement
+  function updateHeatBars() 
+  {
+    ["1", "2"].forEach((n) => {
+      // Mise à jour de la jauge et de la valeur affichée
+      const heatBar = document.getElementById(`heat-bar-${n}`);
+      const heatValue = document.getElementById(`heat-value-${n}`);
+      const maxHeat = 100;
+      const percent = Math.max(0, Math.min(100, (heat / maxHeat) * 100));
+      if (heatBar) {
+        heatBar.style.height = percent + "%";
+        heatBar.className = "w-full transition-all duration-300 " +
+          (percent > 80 ? "bg-red-700" : percent > 50 ? "bg-orange-400" : "bg-green-400");
+      }
+      if (heatValue) heatValue.textContent = localStorage.getItem(`vs_${n}heat`);
+    });
+  }
 
   // Decrementer le timer
   const versusTimer = setInterval(() => {
@@ -487,18 +523,8 @@ export function clickerEvent(): void {
       localStorage.setItem(`vs_${n}heat`, heat.toString());
     }
 
-    // Mise à jour de la jauge et de la valeur affichée
-    const heatBar = document.getElementById(`heat-bar-${n}`);
-    const heatValue = document.getElementById(`heat-value-${n}`);
-    const maxHeat = 100;
-    const percent = Math.max(0, Math.min(100, (heat / maxHeat) * 100));
-    if (heatBar) {
-      heatBar.style.height = percent + "%";
-      heatBar.className = "w-full transition-all duration-300 " +
-        (percent > 80 ? "bg-red-700" : percent > 50 ? "bg-orange-400" : "bg-green-400");
-    }
-    if (heatValue) heatValue.textContent = heat.toString();
-
+    updateHeatBars();
+  
     // Vérification de la fin de surchauffe
     const clickBtn = document.getElementById(`click-btn-${n}`) as HTMLButtonElement;
     if (clickBtn && localStorage.getItem(`vs_${n}overheated`) === "true" && heat <= 5) {
@@ -529,7 +555,9 @@ export function clickerEvent(): void {
       let heating = 5 + Number(localStorage.getItem(`vs_${n}coil`)) - Math.round((Number(localStorage.getItem(`vs_${n}cooler`)) * 0.5));
       if (heating < 0) heating = 0;
       heat = Math.min(maxHeat, Number(localStorage.getItem(`vs_${n}heat`)) + heating);
-      localStorage.setItem("heat", heat.toString());
+      localStorage.setItem(`vs_${n}heat`, heat.toString());
+
+      updateHeatBars();
 
       // Tester et appliquer la surchauffe
       if (Number(localStorage.getItem(`vs_${n}heat`)) >= maxHeat)
@@ -626,7 +654,7 @@ export function clickerEvent(): void {
       if (Number(localStorage.getItem(`vs_${n}score`)) > coil_cost)
       {
           let coil = Number(localStorage.getItem(`vs_${n}coil`)) + 1;
-          let score = Number(localStorage.getItem(`vs_${n}score`)) - Number(localStorage.getItem(`vs_${n}coil`));
+          let score = Number(localStorage.getItem(`vs_${n}score`)) - coil_cost;
           localStorage.setItem(`vs_${n}coil`, coil.toString());
           localStorage.setItem(`vs_${n}score`, score.toString());
           coilCount.textContent = coil.toString();
@@ -654,3 +682,11 @@ export function clickerEvent(): void {
 //#endregion
 
 }
+
+// =================================== //
+// ============= TO DO : ============= //
+// =================================== //
+
+// -Faire un retour au jeu principal a la fin du versus (demander a Thibault)
+// -Faire une route correcte et l'appeler a la fin du versus (voir avec Ken)
+// -Faire un ecran de selection pour choisir la target (score ou duree modulaire ?) du versus (voir avec Thibault)
