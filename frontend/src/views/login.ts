@@ -121,6 +121,8 @@ export function attachLoginEvents() {
       }
       // Connexion classique
       localStorage.setItem("token", data.token);
+      if (data.UserId)
+        localStorage.setItem("userId", data.UserId.toString())
       localStorage.setItem("userLogin", data.login || "");
       localStorage.setItem("userAlias", data.alias || "");
       localStorage.setItem("userAvatar", data.avatar || "");

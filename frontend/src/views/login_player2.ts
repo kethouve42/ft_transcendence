@@ -108,6 +108,8 @@ export function attachLoginPlayer2Events() {
       }
       // Connexion classique
       localStorage.setItem("token_player2", data.token);
+      if (data.UserId)
+        localStorage.setItem("userId_player2", data.UserId.toString())
       msg!.textContent = "Player 2 logged in!";
       setTimeout(() => {
         navigateTo(getRedirectUrl());

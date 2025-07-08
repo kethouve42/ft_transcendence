@@ -296,6 +296,10 @@ function renderUI() {
 
 function showOnly(panel: Panel) {
   currentPanel = panel
+  if (panel === "menu") {
+    localStorage.removeItem("token_player2")
+    localStorage.removeItem("userId_player2")
+  }
   renderUI()
 }
 
@@ -432,26 +436,42 @@ function endGame() {
   else if (score.right === scoreMod)
     winner = "right"
 
-  const token1 = localStorage.getItem("token");
-  const token2 = localStorage.getItem("token_player2");
+  const token1 = localStorage.getItem("token")
+  const token2 = localStorage.getItem("token_player2")
+  const user1_id = Number(localStorage.getItem("userId"))
+  const user2_id = Number(localStorage.getItem("userId_player2"))
 
-  const winner_id = winner === "left" ? token1 : token2;
-
+  if (mode === "ai") {
   fetch("/api/matchs/", {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Authorization": "Bearer " + token1
     },
     body: JSON.stringify({
       date: new Date().toISOString(),
       duration: timerMod,
-      winner_id,
-      score: `${score.left}-${score.right}`,
-      player2_token: token2
+      winner_id: winner === "left" ? user1_id : null,
+      score: `${score.left}-${score.right}`
     })
   }).catch(() => {});
-
+  }
+  else if (mode === "local") {
+    fetch("/api/matchs/", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token1
+      },
+      body: JSON.stringify({
+        date: new Date().toISOString(),
+        duration: timerMod,
+        winner_id: winner === "left" ? user1_id : user2_id,
+        score: `${score.left}-${score.right}`,
+        player2_token: token2
+      })
+    }).catch(() => {});
+  }
   alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right);
   resetGame();
   showOnly("menu");
