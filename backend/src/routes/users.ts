@@ -98,9 +98,6 @@ export default async function userRoutes(app: FastifyInstance)
 
 		const { login, email, alias, avatar } = req.body as { login: string, email: string, alias: string, avatar: string};
 
-		/*if (!login || !email)
-			return reply.status(400).send({ error: 'login et email sont requis' });*/
-
 		try
 		{
 			const stmt = db.prepare(`
@@ -284,22 +281,6 @@ export default async function userRoutes(app: FastifyInstance)
 		return { success: true };
 	});
 
-	//supprimer tous les utilisateurs (SuperAdmin)
-	//!!!!!!!!!!   Rajout de la vérification Admin nécessaire   !!!!!!!!!!!!
-	/*app.delete('/', { preHandler: authMiddleware }, async (req, reply) =>
-	{
-		try
-		{
-			db.prepare('DELETE FROM users').run();
-			return { success: true, message: 'Tous les utilisateurs ont été supprimer' };
-		}
-		catch (err: any)
-		{
-			console.error('Erreur lors de la suppression des utilisateurs :', err);
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
-		}
-	});*/
-
 	//Permet de savoir id et le login de la personne connecter
 	app.get('/me', { preHandler: authMiddleware }, async (req, reply) =>
 	{
@@ -448,6 +429,43 @@ export default async function userRoutes(app: FastifyInstance)
 			matchs,
 			friends
 		};
+	});
+
+	app.post('/me/anonymize', { preHandler: authMiddleware }, async (req, reply) =>
+	{
+		const user = (req as AuthenticatedRequest).user;
+
+		try
+		{
+			const anonymLogin = `anonyme_${user.id}`;
+			const anonymEmail = `anonyme_${user.id}@example.com`;
+			const randomPassword = await bcrypt.hash(Math.random().toString(36), 10);
+
+			const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as { avatar: string | null };
+        	if (userData?.avatar && userData.avatar.startsWith('http://localhost:3000/uploads/avatars/'))
+			{
+            	const oldPath = path.resolve(process.cwd(), '.' + userData.avatar.replace('http://localhost:3000', ''));
+            	try
+				{
+                	if (fs.existsSync(oldPath))
+						fs.unlinkSync(oldPath);
+            	} catch (e)
+				{
+                	console.warn('Avatar non trouvé ou déjà supprimé:', e);
+            	}
+        	}
+
+			db.prepare(`UPDATE users SET login = ?, email = ?, alias = NULL, avatar = NULL, password = ? WHERE id = ?`).run(anonymLogin, anonymEmail, randomPassword, user.id);
+
+			//rajouté les autre tables
+
+			return {success: true };
+		}
+		catch (err: any)
+		{
+			console.error('Erreur lors de l\'anonymisation :', err);
+			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+		}
 	});
 
 }
