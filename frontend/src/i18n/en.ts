@@ -204,4 +204,17 @@ export default {
     contact_info: "For any questions or requests regarding your personal data, ask to your left or right, we are here",
     back_home: "Back to home"
   },
+  click: {
+    hot: "Heat",
+    cl: "Click !",
+    pt: "Points",
+    buy_re: "Buy cooler",
+    buy_ge: "Buy generator",
+    buy_bob: "Buy coils",
+    exit: "Exit",
+    versus: "Duel mode",
+    time: "Remaining time :",
+    overh: "Overheating !",
+    end: "End of game !"
+  }
 };

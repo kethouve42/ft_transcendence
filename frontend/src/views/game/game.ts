@@ -296,10 +296,6 @@ function renderUI() {
 
 function showOnly(panel: Panel) {
   currentPanel = panel
-  if (panel === "menu") {
-    localStorage.removeItem("token_player2")
-    localStorage.removeItem("userId_player2")
-  }
   renderUI()
 }
 

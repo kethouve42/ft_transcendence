@@ -1,4 +1,5 @@
 import { navigateTo } from "../../main";
+import { t } from "../../i18n/index.js"
 
 export function clickerView(): string {
   if (localStorage.getItem("token_player2"))
@@ -11,7 +12,7 @@ export function clickerView(): string {
             <div class="w-8 h-64 bg-gray-800 rounded-lg flex items-end overflow-hidden border-2 border-cyan-400">
               <div id="heat-bar-1" class="w-full bg-red-500 transition-all duration-300" style="height: 0%"></div>
             </div>
-            <span class="mt-2 text-cyan-300 font-bold">Chaleur</span>
+            <span class="mt-2 text-cyan-300 font-bold">${t("click.hot")}</span>
             <span id="heat-value-1" class="text-lg font-extrabold text-red-400">0</span>
           </div>
           <div class="relative flex items-center">
@@ -20,29 +21,29 @@ export function clickerView(): string {
               id="click-btn-1"
               class="ml-4 bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition"
             >
-              Clique !
+              ${t("click.cl")}
             </button>
             <div class="ml-8 flex flex-col items-center">
-              <span class="text-lg text-cyan-300 font-bold">Points</span>
+              <span class="text-lg text-cyan-300 font-bold">${t("click.pt")}</span>
               <span id="point-count-1" class="text-3xl font-extrabold mt-2">0</span>
             </div>
           </div>
           <div class="flex gap-6 mt-10">
             <div class="flex flex-col items-center">
               <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler-1">
-                Acheter refroidisseur
+                ${t("click.buy_re")}
               </button>
               <span id="cooler-count-1" class="mt-2 text-2xl font-bold text-amber-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator-1">
-                Acheter generateur
+                ${t("click.buy_ge")}
               </button>
               <span id="generator-count-1" class="mt-2 text-2xl font-bold text-lime-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil-1">
-                Acheter bobines
+                ${t("click.buy_bob")}
               </button>
               <span id="coil-count-1" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
             </div>
@@ -54,7 +55,7 @@ export function clickerView(): string {
             <div class="w-8 h-64 bg-gray-800 rounded-lg flex items-end overflow-hidden border-2 border-cyan-400">
               <div id="heat-bar-2" class="w-full bg-red-500 transition-all duration-300" style="height: 0%"></div>
             </div>
-            <span class="mt-2 text-cyan-300 font-bold">Chaleur</span>
+            <span class="mt-2 text-cyan-300 font-bold">${t("click.hot")}</span>
             <span id="heat-value-2" class="text-lg font-extrabold text-red-400">0</span>
           </div>
           <div class="relative flex items-center">
@@ -63,29 +64,29 @@ export function clickerView(): string {
               id="click-btn-2"
               class="ml-4 bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition"
             >
-              Clique !
+              ${t("click.cl")}
             </button>
             <div class="ml-8 flex flex-col items-center">
-              <span class="text-lg text-cyan-300 font-bold">Points</span>
+              <span class="text-lg text-cyan-300 font-bold">${t("click.pt")}</span>
               <span id="point-count-2" class="text-3xl font-extrabold mt-2">0</span>
             </div>
           </div>
           <div class="flex gap-6 mt-10">
             <div class="flex flex-col items-center">
               <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler-2">
-                Acheter refroidisseur
+                ${t("click.buy_re")}
               </button>
               <span id="cooler-count-2" class="mt-2 text-2xl font-bold text-amber-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator-2">
-                Acheter generateur
+                ${t("click.buy_ge")}
               </button>
               <span id="generator-count-2" class="mt-2 text-2xl font-bold text-lime-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil-2">
-                Acheter bobines
+                ${t("click.buy_bob")}
               </button>
               <span id="coil-count-2" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
             </div>
@@ -96,7 +97,7 @@ export function clickerView(): string {
           id="quit-versus-btn"
           class="fixed top-4 right-4 bg-gray-700 hover:bg-gray-500 text-white px-4 py-2 rounded shadow-lg z-50"
         >
-          Quitter
+           ${t("click.exit")}
         </button>
       </div>
     `;
@@ -110,7 +111,7 @@ export function clickerView(): string {
         <div class="w-8 h-64 bg-gray-800 rounded-lg flex items-end overflow-hidden border-2 border-cyan-400">
           <div id="heat-bar" class="w-full bg-red-500 transition-all duration-300" style="height: 0%"></div>
         </div>
-        <span class="mt-2 text-cyan-300 font-bold">Chaleur</span>
+        <span class="mt-2 text-cyan-300 font-bold">${t("click.hot")}</span>
         <span id="heat-value" class="text-lg font-extrabold text-red-400">0</span>
       </div>
       <!-- Le reste de ton contenu (image, boutons, etc) -->
@@ -122,11 +123,11 @@ export function clickerView(): string {
           id="click-btn"
           class="ml-4 bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition"
         >
-          Clique !
+          ${t("click.cl")}
         </button>
         <!-- Compteur à droite de l'image -->
         <div class="ml-8 flex flex-col items-center">
-          <span class="text-lg text-cyan-300 font-bold">Points</span>
+          <span class="text-lg text-cyan-300 font-bold">${t("click.pt")}</span>
           <span id="point-count" class="text-3xl font-extrabold mt-2">0</span>
         </div>
       </div>
@@ -134,19 +135,19 @@ export function clickerView(): string {
       <div class="flex gap-6 mt-10">
         <div class="flex flex-col items-center">
           <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler">
-          Acheter refroidisseur
+            ${t("click.buy_re")}
           </button>
           <span id="cooler-count" class="mt-2 text-2xl font-bold text-amber-400">0</span>
           </div>
           <div class="flex flex-col items-center">
           <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator">
-          Acheter generateur
+            ${t("click.buy_ge")}
           </button>
           <span id="generator-count" class="mt-2 text-2xl font-bold text-lime-400">0</span>
         </div>
         <div class="flex flex-col items-center">
           <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil">
-          Acheter bobines
+            ${t("click.buy_bob")}
           </button>
           <span id="coil-count" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
           </div>
@@ -156,7 +157,7 @@ export function clickerView(): string {
         id="versus-btn"
         class="fixed top-4 right-4 bg-pink-600 hover:bg-pink-400 text-white px-4 py-2 rounded shadow-lg z-50"
       >
-        Mode Versus
+        ${t("click.versus")}
       </button>
       </div>
       `;
@@ -195,7 +196,7 @@ export function clickerEvent(): void {
   {
     (clickBtn as HTMLButtonElement).disabled = true;
     clickBtn!.classList.add("opacity-50", "cursor-not-allowed");
-    clickBtn!.textContent = "Surchauffe !";
+    clickBtn!.textContent = `${t("click.overh")}`;
   }
   updateHeatBar();
 
@@ -231,7 +232,7 @@ export function clickerEvent(): void {
       (clickBtn as HTMLButtonElement).disabled = false;
       localStorage.setItem("overheated", "false");
       clickBtn!.classList.remove("opacity-50", "cursor-not-allowed");
-      clickBtn!.textContent = "Clique !";
+      clickBtn!.textContent = `${t("click.cl")}`;
     }
   }, 500);
 
@@ -279,7 +280,7 @@ export function clickerEvent(): void {
         (clickBtn as HTMLButtonElement).disabled = true;
         localStorage.setItem("overheated", "true");
         clickBtn.classList.add("opacity-50", "cursor-not-allowed");
-        clickBtn.textContent = "Surchauffe !";
+        clickBtn.textContent = `${t("click.overh")}`;
 
         fetch("/api/clicker/overheat", {
         method: "POST",
@@ -460,7 +461,7 @@ export function clickerEvent(): void {
     document.body.appendChild(timerDiv);
   }
   let timeLeft = 60; // secondes
-  timerDiv.textContent = `Temps restant : ${timeLeft}s`;
+  timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
 
   const quitBtn = document.getElementById("quit-versus-btn");
 
@@ -485,7 +486,7 @@ export function clickerEvent(): void {
   // Decrementer le timer
   const versusTimer = setInterval(() => {
     timeLeft--;
-    timerDiv!.textContent = `Temps restant : ${timeLeft}s`;
+    timerDiv!.textContent = `${t("click.time")} ${timeLeft}s`;
     // Fin de la partie versus
     if (timeLeft <= 0) {
       clearInterval(versusTimer);
@@ -503,7 +504,7 @@ export function clickerEvent(): void {
       localStorage.removeItem(`vs_${n}overheated`);
       });
 
-      timerDiv!.textContent = "Fin de la partie !";
+      timerDiv!.textContent = `${t("click.end")}`;
       setTimeout(() => {
         timerDiv!.remove();
         navigateTo("/");
@@ -531,7 +532,7 @@ export function clickerEvent(): void {
       clickBtn.disabled = false;
       localStorage.setItem(`vs_${n}overheated`, "false");
       clickBtn.classList.remove("opacity-50", "cursor-not-allowed");
-      clickBtn.textContent = "Clique !";
+      clickBtn.textContent = `${t("click.cl")}`;
     }
 
     // Activation des generateurs secondaires
@@ -565,7 +566,7 @@ export function clickerEvent(): void {
         (clickBtn as HTMLButtonElement).disabled = true;
         localStorage.setItem(`vs_${n}overheated`, "true");
         clickBtn.classList.add("opacity-50", "cursor-not-allowed");
-        clickBtn.textContent = "Surchauffe !";
+        clickBtn.textContent = `${t("click.overh")}`;
 
         const scoreStr = localStorage.getItem(`vs_${n}score`);
         const scoreBigInt = scoreStr ? BigInt(scoreStr) : BigInt(0);
@@ -676,6 +677,10 @@ export function clickerEvent(): void {
     localStorage.removeItem(`vs_${n}coil`);
     localStorage.removeItem(`vs_${n}overheated`);
     });
+    clearInterval(versusTimer)
+    if (timerDiv)
+      timerDiv.remove()
+    navigateTo("/")
   });
 
 }

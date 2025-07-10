@@ -204,4 +204,17 @@ export default {
     contact_info: "Para cualquier pregunta o solicitud sobre sus datos personales, pregunte a su izquierda o derecha, estamos aquí",
     back_home: "Volver al inicio"
   },
+  click: {
+    hot: "Calor",
+    cl: "Haga clic.",
+    pt: "Puntos",
+    buy_re: "Comprar nevera",
+    buy_ge: "Comprar generador",
+    buy_bob: "Comprar carretes",
+    exit: "Deja",
+    versus: "Modo duelo",
+    time: "Tiempo restante :",
+    overh: "¡Sobrecalentamiento !",
+    end: "¡Se acabó el juego !"
+  }
 };

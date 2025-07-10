@@ -43,7 +43,8 @@ export default {
   },
   error: {
     not_found: "Page non trouvée",
-    back_home: "Retour à l'accueil"
+    back_home: "Retour à l'accueil",
+    e_or_p: "Email ou mot de passe incorrect"
   },
   profile: {
     loading: "Chargement du profil...",
@@ -204,4 +205,17 @@ export default {
     contact_info: "Pour toute question ou demande concernant vos données personnelles, demande a ta gauche ou ta droite on est la",
     back_home: "Retour à l'accueil"
   },
+  click: {
+    hot: "chaleur",
+    cl: "Clique !",
+    pt: "Points",
+    buy_re: "Acheter refroidisseur",
+    buy_ge: "Acheter generateur",
+    buy_bob: "Acheter bobines",
+    exit: "Quitter",
+    versus: "Mode Duel",
+    time: "Temps restant :",
+    overh: "Surchauffe !",
+    end: "Fin de la partie !"
+  }
 };
