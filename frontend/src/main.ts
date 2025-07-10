@@ -10,6 +10,7 @@ import { clickerView, clickerEvent } from "./views/clicker/clicker";
 import { gameViews, gameEvent} from "./views/game/game"
 import { loginPlayer2View, attachLoginPlayer2Events } from "./views/login_player2"
 import { privacyView } from "./views/privacy";
+import { loginTournamentView, attachLoginTournamentEvents } from "./views/game/loginTournament"
 
 // Ajoute ici toutes les routes de ton app
 type RouteHandler = (params?: any) => string | Promise<string>;
@@ -24,6 +25,7 @@ const routes: Record<string, RouteHandler> = {
   "/pong": gameViews,
   "/loginUser2": loginPlayer2View,
   "/privacy": privacyView,
+  "/loginTournament" : loginTournamentView,
 };
 
 function pingUser() {
@@ -97,6 +99,7 @@ function attachEvents(route: string) {
   if (route === "/clicker") clickerEvent();
   if (route === "/pong") gameEvent();
   if (route === "/loginUser2") attachLoginPlayer2Events();
+  if (route === "/loginTournament") attachLoginTournamentEvents()
 }
 
 export function attachLinkHandlers() {
