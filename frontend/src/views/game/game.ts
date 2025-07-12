@@ -4,15 +4,15 @@ import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
 import { navbarView, attachNavbarEvents } from '../navbar.js'
-import { loginTournamentView, attachLoginTournamentEvents } from './loginTournament.js'
 import { t } from "../../i18n/index.js"
 import { navigateTo } from '../../main.js'
 import "../../css/style.css"
+import { duplexPair } from 'stream'
 
 type Panel =  "menu" | "settings" | "ai" | "keyConfig" | "rules" | "game" | "tournament"
 
 let mode: 'local' | 'ai' | 'tournoi' = 'local'
-const epsilon = 0.1 // Constante pour les calculs de collision pour éviter que la balle coince.
+const epsilon = 0.5 // Constante pour les calculs de collision pour éviter que la balle coince.
 let aiDifficulty: 'easy' | 'medium' | 'hard' = 'easy'
 let ballSpeed = baseSpeed
 let timerMod = 60
@@ -47,10 +47,10 @@ export function gameViews() {
   <div class="app-container">
     <div id="menu" class="menu">
       <button id="btn-local" class="menu-btn">${t("menu.play_local")}</button>
+      <button id="btn-tournament" class="menu-btn">${t("menu.tournament")}</button>
       <button id="btn-ai" class="menu-btn">${t("menu.play_ai")}</button>
       <button id="btn-rules" class="menu-btn">${t("menu.rules")}</button>
       <button id="btn-settings" class="menu-btn">${t("menu.settings")}</button>
-      <button id="btn-tournament" class="menu-btn">Tournoi</button>
     </div>
   </div>
   `
@@ -89,7 +89,7 @@ function renderPanelRules() {
             </li>
             <li>
               <span class="speed-down"></span>
-              ${t("rules.effects.faster")}
+              ${t("rules.effects.slower")}
             </li>
           </ul>
         </li>
@@ -189,24 +189,40 @@ function renderPanelKeys() {
 }
 
 function renderTournament() {
-  const main_login = localStorage.getItem("userLogin") || "Joueur 1"
+  const login1 = localStorage.getItem("tournament_login_1") || "Joueur 1"
   const login2 = localStorage.getItem("tournament_login_2") || "Joueur 2"
   const login3 = localStorage.getItem("tournament_login_3") || "Joueur 3"
   const login4 = localStorage.getItem("tournament_login_4") || "Joueur 4"
   return `
     <div class="settings-panel">
-      <h1>Tournoi de 4 joueurs.</h1>
+      <h1>${t("tournament.title")}</h1>
       <div class="settings-grid">
-        <button id="btn_tp1" class="menu-btn">${main_login}</button>
+        <button id="btn_tp1" class="menu-btn">${login1}</button>
         <button id="btn_tp2" class="menu-btn">${login2}</button>
         <button id="btn_tp3" class="menu-btn">${login3}</button>
         <button id="btn_tp4" class="menu-btn">${login4}</button>
       </div>
       <div class="settings-action">
-        <button id="btn-tst" class="menu-btn save-btn">Lancer le tournoi</button>
+        <button id="btn-tst" class="menu-btn save-btn">${t("tournament.start")}</button>
         <button id="btn-tc" class="menu-btn save-btn">${t("tournament.cancel")}</button>
       </div>
       <div id="tournament-message" class="text-cyan-200 mt-4"></div>
+    </div>
+  `
+}
+
+function renderPanelMatchVersus(pseudo1: string, pseudo2: string, countdownSeconds = 5): string {
+  return `
+    <div id="match-modal" class="modal-overlay">
+      <div class="modal-card">
+        <h2 class="modal-title">${t("tournament.upcoming_match")}</h2>
+        <div class="modal-body">
+          <span class="player-name">${pseudo1}</span>
+          <span class="vs">VS</span>
+          <span class="player-name">${pseudo2}</span>
+        </div>
+        <div id="modal-countdown" class="modal-countdown">${countdownSeconds}</div>
+      </div>
     </div>
   `
 }
@@ -223,50 +239,60 @@ function renderGame() {
 }
 
 function handleTournamentLogin(playerNum: number) {
+  if (playerNum === 1) {
+    localStorage.setItem("tournament_userId_1", localStorage.getItem("userId")!)
+    localStorage.setItem("tournament_token_1", localStorage.getItem("token")!)
+    localStorage.setItem("tournament_login_1", localStorage.getItem("userLogin")!)
+    showOnly("tournament")
+    return
+  }
   localStorage.setItem("tournament_login_player", playerNum.toString())
   navigateTo(`/loginTournament?player=${playerNum}&redirect=/pong`)
 }
 
-function showMatchModal(pseudo1: string, pseudo2: string, callback: () => void) {
-  const modal = document.createElement("div");
-  modal.id = "match-modal";
-  modal.style.position = "fixed";
-  modal.style.top = "0";
-  modal.style.left = "0";
-  modal.style.width = "100vw";
-  modal.style.height = "100vh";
-  modal.style.background = "rgba(0,0,0,0.7)";
-  modal.style.display = "flex";
-  modal.style.alignItems = "center";
-  modal.style.justifyContent = "center";
-  modal.style.zIndex = "9999";
-  modal.innerHTML = `
-    <div style="background:#0e2233;padding:2rem 3rem;border-radius:1rem;text-align:center;box-shadow:0 0 20px #000">
-      <h2 style="color:#00e6e6;font-size:2rem;margin-bottom:1rem;">Match à venir</h2>
-      <div style="font-size:1.5rem;color:#fff;margin-bottom:1rem;">
-        <b>${pseudo1}</b> VS <b>${pseudo2}</b>
-      </div>
-      <div id="modal-countdown" style="font-size:2rem;color:#00e6e6;">10</div>
-    </div>
-  `;
-  document.body.appendChild(modal);
+export function showOnly(panel: Panel) {
+  currentPanel = panel
+  renderUI()
+}
 
-  let seconds = 10;
-  const countdown = setInterval(() => {
-    seconds--;
-    const el = document.getElementById("modal-countdown");
-    if (el) el.textContent = seconds.toString();
+function showMatchVersus(pseudo1: string, pseudo2: string, callback: () => void) {
+  // 1. Injecte la modale
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    renderPanelMatchVersus(pseudo1, pseudo2, 5)
+  )
+
+  // 2. Gère le countdown
+  let seconds = 5
+  const countdownEl = document.getElementById("modal-countdown")!
+  const modalEl = document.getElementById("match-modal")!
+
+  const interval = setInterval(() => {
+    seconds--
+    countdownEl.textContent = String(seconds)
     if (seconds <= 0) {
-      clearInterval(countdown);
-      modal.remove();
-      callback();
+      clearInterval(interval)
+      modalEl.remove()
+      callback()
     }
-  }, 1000); 
+  }, 1000)
+}
+export function clearTournamentData() {
+  localStorage.removeItem("token_player2")
+  // Purge les joueurs 1–4 et l’état du tournoi
+  for (let i = 1; i <= 4; i++) {
+    localStorage.removeItem(`tournament_login_${i}`)
+    localStorage.removeItem(`tournament_userId_${i}`)
+    localStorage.removeItem(`tournament_token_${i}`)
+  }
+  localStorage.removeItem("tournament_phase")
+  localStorage.removeItem("tournament_winner1")
+  localStorage.removeItem("tournament_winner2")
+  localStorage.removeItem("returnToTournament")
 }
 
 export function gameEvent() {
   const root = document.getElementById('app')!
-  let tournamentPlayers: { [k:number]: {token?: string, id?: number, login?: string} } = {}
 
   root.querySelector('#btn-local')?.addEventListener("click", () => {
     if (!localStorage.getItem("token_player2")) {
@@ -280,6 +306,7 @@ export function gameEvent() {
   root.querySelector('#btn-rules')?.addEventListener("click", () => showOnly("rules"))
   root.querySelector('#btn-settings')?.addEventListener("click", () => showOnly("settings"))
   root.querySelector('#btn-tournament')?.addEventListener("click", () => showOnly("tournament"))
+  root.querySelector('#btn_tp1')?.addEventListener("click", () => handleTournamentLogin(1))
   root.querySelector('#btn_tp2')?.addEventListener("click", () => handleTournamentLogin(2))
   root.querySelector('#btn_tp3')?.addEventListener("click", () => handleTournamentLogin(3))
   root.querySelector('#btn_tp4')?.addEventListener("click", () => handleTournamentLogin(4))
@@ -316,12 +343,12 @@ export function gameEvent() {
     const msg = document.getElementById("tournament-message")
     if (ids.some(id => !id) || tokens.some(t => !t)) {
       if (msg) 
-        msg.textContent = "Tous les joueurs doivent être connectés."
+        msg.textContent = `${t("tournament.login_page.all_con")}`
       return
     }
     if (new Set(ids).size !== 4) {
       if (msg) 
-        msg.textContent = "Chaque joueur doit avoir un compte unique."
+        msg.textContent = `${t("tournament.login_page.err_2same")}`
       return
     }
     // Lance la configuration des touches pour le premier match
@@ -329,6 +356,7 @@ export function gameEvent() {
     showOnly("keyConfig")
   })
 
+  root.querySelector('#btn-tc')?.addEventListener("click", () => showOnly("menu"))
   root.querySelector('#select-ai-difficulty')?.addEventListener("change", e => {
     aiDifficulty = (e.target as HTMLSelectElement).value as any
   })
@@ -349,7 +377,7 @@ export function gameEvent() {
       const phase = Number(localStorage.getItem("tournament_phase") || "1")
       let pseudo1 = "Joueur 1", pseudo2 = "Joueur 2"
       if (phase === 1) {
-        pseudo1 = localStorage.getItem("userLogin") || "Joueur 1"
+        pseudo1 = localStorage.getItem("tournament_login_1") || "Joueur 1"
         pseudo2 = localStorage.getItem("tournament_login_2") || "Joueur 2"
       } 
       else if (phase === 2) {
@@ -363,14 +391,14 @@ export function gameEvent() {
           winner1 === localStorage.getItem("tournament_userId_1") ? "1" :
           winner1 === localStorage.getItem("tournament_userId_2") ? "2" :
           winner1 === localStorage.getItem("tournament_userId_3") ? "3" : "4"
-        )) || "Vainqueur 1";
+        )) || "Vainqueur 1"
         pseudo2 = localStorage.getItem("tournament_login_" + (
           winner2 === localStorage.getItem("tournament_userId_1") ? "1" :
           winner2 === localStorage.getItem("tournament_userId_2") ? "2" :
           winner2 === localStorage.getItem("tournament_userId_3") ? "3" : "4"
-        )) || "Vainqueur 2";
+        )) || "Vainqueur 2"
       }
-      showMatchModal(pseudo1, pseudo2, () => startMatch())
+      showMatchVersus(pseudo1, pseudo2, () => startMatch())
     } 
     else
       startMatch()
@@ -419,15 +447,6 @@ function renderUI() {
   root.innerHTML = html
   gameEvent()
   attachNavbarEvents()
-}
-
-function showOnly(panel: Panel) {
-  currentPanel = panel
-  if (localStorage.getItem("returnToTournament")) {
-    currentPanel = "tournament"
-    localStorage.removeItem("returnToTournament")
-  }
-  renderUI()
 }
 
 function onKeyDownDuringBinding(e: KeyboardEvent) {
@@ -556,82 +575,121 @@ function resetGame(): void {
   nextTargetY = rightPaddle.y
 }
 
-function endGame() {
+async function endGame() {
   let winner: "left" | "right" | null = null
   if (score.left === scoreMod)
     winner = "left"
   else if (score.right === scoreMod)
     winner = "right"
+  else if (score.left > score.right)
+    winner = "left"
+  else if (score.right > score.left)
+    winner = "right"
+
+  if (mode === "tournoi") {
+    const phase = Number(localStorage.getItem("tournament_phase") || "1")
+    if (phase === 1) {
+      localStorage.setItem("token", localStorage.getItem("tournament_token_1")!)
+      localStorage.setItem("userId", localStorage.getItem("tournament_userId_1")!)
+      localStorage.setItem("token_player2", localStorage.getItem("tournament_token_2")!)
+      localStorage.setItem("userId_player2", localStorage.getItem("tournament_userId_2")!)
+    }
+    else if (phase === 2) {
+      localStorage.setItem("token", localStorage.getItem("tournament_token_3")!)
+      localStorage.setItem("userId", localStorage.getItem("tournament_userId_3")!)
+      localStorage.setItem("token_player2",localStorage.getItem("tournament_token_4")!)
+      localStorage.setItem("userId_player2", localStorage.getItem("tournament_userId_4")!)
+    }
+    else if (phase === 3) {
+      localStorage.setItem("token", localStorage.getItem("tournament_winner1_token")!)
+      localStorage.setItem("userId", localStorage.getItem("tournament_winner1")!)
+      localStorage.setItem("token_player2", localStorage.getItem("tournament_winner2_token")!)
+      localStorage.setItem("userId_player2", localStorage.getItem("tournament_winner2")!)
+    }
+  }
 
   const token1 = localStorage.getItem("token")
   const token2 = localStorage.getItem("token_player2")
   const user1_id = Number(localStorage.getItem("userId"))
   const user2_id = Number(localStorage.getItem("userId_player2"))
+  const winnerID = winner === "left" ? user1_id : winner === "right" ? user2_id : null
+  const scoreStr = `${score.left}-${score.right}`
 
-  if (mode === "ai") {
-  fetch("/api/matchs/", {
-    method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token1
-    },
-    body: JSON.stringify({
-      date: new Date().toISOString(),
-      duration: timerMod,
-      winner_id: winner === "left" ? user1_id : null,
-      score: `${score.left}-${score.right}`
-    })
-  }).catch(() => {})
+  const payload: Record<string, any> = {
+    date: new Date().toISOString(),
+    duration: timerMod,
+    winner_id: winnerID,
+    score: scoreStr,
   }
-  else if (mode === "local" || mode === "tournoi") {
-    fetch("/api/matchs/", {
+  if (mode !== "ai" && token2)
+    payload.player2_token = token2
+
+  try {
+    await fetch("/api/matchs/", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
         "Authorization": "Bearer " + token1
       },
-      body: JSON.stringify({
-        date: new Date().toISOString(),
-        duration: timerMod,
-        winner_id: winner === "left" ? user1_id : user2_id,
-        score: `${score.left}-${score.right}`,
-        player2_token: token2
-      })
-    }).catch(() => {})
+      body: JSON.stringify(payload)
+    })
+  }
+  catch (err) {
+    console.error("Erreur lors de l'enregistrement du match:", err)
   }
   alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right)
   resetGame()
   showOnly("menu")
+
   if (localStorage.getItem("tournament_phase")) {
-    const phase = Number(localStorage.getItem("tournament_phase"))
+    const phase = Number(localStorage.getItem("tournament_phase") || "1");
     if (phase === 1) {
-      // Stocke le vainqueur du match 1
-      localStorage.setItem("tournament_winner1", winner === "left"
+      // → Match 1 : joueur 1 vs joueur 2
+      const winnerUserId = winner === "left"
         ? localStorage.getItem("tournament_userId_1")!
-        : localStorage.getItem("tournament_userId_2")!)
-      localStorage.setItem("tournament_winner1_token", winner === "left"
+        : localStorage.getItem("tournament_userId_2")!
+      const winnerToken = winner === "left"
         ? localStorage.getItem("tournament_token_1")!
-        : localStorage.getItem("tournament_token_2")!)
+        : localStorage.getItem("tournament_token_2")!
+      localStorage.setItem("tournament_winner1", winnerUserId)
+      localStorage.setItem("tournament_winner1_token", winnerToken)
       localStorage.setItem("tournament_phase", "2")
       showOnly("keyConfig")
       return
     }
     if (phase === 2) {
-      // Stocke le vainqueur du match 2
-      localStorage.setItem("tournament_winner2", winner === "left"
+      // → Match 2 : joueur 3 vs joueur 4
+      const winnerUserId = winner === "left"
         ? localStorage.getItem("tournament_userId_3")!
-        : localStorage.getItem("tournament_userId_4")!)
-      localStorage.setItem("tournament_winner2_token", winner === "left"
+        : localStorage.getItem("tournament_userId_4")!
+      const winnerToken = winner === "left"
         ? localStorage.getItem("tournament_token_3")!
-        : localStorage.getItem("tournament_token_4")!)
+        : localStorage.getItem("tournament_token_4")!
+  
+      localStorage.setItem("tournament_winner2", winnerUserId)
+      localStorage.setItem("tournament_winner2_token", winnerToken)
       localStorage.setItem("tournament_phase", "3")
       showOnly("keyConfig")
       return
     }
     if (phase === 3) {
-      // Finale : winner1 vs winner2
-      // Affiche le gagnant du tournoi ou recommence
-      alert("Tournoi terminé !"), ["1","2","3","4","winner1","winner2","winner1_token","winner2_token","phase"].forEach(k => localStorage.removeItem("tournament_" + k))
+      alert("Tournoi terminé !")
+
+      const oriToken = localStorage.getItem("tournament_original_token")
+      const oriUser = localStorage.getItem("tournament_original_userId")
+      if (oriToken)
+        localStorage.setItem("token", oriToken)
+      if (oriUser)
+        localStorage.setItem("userId", oriUser)
+
+      const keysToRemove = [
+        "tournament_userId_1", "tournament_userId_2", "tournament_userId_3", "tournament_userId_4",
+        "tournament_token_1",  "tournament_token_2",  "tournament_token_3",  "tournament_token_4",
+        "tournament_login_1", "tournament_login_2",  "tournament_login_3",  "tournament_login_4", "tournament_winner1", 
+        "tournament_winner1_token", "tournament_winner2", "tournament_winner2_token", "tournament_phase", "tournament_original_token",
+        "tournament_original_userId"
+      ]
+      keysToRemove.forEach(key => localStorage.removeItem(key))
       showOnly("menu")
       return
     }
@@ -639,15 +697,14 @@ function endGame() {
 }
 
 function update() {
-  if (mode === "local") 
-  {
+  if (mode === "ai")
+    aiStep()
+  else {
     if (keyPressed[keyBinding.player2Up] && rightPaddle.y > 0)
       rightPaddle.y -= baseSpeed
     if (keyPressed[keyBinding.player2Down] && rightPaddle.y < canvas!.height-paddleHeight)
       rightPaddle.y += baseSpeed
-  } 
-  else
-    aiStep()
+  }
   if (keyPressed[keyBinding.player1Up] && leftPaddle.y > 0)
     leftPaddle.y -= baseSpeed
   if (keyPressed[keyBinding.player1Down] && leftPaddle.y < canvas!.height-paddleHeight)
@@ -670,7 +727,7 @@ function update() {
     ball.vx = Math.abs(ball.vx)
   }
 
-  if (
+  if ( 
     ball.x + ballSize >= rightPaddle.x &&
     ball.x <= rightPaddle.x + paddleWidth &&
     ball.y + ballSize > rightPaddle.y + epsilon &&
@@ -690,6 +747,11 @@ function update() {
     const elapsed = Math.floor((Date.now() - timer.start) / 1000)
     const remaining = Math.max(0, timer.duration - elapsed)
     if (remaining <= 0) {
+      if (mode === "tournoi")
+        if (score.left === score.right) {
+          startTimer(10)
+          return
+        }
       timer.isRunning = false
       endGame()
       return
@@ -701,6 +763,7 @@ function update() {
     endGame()
     return
   }
+
 }
 
 function render() {
@@ -722,20 +785,29 @@ function gameLoop() {
 
 function startMatch() {
   let pseudo1 = "Joueur 1"
-  let pseudo2 = "Joueur 2"
-  if (currentPanel === "tournament") {
-    mode === "tournoi"
-    const phase = Number(localStorage.getItem("tournament_phase") || "1")
+  let pseudo2 = "Joueur 2"  
+  const phaseStr = localStorage.getItem("tournament_phase")
+  if (phaseStr) {
+    mode = "tournoi"
+    const phase = Number(phaseStr)
+
+    if (phase === 1 && !localStorage.getItem("tournament_original_token")) {
+      localStorage.setItem("tournament_original_token", localStorage.getItem("token")!)
+      localStorage.setItem("tournament_original_userId", localStorage.getItem("userId")!)
+    }
+
     if (phase === 1) {
+      mode = "tournoi"
       // joueur 1 vs joueur 2
       localStorage.setItem("token", localStorage.getItem("tournament_token_1")!)
       localStorage.setItem("userId", localStorage.getItem("tournament_userId_1")!)
       localStorage.setItem("token_player2", localStorage.getItem("tournament_token_2")!)
       localStorage.setItem("userId_player2", localStorage.getItem("tournament_userId_2")!)
-      pseudo1 = localStorage.getItem("userLogin") || "Joueur 1"
+      pseudo1 = localStorage.getItem("tournament_login_1") || "Joueur 1"
       pseudo2 = localStorage.getItem("tournament_login_2") || "Joueur 2"
     } 
     else if (phase === 2) {
+      mode = "tournoi"
       // joueur 3 vs joueur 4
       localStorage.setItem("token", localStorage.getItem("tournament_token_3")!)
       localStorage.setItem("userId", localStorage.getItem("tournament_userId_3")!)
@@ -745,33 +817,35 @@ function startMatch() {
       pseudo2 = localStorage.getItem("tournament_login_4") || "Joueur 4"
     }
     else if (phase === 3) {
+      mode = "tournoi"
+      // joueur gagnant 1 vs joueur gagnant 2
       localStorage.setItem("token", localStorage.getItem("tournament_winner1_token")!)
       localStorage.setItem("userId", localStorage.getItem("tournament_winner1")!)
       localStorage.setItem("token_player2", localStorage.getItem("tournament_winner2_token")!)
       localStorage.setItem("userId_player2", localStorage.getItem("tournament_winner2")!)
-      pseudo1 = localStorage.getItem("tournament_login_" + (
-        localStorage.getItem("tournament_winner1") === localStorage.getItem("tournament_userId_1") ? "1" : 
-        localStorage.getItem("tournament_winner1") === localStorage.getItem("tournament_userId_2") ? "2" :
-        localStorage.getItem("tournament_winner1") === localStorage.getItem("tournament_userId_3") ? "3" : "4"
-      )) || "Vainqueur 1"
-      pseudo2 = localStorage.getItem("tournament_login_" + (
-        localStorage.getItem("tournament_winner2") === localStorage.getItem("tournament_userId_1") ? "1" : 
-        localStorage.getItem("tournament_winner2") === localStorage.getItem("tournament_userId_2") ? "2" :
-        localStorage.getItem("tournament_winner2") === localStorage.getItem("tournament_userId_3") ? "3" : "4"
-      )) || "Vainqueur 2"
+      pseudo1 = localStorage.getItem("tournament_winner1") || "Joueur 1"
+      pseudo2 = localStorage.getItem("tournament_winner2") || "Joueur 2"
     }
   }
   else
     mode = (currentPanel === "ai") ? "ai" : "local"
+
   showOnly("game")
-  initPaddle(canvas!)
-  resetBall(canvas!)
+  canvas = document.getElementById("pong") as HTMLCanvasElement
+  ctx = canvas.getContext("2d")!
+  initPaddle(canvas)
+  resetBall(canvas)
   resetTimer()
   const timerGame = Math.max(10, timerMod)
   startTimer(timerGame)
   gameLoop()
 }
-/*
-window.addEventListener("load", () => {
-  renderUI()
-})*/
+
+// window.addEventListener("load", () => {
+//   if (localStorage.getItem("returnToTournament")) {
+//     localStorage.removeItem("returnToTournament")
+//     showOnly("tournament")
+//   }
+//   else
+//     showOnly("menu")
+// })

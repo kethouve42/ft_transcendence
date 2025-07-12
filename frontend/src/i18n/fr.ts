@@ -130,6 +130,7 @@ export default {
     play_ai: "Jouer contre l'IA",
     rules: "Règle",
     settings: "Paramètres",
+    tournament: "Tournoi",
   },
   local: {
     title: "Configuration des touches",
@@ -217,5 +218,16 @@ export default {
     time: "Temps restant :",
     overh: "Surchauffe !",
     end: "Fin de la partie !"
+  },
+  tournament: {
+    title: "Tournoi de 4 joueurs.",
+    start: "Lancer le tournoi",
+    cancel: "Fermer",
+    login_page: {
+      title: "Connexion Joueur",
+      err_2same: "Chaque joueur doit avoir un compte unique.",
+      all_con: "Tous les joueurs doivent être connectés.",
+    },
+    upcoming_match: "Match à venir",
   }
 };

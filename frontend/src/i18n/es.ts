@@ -129,6 +129,7 @@ export default {
     play_ai: "Jugar contra la IA",
     rules: "Reglas",
     settings: "Configuración",
+    tournament: "Torneo",
   },
   local: {
     title: "Configuración de teclas",
@@ -216,5 +217,16 @@ export default {
     time: "Tiempo restante :",
     overh: "¡Sobrecalentamiento !",
     end: "¡Se acabó el juego !"
+  },
+  tournament: {
+    title: "Torneo de 4 jugadores.",
+    start: "Iniciar el torneo",
+    cancel: "Cerrar",
+    login_page: {
+      title: "Inicio de sesión del jugador",
+      err_2same: "Cada jugador debe tener una cuenta única.",
+      all_con: "Todos los jugadores deben estar conectados.",
+    },
+    upcoming_match: "Próximo partido",
   }
 };

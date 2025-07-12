@@ -1,5 +1,7 @@
 import { navigateTo } from "../main";
 import { t, getLang, setLang, LANG_NAMES } from "../i18n";
+import { clearTournamentData } from "./game/game";
+
 export function navbarView(): string {
   const isLogged = !!localStorage.getItem("token");
   const userLogin = localStorage.getItem("userLogin");
@@ -68,6 +70,7 @@ export function attachNavbarEvents() {
       localStorage.removeItem("userAlias");
       localStorage.removeItem("userAvatar");
       localStorage.removeItem("userId");
+      clearTournamentData()
       navigateTo("/login");
     });
   }

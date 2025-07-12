@@ -129,6 +129,7 @@ export default {
     play_ai: "Play against the AI",
     rules: "Rules",
     settings: "Settings",
+    tournament: "Tournament",
   },
   local: {
     title: "Key Configuration",
@@ -216,5 +217,16 @@ export default {
     time: "Remaining time :",
     overh: "Overheating !",
     end: "End of game !"
+  },
+  tournament: {
+    title: "4 player tournament.",
+    start: "Launch the tournament",
+    cancel: "Close",
+    login_page: {
+      title: "Player login",
+      err_2same: "Each player must have a unique account.",
+      all_con: "All players must be logged in.",
+    },
+    upcoming_match: "Upcoming match",
   }
 };
