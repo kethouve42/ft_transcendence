@@ -9,6 +9,7 @@ import fs from 'fs';
 import { FastifyRequest } from "fastify";
 import nodemailer from 'nodemailer';
 import { AuthUser, Match, Friend } from '../types/interfaces';
+import crypto from "crypto";
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -371,11 +372,12 @@ export default async function userRoutes(app: FastifyInstance)
 				const fileName = `avatar_${user.id}_${Date.now()}${fileExt}`;
 				const uploadDir = path.resolve(process.cwd(), 'uploads/avatars');
 				const uploadPath = path.join(uploadDir, fileName);
+				const avatarPath = `/uploads/avatars/${fileName}`;
 
 				//Suprime l'ancien avatar si existant
-				if (userData?.avatar && userData.avatar.startsWith('http://localhost:3000/uploads/avatars/'))
+				if (userData?.avatar && userData.avatar.startsWith('/uploads/avatars/'))
 				{
-                	const oldPath = path.resolve(process.cwd(), '.' + userData.avatar.replace('http://localhost:3000', ''));
+                	const oldPath = path.resolve(process.cwd(), '.' + userData.avatar);
                 	try
 					{
 						if (fs.existsSync(oldPath))
@@ -399,15 +401,43 @@ export default async function userRoutes(app: FastifyInstance)
 				});
 
 				// Sauvegarde le chemin relatif ou URL dans la DB
-				db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(`http://localhost:3000/uploads/avatars/${fileName}`, user.id);
+				db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(avatarPath, user.id);
 
 				uploaded = true;
-				return reply.send({ success: true, url: `http://localhost:3000/uploads/avatars/${fileName}` });
+				return reply.send({ success: true, url: avatarPath });
 			}
 		}
 
 		if (!uploaded)
 			return reply.status(400).send({ error: 'Aucun fichier reçu' });
+	});
+
+	//Reset d'avatar
+	app.post('/reset-avatar', { preHandler: authMiddleware }, async (req, reply) =>
+	{
+		const user = (req as AuthenticatedRequest).user;
+
+		const userData = db.prepare('SELECT avatar FROM users WHERE id = ?').get(user.id) as { avatar: string | null };
+
+		//Suprime l'ancien avatar si existant
+		if (userData?.avatar && userData.avatar.startsWith('/uploads/avatars/'))
+		{
+        	const oldPath = path.resolve(process.cwd(), '.' + userData.avatar);
+        	try
+			{
+				if (fs.existsSync(oldPath))
+					fs.unlinkSync(oldPath);
+        	}
+			catch (e)
+			{
+            	console.warn('Impossible de supprimer l\'ancien avatar :', e);
+        	}
+        }
+
+		// Sauvegarde le chemin relatif ou URL dans la DB
+		db.prepare(`UPDATE users SET avatar = NULL WHERE id = ?`).run('', user.id);
+
+		return { success: true };
 	});
 
 	//Exporter ses propre données
@@ -431,6 +461,7 @@ export default async function userRoutes(app: FastifyInstance)
 		};
 	});
 
+	//Anonymisation
 	app.post('/me/anonymize', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const user = (req as AuthenticatedRequest).user;
@@ -457,8 +488,6 @@ export default async function userRoutes(app: FastifyInstance)
 
 			db.prepare(`UPDATE users SET login = ?, email = ?, alias = NULL, avatar = NULL, password = ? WHERE id = ?`).run(anonymLogin, anonymEmail, randomPassword, user.id);
 
-			//rajouté les autre tables
-
 			return {success: true };
 		}
 		catch (err: any)
@@ -468,4 +497,52 @@ export default async function userRoutes(app: FastifyInstance)
 		}
 	});
 
+	//Mot de passe oublié
+	app.post('/forgot-password', async (req, reply) =>
+	{
+		const { email } = req.body as { email: string };
+		if (!email)
+        	return reply.status(400).send({ error: "Email requis" });
+
+		// Vérifie si l'utilisateur existe
+		const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email) as { id: number, email: string } | undefined;
+		if (!user)
+			return reply.status(200).send({ success: true });
+
+		// Génère un token sécurisé
+		const resetToken = crypto.randomBytes(32).toString('hex');
+		const expires = Date.now() + 1000 * 60 * 15; // 15 minutes
+
+		// Stocke le token et l'expiration
+		db.prepare('UPDATE users SET reset_token = ?, reset_expires = ? WHERE id = ?').run(resetToken, expires, user.id);
+
+		// Envoie l'email avec le lien de réinitialisation
+		const resetUrl = `https://localhost:8443/reset-password?token=${resetToken}`;
+		await transporter.sendMail({
+			from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+			to: user.email,
+			subject: 'Réinitialisation de votre mot de passe',
+			text: `Pour réinitialiser votre mot de passe, cliquez sur ce lien : ${resetUrl} (valable 15 minutes)`
+		});
+
+    	return { success: true };
+	});
+
+	//Maj du mot de passe oublié
+	app.post('/reset-password', async (req, reply) => {
+		const { token, newPassword } = req.body as { token: string, newPassword: string };
+		if (!token || !newPassword)
+			return reply.status(400).send({ error: "Token et nouveau mot de passe requis" });
+
+		// Vérifie le token
+		const user = db.prepare('SELECT id, reset_expires FROM users WHERE reset_token = ?').get(token) as { id: number, reset_expires: number } | undefined;
+		if (!user || !user.reset_expires || user.reset_expires < Date.now())
+			return reply.status(400).send({ error: "Token invalide ou expiré" });
+
+		// Met à jour le mot de passe
+		const hashedPassword = await bcrypt.hash(newPassword, 10);
+		db.prepare('UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?').run(hashedPassword, user.id);
+
+		return { success: true };
+	});
 }

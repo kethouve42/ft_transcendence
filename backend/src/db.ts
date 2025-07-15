@@ -24,7 +24,9 @@ CREATE TABLE IF NOT EXISTS users (
   tfa_enabled BOOLEAN DEFAULT 0,
   tfa_code TEXT,
   tfa_expires INTEGER,
-  last_seen INTEGER
+  last_seen INTEGER,
+  reset_token TEXT,
+  reset_expires INTEGER
 );
 
 -- Table des relations d'amitié
