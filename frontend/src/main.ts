@@ -65,7 +65,6 @@ function render(route: string) {
 
   const protectedRoutes_lr = [
     "/login",
-    "/register",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");
@@ -138,6 +137,8 @@ function toggleContrast() {
 }
 
 export function escapeHTML(str: string) {
+  if (!str)
+    return
   return str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

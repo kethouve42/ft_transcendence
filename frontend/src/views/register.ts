@@ -42,18 +42,6 @@ export function registerView(): string {
 }
 
 export function attachRegisterEvents() {
-  // Vérifie la connexion à la base au chargement
-  fetch("/api/users")
-    .then(res => {
-      const msg = document.getElementById("register-message");
-      if (!res.ok) throw new Error(t("register.error_api") + res.status);
-      if (msg) msg.textContent = t("register.db_ok");
-    })
-    .catch(err => {
-      const msg = document.getElementById("register-message");
-      if (msg) msg.textContent = t("register.db_fail") + err.message;
-    });
-
   const form = document.getElementById("register-form") as HTMLFormElement | null;
   const msg = document.getElementById("register-message");
   if (!form) return;

@@ -36,6 +36,7 @@ export function loginPlayer2View(): string {
           ${t("login.submit")}
         </button>
         <div id="login-player2-message" class="text-red-400"></div>
+        <a href="/register" class="text-cyan-400 underline mt-4 inline-block">${t("login.register")}</a>
       </form>
     </div>
   `;
