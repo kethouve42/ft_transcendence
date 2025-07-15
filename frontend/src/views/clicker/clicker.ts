@@ -31,19 +31,19 @@ export function clickerView(): string {
           <div class="flex gap-6 mt-10">
             <div class="flex flex-col items-center">
               <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler-1">
-                ${t("click.buy_re")}
+                ${t("click.buy_re")} <span id="cost-cooler-1" class="ml-2 text-xs text-amber-200"></span>
               </button>
               <span id="cooler-count-1" class="mt-2 text-2xl font-bold text-amber-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator-1">
-                ${t("click.buy_ge")}
+                ${t("click.buy_ge")} <span id="cost-generator-1" class="ml-2 text-xs text-lime-200"></span>
               </button>
               <span id="generator-count-1" class="mt-2 text-2xl font-bold text-lime-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil-1">
-                ${t("click.buy_bob")}
+                ${t("click.buy_bob")} <span id="cost-coil-1" class="ml-2 text-xs text-fuchsia-200"></span>
               </button>
               <span id="coil-count-1" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
             </div>
@@ -74,19 +74,19 @@ export function clickerView(): string {
           <div class="flex gap-6 mt-10">
             <div class="flex flex-col items-center">
               <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler-2">
-                ${t("click.buy_re")}
+                ${t("click.buy_re")} <span id="cost-cooler-2" class="ml-2 text-xs text-amber-200"></span>
               </button>
               <span id="cooler-count-2" class="mt-2 text-2xl font-bold text-amber-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator-2">
-                ${t("click.buy_ge")}
+                ${t("click.buy_ge")} <span id="cost-generator-2" class="ml-2 text-xs text-lime-200"></span>
               </button>
               <span id="generator-count-2" class="mt-2 text-2xl font-bold text-lime-400">0</span>
             </div>
             <div class="flex flex-col items-center">
               <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil-2">
-                ${t("click.buy_bob")}
+                ${t("click.buy_bob")} <span id="cost-coil-2" class="ml-2 text-xs text-fuchsia-200"></span>
               </button>
               <span id="coil-count-2" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
             </div>
@@ -95,7 +95,7 @@ export function clickerView(): string {
         <!-- Bouton Quitter -->
         <button
           id="quit-versus-btn"
-          class="fixed top-4 right-4 bg-gray-700 hover:bg-gray-500 text-white px-4 py-2 rounded shadow-lg z-50"
+          class="top-4 right-4 bg-gray-700 hover:bg-gray-500 text-white px-4 py-2 rounded shadow-lg z-50"
         >
            ${t("click.exit")}
         </button>
@@ -135,19 +135,19 @@ export function clickerView(): string {
       <div class="flex gap-6 mt-10">
         <div class="flex flex-col items-center">
           <button class="bg-amber-500 hover:bg-amber-400 text-white px-5 py-2 rounded-lg shadow transition" id="buy-cooler">
-            ${t("click.buy_re")}
+            ${t("click.buy_re")} <span id="cost-cooler" class="ml-2 text-xs text-amber-200"></span>
           </button>
           <span id="cooler-count" class="mt-2 text-2xl font-bold text-amber-400">0</span>
           </div>
           <div class="flex flex-col items-center">
           <button class="bg-lime-600 hover:bg-lime-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-generator">
-            ${t("click.buy_ge")}
+            ${t("click.buy_ge")} <span id="cost-generator" class="ml-2 text-xs text-lime-200"></span>
           </button>
           <span id="generator-count" class="mt-2 text-2xl font-bold text-lime-400">0</span>
         </div>
         <div class="flex flex-col items-center">
           <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-5 py-2 rounded-lg shadow transition" id="buy-coil">
-            ${t("click.buy_bob")}
+            ${t("click.buy_bob")} <span id="cost-coil" class="ml-2 text-xs text-fuchsia-200"></span>
           </button>
           <span id="coil-count" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
           </div>
@@ -155,7 +155,7 @@ export function clickerView(): string {
       <!-- Bouton Mode Versus -->
       <button
         id="versus-btn"
-        class="fixed top-4 right-4 bg-pink-600 hover:bg-pink-400 text-white px-4 py-2 rounded shadow-lg z-50"
+        class="top-4 right-4 bg-pink-600 hover:bg-pink-400 text-white px-4 py-2 rounded shadow-lg z-50"
       >
         ${t("click.versus")}
       </button>
@@ -170,7 +170,7 @@ export function clickerEvent(): void {
 
   // Initialisation de la chaleur et des variables
   let heat = 0;
-  let overheated = false;
+  //let overheated = false;
   const maxHeat = 100;
   const versusBtn = document.getElementById("versus-btn");
 
@@ -181,10 +181,13 @@ export function clickerEvent(): void {
   const heatValue = document.getElementById("heat-value");
   const clickBtn = document.getElementById("click-btn");
   const pointCount = document.getElementById("point-count");
+  const costCooler = document.getElementById("cost-cooler");
   const coolerCount = document.getElementById("cooler-count");
   const buyCoolerBtn = document.getElementById("buy-cooler");
+  const costGenerator = document.getElementById("cost-generator");
   const generatorCount = document.getElementById("generator-count");
   const buyGeneratorBtn = document.getElementById("buy-generator");
+  const costCoil = document.getElementById("cost-coil");
   const coilCount = document.getElementById("coil-count");
   const buyCoilBtn = document.getElementById("buy-coil");
 
@@ -222,8 +225,8 @@ export function clickerEvent(): void {
       if (cooling < 0) cooling = 0;
       heat = Math.max(0, Number(localStorage.getItem("heat")) - cooling);
       localStorage.setItem("heat", heat.toString());
-      updateHeatBar();
     }
+    updateHeatBar();
 
     // Vérification de la fin de surchauffe
     if (clickBtn)
@@ -338,11 +341,15 @@ export function clickerEvent(): void {
         .then(data => {
           pointCount!.textContent = data.newScore;
           coolerCount!.textContent = data.newCooler;
+          let coolerLevel = Number(coolerCount!.textContent) || 0;
+          let coolerCost = coolerLevel === 0 ? 50 : Math.round(50 * Math.pow(1.15, coolerLevel));
+          if (costCooler) costCooler.textContent = `(${coolerCost})`;
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
         });
     });
+    
   }
 
   // Bouton "Acheter generateur" (buyGenerator)
@@ -361,6 +368,9 @@ export function clickerEvent(): void {
         .then(data => {
           pointCount!.textContent = data.newScore;
           generatorCount!.textContent = data.newGenerator;
+          let generatorLevel = Number(generatorCount!.textContent) || 0;
+          let generatorCost = generatorLevel === 0 ? 150 : Math.round(150 * Math.pow(1.25, generatorLevel));
+          if (costGenerator) costGenerator.textContent = `(${generatorCost})`;
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -384,6 +394,9 @@ export function clickerEvent(): void {
         .then(data => {
           pointCount!.textContent = data.newScore;
           coilCount!.textContent = data.newCoil;
+          let coilLevel = Number(coilCount!.textContent) || 0;
+          let coilCost = coilLevel === 0 ? 75 : Math.round(75 * Math.pow(1.15, coilLevel));
+          if (costCoil) costCoil.textContent = `(${coilCost})`;
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -407,10 +420,23 @@ export function clickerEvent(): void {
         coolerCount!.textContent = data.cooler;
         generatorCount!.textContent = data.generator;
         coilCount!.textContent = data.coil
+
+        // Calcul initial des coûts
+        let coolerLevel = Number(coolerCount!.textContent) || 0;
+        let coolerCost = coolerLevel === 0 ? 50 : Math.round(50 * Math.pow(1.15, coolerLevel));
+        if (costCooler) costCooler.textContent = `(${coolerCost})`;
+        let generatorLevel = Number(generatorCount!.textContent) || 0;
+        let generatorCost = generatorLevel === 0 ? 150 : Math.round(150 * Math.pow(1.25, generatorLevel));
+        if (costGenerator) costGenerator.textContent = `(${generatorCost})`;
+        let coilLevel = Number(coilCount!.textContent) || 0;
+        let coilCost = coilLevel === 0 ? 75 : Math.round(75 * Math.pow(1.15, coilLevel));
+        if (costCoil) costCoil.textContent = `(${coilCost})`;
     })
     .catch(err => {
       console.error("❌ Erreur :", err.message);
     });
+
+
 
   // Verification et purge mode versus
   if (!localStorage.getItem("token_player2"))
@@ -437,22 +463,48 @@ export function clickerEvent(): void {
   
     // Page de connection pour le second joueur
     navigateTo(`/loginUser2?redirect=${encodeURIComponent(window.location.pathname)}`);
-  
-    // Initialisation des variables pour le versus
-    ["1", "2"].forEach((n) => {
-    localStorage.setItem(`vs_${n}score`, "0");
-    localStorage.setItem(`vs_${n}heat`, "0");
-    localStorage.setItem(`vs_${n}cooler`, "0");
-    localStorage.setItem(`vs_${n}generator`, "0");
-    localStorage.setItem(`vs_${n}coil`, "0");
-    localStorage.setItem(`vs_${n}overheated`, "false");
-    });
   });
   }
   
   if (localStorage.getItem("token_player2")) {
 
-  // Crée et initialiser le timer versus
+
+  // Initialisation des variables pour le versus
+  const quitBtn = document.getElementById("quit-versus-btn");
+  ["1", "2"].forEach((n) => {
+  localStorage.setItem(`vs_${n}score`, "0");
+  localStorage.setItem(`vs_${n}heat`, "0");
+  localStorage.setItem(`vs_${n}cooler`, "0");
+  localStorage.setItem(`vs_${n}generator`, "0");
+  localStorage.setItem(`vs_${n}coil`, "0");
+  localStorage.setItem(`vs_${n}overheated`, "false");
+  });
+
+  // Fonction pour mettre à jour dynamiquement les coûts pour chaque joueur
+  function updateVersusCosts() {
+    ["1", "2"].forEach((n) => {
+      // Cooler
+      let coolerLevel = Number(localStorage.getItem(`vs_${n}cooler`)) || 0;
+      let coolerCost = coolerLevel === 0 ? 50 : Math.round(50 * Math.pow(1.15, coolerLevel));
+      const costCooler = document.getElementById(`cost-cooler-${n}`);
+      if (costCooler) costCooler.textContent = `(${coolerCost})`;
+
+      // Generator
+      let generatorLevel = Number(localStorage.getItem(`vs_${n}generator`)) || 0;
+      let generatorCost = generatorLevel === 0 ? 150 : Math.round(150 * Math.pow(1.25, generatorLevel));
+      const costGenerator = document.getElementById(`cost-generator-${n}`);
+      if (costGenerator) costGenerator.textContent = `(${generatorCost})`;
+
+      // Coil
+      let coilLevel = Number(localStorage.getItem(`vs_${n}coil`)) || 0;
+      let coilCost = coilLevel === 0 ? 75 : Math.round(75 * Math.pow(1.15, coilLevel));
+      const costCoil = document.getElementById(`cost-coil-${n}`);
+      if (costCoil) costCoil.textContent = `(${coilCost})`;
+    });
+  }
+  updateVersusCosts();
+
+  // Crée et initialiser le timer versus   A REMPLACER !!!
   let timerDiv = document.getElementById("versus-timer");
   if (!timerDiv) {
     timerDiv = document.createElement("div");
@@ -463,8 +515,7 @@ export function clickerEvent(): void {
   let timeLeft = 60; // secondes
   timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
 
-  const quitBtn = document.getElementById("quit-versus-btn");
-
+  
   // Fonction pour mettre à jour les jauges visuellement
   function updateHeatBars() 
   {
@@ -473,7 +524,7 @@ export function clickerEvent(): void {
       const heatBar = document.getElementById(`heat-bar-${n}`);
       const heatValue = document.getElementById(`heat-value-${n}`);
       const maxHeat = 100;
-      const percent = Math.max(0, Math.min(100, (heat / maxHeat) * 100));
+      const percent = Math.max(0, Math.min(100, Number(localStorage.getItem(`vs_${n}heat`)) / maxHeat) * 100);
       if (heatBar) {
         heatBar.style.height = percent + "%";
         heatBar.className = "w-full transition-all duration-300 " +
@@ -490,59 +541,63 @@ export function clickerEvent(): void {
     // Fin de la partie versus
     if (timeLeft <= 0) {
       clearInterval(versusTimer);
-      localStorage.removeItem("token_player2");
-
-      const score1 = localStorage.getItem("vs_1score") || "0";
-      const score2 = localStorage.getItem("vs_2score") || "0";
+      
       // Nettoyage des donnees versus
       ["1", "2"].forEach((n) => {
-      localStorage.removeItem(`vs_${n}score`);
-      localStorage.removeItem(`vs_${n}heat`);
-      localStorage.removeItem(`vs_${n}cooler`);
-      localStorage.removeItem(`vs_${n}generator`);
-      localStorage.removeItem(`vs_${n}coil`);
-      localStorage.removeItem(`vs_${n}overheated`);
+        localStorage.removeItem(`vs_${n}score`);
+        localStorage.removeItem(`vs_${n}heat`);
+        localStorage.removeItem(`vs_${n}cooler`);
+        localStorage.removeItem(`vs_${n}generator`);
+        localStorage.removeItem(`vs_${n}coil`);
+        localStorage.removeItem(`vs_${n}overheated`);
       });
-
+      
       timerDiv!.textContent = `${t("click.end")}`;
+      localStorage.removeItem("token_player2");
+      localStorage.removeItem("userId_player2");
       setTimeout(() => {
         timerDiv!.remove();
-        navigateTo("/");
       }, 2000);
+      navigateTo("/clicker");
     }
   }, 1000);
 
-  // Decrement chaleur et generateurs auxiliaires
+
+  // Decrement chaleur
   setInterval(() => {
-  ["1", "2"].forEach((n) => {
-    // Refroidissement du réacteur pour chaque joueur
-    let heat = Number(localStorage.getItem(`vs_${n}heat`)) || 0;
-    if (heat > 0) {
-      let cooling = Math.round((2 + Number(localStorage.getItem(`vs_${n}cooler`))) - Number(localStorage.getItem(`vs_${n}generator`)) * 0.5);
-      if (cooling < 0) cooling = 0;
-      heat = Math.max(0, heat - cooling);
-      localStorage.setItem(`vs_${n}heat`, heat.toString());
-    }
-
-    updateHeatBars();
+    ["1", "2"].forEach((n) => {
+      // Refroidissement du réacteur pour chaque joueur
+      let heat = Number(localStorage.getItem(`vs_${n}heat`)) || 0;
+      if (heat > 0) {
+        let cooling = Math.round((2 + Number(localStorage.getItem(`vs_${n}cooler`))) - Number(localStorage.getItem(`vs_${n}generator`)) * 0.5);
+        if (cooling < 0) cooling = 0;
+        heat = Math.max(0, heat - cooling);
+        localStorage.setItem(`vs_${n}heat`, heat.toString());
+      }
   
-    // Vérification de la fin de surchauffe
-    const clickBtn = document.getElementById(`click-btn-${n}`) as HTMLButtonElement;
-    if (clickBtn && localStorage.getItem(`vs_${n}overheated`) === "true" && heat <= 5) {
-      clickBtn.disabled = false;
-      localStorage.setItem(`vs_${n}overheated`, "false");
-      clickBtn.classList.remove("opacity-50", "cursor-not-allowed");
-      clickBtn.textContent = `${t("click.cl")}`;
-    }
+      updateHeatBars();
+    
+      // Vérification de la fin de surchauffe
+      const clickBtn = document.getElementById(`click-btn-${n}`) as HTMLButtonElement;
+      if (clickBtn && localStorage.getItem(`vs_${n}overheated`) === "true" && heat <= 5) {
+        clickBtn.disabled = false;
+        localStorage.setItem(`vs_${n}overheated`, "false");
+        clickBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        clickBtn.textContent = `${t("click.cl")}`;
+      }
+    });
+  }, 500);
 
-    // Activation des generateurs secondaires
-    if (localStorage.getItem(`vs_${n}overheated`) === "false") {
-      let score = Number(localStorage.getItem(`vs_${n}score`)) + Number(localStorage.getItem(`vs_${n}generator`));
-      localStorage.setItem(`vs_${n}score`, score.toString());
-      const pointCount = document.getElementById(`point-count-${n}`);
-      pointCount!.textContent = score.toString();
-    }
-  });
+  // Production des generateurs auxiliaires
+  setInterval(() => {
+    ["1", "2"].forEach((n) => {
+      if (localStorage.getItem(`vs_${n}overheated`) === "false") {
+        let score = Number(localStorage.getItem(`vs_${n}score`)) + Number(localStorage.getItem(`vs_${n}generator`));
+        localStorage.setItem(`vs_${n}score`, score.toString());
+        const pointCount = document.getElementById(`point-count-${n}`);
+        pointCount!.textContent = score.toString();
+      }
+    });
   }, 1000);
 
   // Bouton click
@@ -610,6 +665,7 @@ export function clickerEvent(): void {
           localStorage.setItem(`vs_${n}score`, score.toString());
           coolerCount.textContent = cooler.toString();
           pointCount!.textContent = score.toString();
+          updateVersusCosts();
       }
     });
   }
@@ -635,6 +691,7 @@ export function clickerEvent(): void {
           localStorage.setItem(`vs_${n}score`, score.toString());
           generatorCount.textContent = generator.toString();
           pointCount!.textContent = score.toString();
+          updateVersusCosts();
       }
     });
   }
@@ -660,6 +717,7 @@ export function clickerEvent(): void {
           localStorage.setItem(`vs_${n}score`, score.toString());
           coilCount.textContent = coil.toString();
           pointCount!.textContent = score.toString();
+          updateVersusCosts();
       }
     });
   }
@@ -668,22 +726,24 @@ export function clickerEvent(): void {
   // Bouton Quitter
   quitBtn!.addEventListener("click", () => {
     // Nettoyage des donnees versus
-    localStorage.removeItem("token_player2");
-  ["1", "2"].forEach((n) => {
-    localStorage.removeItem(`vs_${n}score`);
-    localStorage.removeItem(`vs_${n}heat`);
-    localStorage.removeItem(`vs_${n}cooler`);
-    localStorage.removeItem(`vs_${n}generator`);
-    localStorage.removeItem(`vs_${n}coil`);
-    localStorage.removeItem(`vs_${n}overheated`);
+    ["1", "2"].forEach((n) => {
+      localStorage.removeItem(`vs_${n}score`);
+      localStorage.removeItem(`vs_${n}heat`);
+      localStorage.removeItem(`vs_${n}cooler`);
+      localStorage.removeItem(`vs_${n}generator`);
+      localStorage.removeItem(`vs_${n}coil`);
+      localStorage.removeItem(`vs_${n}overheated`);
     });
+    localStorage.removeItem("token_player2");
+    localStorage.removeItem("userId_player2");
     clearInterval(versusTimer)
     if (timerDiv)
-      timerDiv.remove()
-    navigateTo("/")
+      timerDiv.remove();
+    navigateTo("/clicker");
   });
-
 }
+
+
 //#endregion
 
 }
@@ -692,6 +752,6 @@ export function clickerEvent(): void {
 // ============= TO DO : ============= //
 // =================================== //
 
-// -Faire un retour au jeu principal a la fin du versus (demander a Thibault)
+// Gerer le fait de quitter le versus en pleine partie
 // -Faire une route correcte et l'appeler a la fin du versus (voir avec Ken)
 // -Faire un ecran de selection pour choisir la target (score ou duree modulaire ?) du versus (voir avec Thibault)
