@@ -10,9 +10,6 @@ up:
 down:
 	docker-compose down
 
-restart:
-	docker-compose restart frontend
-	@echo "frontend are restarted"
 re: down up
 
 logs:
@@ -27,3 +24,9 @@ exec-backend:
 
 ps:
 	docker-compose ps
+
+dev-frontend:
+	cd	frontend	&&	npm run dev
+
+up-back:
+	docker-compose	up --build	-d	backend	elasticsearch	logstash	kibana

@@ -1,4 +1,4 @@
-import { navigateTo } from "../main";
+import { navigateTo, escapeHTML } from "../main";
 import { t } from "../i18n";
 
 export function dashboardEditView(): string {
@@ -97,9 +97,9 @@ export function attachDashboardEditEvents() {
       .then(user => {
         const form = document.getElementById("edit-profile-form") as HTMLFormElement | null;
         if (form && user) {
-          (form.elements.namedItem("login") as HTMLInputElement).value = user.login || "";
-          (form.elements.namedItem("alias") as HTMLInputElement).value = user.alias || "";
-          (form.elements.namedItem("email") as HTMLInputElement).value = user.email || "";
+          (form.elements.namedItem("login") as HTMLInputElement).value = escapeHTML(user.login) || "";
+          (form.elements.namedItem("alias") as HTMLInputElement).value = escapeHTML(user.alias) || "";
+          (form.elements.namedItem("email") as HTMLInputElement).value = escapeHTML(user.email) || "";
           (form.elements.namedItem("avatar") as HTMLInputElement).value = user.avatar || "";
         }
       });

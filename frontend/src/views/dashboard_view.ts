@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { navigateTo } from "../main";
+import { navigateTo, escapeHTML } from "../main";
 
 export function dashboardView(): string {
   return `
@@ -112,10 +112,10 @@ export function attachDashboardViewEvents() {
       if (info) {
         info.innerHTML = `
           <img src="${user.avatar || "/uploads/default-avatar.png"}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />
-          <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-2">${user.login}</h2>
+          <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-2">${escapeHTML(user.login)}</h2>
           <div class="flex gap-6 text-cyan-100 text-lg">
-            <span><b>${t("dashboard.alias")} :</b> ${user.alias || `<span class="italic text-cyan-400">${t("dashboard.none")}</span>`}</span>
-            <span><b>${t("dashboard.email")} :</b> ${user.email}</span>
+            <span><b>${t("dashboard.alias")} :</b> ${escapeHTML(user.alias) || `<span class="italic text-cyan-400">${t("dashboard.none")}</span>`}</span>
+            <span><b>${t("dashboard.email")} :</b> ${escapeHTML(user.email)}</span>
           </div>
         `;
       }
@@ -235,5 +235,5 @@ function renderUser(id: number | null, userMap: Record<number, { alias?: string;
   if (!id) return `<span class="italic text-cyan-400">${t("dashboard.ia")}</span>`;
   const user = userMap[id];
   if (!user) return `<span>${id}</span>`;
-  return `<span class="text-cyan-300 hover:underline cursor-pointer" onclick="navigateTo('/profile/${id}')">${user.alias || user.login}</span>`;
+  return `<span class="text-cyan-300 hover:underline cursor-pointer" onclick="navigateTo('/profile/${id}')">${escapeHTML(user.alias || user.login)}</span>`;
 }

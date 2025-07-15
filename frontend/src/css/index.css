@@ -1,8 +1,8 @@
+@import './accessibility.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import './accessibility.css';
 
 
 :root {
@@ -11,6 +11,23 @@
   color: #e0f7fa;
   background: #0f2027;
   letter-spacing: 0.05em;
+}
+
+html, body {
+  font-size: var(--base-font-size, 16px);
+}
+
+body.high-contrast, .high-contrast * {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  outline-color: #fff !important;
+}
+
+.high-contrast a, .high-contrast button {
+  color: #fff !important;
+  background-color: #222 !important;
+  border-color: #fff !important;
 }
 
 body {

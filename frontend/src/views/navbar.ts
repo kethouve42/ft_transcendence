@@ -1,4 +1,4 @@
-import { navigateTo } from "../main";
+import { navigateTo, escapeHTML } from "../main";
 import { t, getLang, setLang, LANG_NAMES } from "../i18n";
 import { clearTournamentData } from "./game/game";
 
@@ -45,7 +45,7 @@ export function navbarView(): string {
                   class="w-9 h-9 rounded-full border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg object-cover bg-cyan-900"
                 />
                 </span>
-                <span class="uppercase tracking-wider">${userAlias || userLogin || "Profil"}</span>
+                <span class="uppercase tracking-wider">${escapeHTML(userAlias || userLogin || "Profil")}</span>
               </a>
               <button id="logout-btn" class="bg-cyan-700/80 text-white border border-cyan-400 px-5 py-2 rounded-full font-semibold shadow-cyan-400/30 shadow-md hover:bg-cyan-500/80 hover:text-black transition">
                 ${t("nav.logout")}

@@ -1,4 +1,4 @@
-import { navigateTo } from "../main";
+import { navigateTo, escapeHTML } from "../main";
 import { attachLinkHandlers } from "../main";
 import { t } from "../i18n";
 
@@ -41,7 +41,7 @@ export function dashboardFriendsView(): string {
                           : `<span class="flex items-center justify-center h-full text-cyan-300 font-bold text-xl">${friend.login[0]?.toUpperCase() || "?"}</span>`
                       }
                     </span>
-                    <span class="text-cyan-200 font-semibold">${friend.alias || friend.login}</span>
+                    <span class="text-cyan-200 font-semibold">${escapeHTML(friend.alias || friend.login)}</span>
                     <a href="/profile/${friend.id}" class="ml-auto bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-1 rounded-lg shadow transition">
                       ${t("dashboard.view_profile")}
                     </a>

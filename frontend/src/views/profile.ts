@@ -1,4 +1,5 @@
 import { t } from "../i18n";
+import { escapeHTML } from "../main"
 
 export function profileView(userId: string | number): string {
   return `
@@ -37,7 +38,7 @@ export function attachProfileEvents(userId: string | number) {
             ` : ""}
           </span>
           <div>
-            <div class="text-2xl font-bold text-cyan-200">${user.alias || user.login}</div>
+            <div class="text-2xl font-bold text-cyan-200">${escapeHTML(user.alias || user.login)}</div>
             ${isOnline ? `<div class="text-green-400 text-sm font-semibold mt-1">${t("profile.online")}</div>` : ""}
           </div>
         </div>
