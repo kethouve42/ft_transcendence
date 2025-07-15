@@ -107,6 +107,14 @@ export function attachLoginPlayer2Events() {
         msg!.textContent = data.error || t("login.error");
         return;
       }
+      
+      // On bloque si c’est le même utilisateur que player 1
+      const user1Id = localStorage.getItem("userId")
+      if (data.UserId && data.UserId.toString() === user1Id) {
+        msg!.textContent = `${t("tournament.login_page.err_2same")}`
+        return
+      }
+
       // Connexion classique
       localStorage.setItem("token_player2", data.token);
       if (data.UserId)
