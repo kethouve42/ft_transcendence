@@ -33,13 +33,13 @@ export default {
     title: "Inscription",
     login: "Login",
     email: "Email",
-    password: "Mot de passe",
-    submit: "Ajouter",
-    db_ok: "Connexion à la base OK !",
-    db_fail: "Impossible de se connecter à la base : ",
-    error_api: "Erreur API: ",
-    success: "Utilisateur ajouté !",
-    error_add: "Erreur lors de l'ajout : "
+    password: "Password",
+    submit: "Add to",
+    db_ok: "Connection to the base OK!",
+    db_fail: "Unable to connect to the base :",
+    error_api: "API Error: ",
+    success: "User added!",
+    error_add: "Error adding :"
   },
   error: {
     not_found: "Page not found",
@@ -228,5 +228,6 @@ export default {
       all_con: "All players must be logged in.",
     },
     upcoming_match: "Upcoming match",
+    con: "¡Conectado!",
   }
 };

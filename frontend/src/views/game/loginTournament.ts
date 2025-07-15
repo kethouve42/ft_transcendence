@@ -1,12 +1,12 @@
 import { t } from "../../i18n"
-import { showOnly } from "./game";
+import { showOnly } from "./game"
 
 export function loginTournamentView(): string {
-  const playerParam = new URLSearchParams(window.location.search).get("player");
+  const playerParam = new URLSearchParams(window.location.search).get("player")
   if (!playerParam) {
-    throw new Error("Numéro de joueur de tournoi manquant dans l'URL");
+    throw new Error("Numéro de joueur de tournoi manquant dans l'URL")
   }
-  const playerNum = Number(playerParam);
+  const playerNum = Number(playerParam)
     return `
     <div class="settings-panel">
       <h2> ${t("tournament.login_page.title")} ${playerNum} </h2>
@@ -16,6 +16,7 @@ export function loginTournamentView(): string {
           <button type="submit" class="menu-btn save-btn">${t("login.submit")}</button>
           <div id="tournament-login-message" class="text-cyan-200"></div>
           </form>
+        <a href="/register" class="text-cyan-400 underline mt-4 inline-block">${t("login.register")}</a>
     </div>
     `
 }
@@ -23,11 +24,11 @@ export function loginTournamentView(): string {
 export function attachLoginTournamentEvents() {
   const form = document.getElementById("tournament-login-form") as HTMLFormElement | null
   const msg = document.getElementById("tournament-login-message")
-  const playerParam = new URLSearchParams(window.location.search).get("player");
+  const playerParam = new URLSearchParams(window.location.search).get("player")
   if (!playerParam) {
-    throw new Error("Numéro de joueur de tournoi manquant dans l'URL");
+    throw new Error("Numéro de joueur de tournoi manquant dans l'URL")
   }
-  const playerNum = Number(playerParam);
+  const playerNum = Number(playerParam)
   if (!form) 
     return
 
@@ -55,7 +56,7 @@ export function attachLoginTournamentEvents() {
         localStorage.setItem(`tournament_userId_${playerNum}`, data.UserId.toString())
       if (data.login)
         localStorage.setItem(`tournament_login_${playerNum}`, data.login)
-      if (msg) msg.textContent = "Connecté !"
+      if (msg) msg.textContent = `${t("tournament.con")}`
       setTimeout(() => {
         // Redirige vers la page tournoi
         showOnly("tournament")

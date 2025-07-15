@@ -640,9 +640,10 @@ async function endGame() {
   alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right)
   resetGame()
   showOnly("menu")
+  localStorage.removeItem("token_player2")
 
   if (localStorage.getItem("tournament_phase")) {
-    const phase = Number(localStorage.getItem("tournament_phase") || "1");
+    const phase = Number(localStorage.getItem("tournament_phase") || "1")
     if (phase === 1) {
       // → Match 1 : joueur 1 vs joueur 2
       const winnerUserId = winner === "left"
@@ -747,7 +748,7 @@ function update() {
     const elapsed = Math.floor((Date.now() - timer.start) / 1000)
     const remaining = Math.max(0, timer.duration - elapsed)
     if (remaining <= 0) {
-      if (mode === "tournoi")
+      if (mode === "tournoi" || mode === "local")
         if (score.left === score.right) {
           startTimer(10)
           return

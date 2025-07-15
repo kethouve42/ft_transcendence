@@ -228,5 +228,6 @@ export default {
       all_con: "Todos los jugadores deben estar conectados.",
     },
     upcoming_match: "Próximo partido",
+    con: "Connected !",
   }
 };
