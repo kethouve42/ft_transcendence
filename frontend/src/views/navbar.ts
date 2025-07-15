@@ -1,6 +1,6 @@
 import { navigateTo, escapeHTML } from "../main";
 import { t, getLang, setLang, LANG_NAMES } from "../i18n";
-import { clearTournamentData } from "./game/game";
+import { clearTournamentData } from "./game/loginTournament";
 
 export function navbarView(): string {
   const isLogged = !!localStorage.getItem("token");

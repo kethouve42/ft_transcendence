@@ -4,18 +4,20 @@ import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
 import { navbarView, attachNavbarEvents } from '../navbar.js'
+import { renderPanelFinalScoreTable, Score } from './loginTournament.js'
+import { renderPanelResult, attachResultEvents, handleTournamentLogin } from './loginTournament.js'
+import { aiStep } from './ai_logic.js'
 import { t } from "../../i18n/index.js"
 import { navigateTo } from '../../main.js'
 import "../../css/style.css"
-import { duplexPair } from 'stream'
 
 type Panel =  "menu" | "settings" | "ai" | "keyConfig" | "rules" | "game" | "tournament"
 
 let mode: 'local' | 'ai' | 'tournoi' = 'local'
 const epsilon = 0.5 // Constante pour les calculs de collision pour éviter que la balle coince.
-let aiDifficulty: 'easy' | 'medium' | 'hard' = 'easy'
+export let aiDifficulty: 'easy' | 'medium' | 'hard' = 'easy'
 let ballSpeed = baseSpeed
-let timerMod = 60
+let timerMod = 10
 let scoreMod = 10
 
 let keyBinding = {
@@ -30,9 +32,9 @@ let pendingBinding: keyof typeof keyBinding | null = null
 let animationId: number
 let keyPressed: Record<string, boolean> = {}
 let currentPanel: Panel = "menu"
-let lastAiUpdate = Date.now()
-let previousTargetY = 0
-let nextTargetY = 0
+export let lastAiUpdate = Date.now()
+export let previousTargetY = 0
+export let nextTargetY = 0
 
 let canvas: HTMLCanvasElement
 let ctx: CanvasRenderingContext2D
@@ -238,31 +240,17 @@ function renderGame() {
   `
 }
 
-function handleTournamentLogin(playerNum: number) {
-  if (playerNum === 1) {
-    localStorage.setItem("tournament_userId_1", localStorage.getItem("userId")!)
-    localStorage.setItem("tournament_token_1", localStorage.getItem("token")!)
-    localStorage.setItem("tournament_login_1", localStorage.getItem("userLogin")!)
-    showOnly("tournament")
-    return
-  }
-  localStorage.setItem("tournament_login_player", playerNum.toString())
-  navigateTo(`/loginTournament?player=${playerNum}&redirect=/pong`)
-}
-
 export function showOnly(panel: Panel) {
   currentPanel = panel
   renderUI()
 }
 
 function showMatchVersus(pseudo1: string, pseudo2: string, callback: () => void) {
-  // 1. Injecte la modale
   document.body.insertAdjacentHTML(
     "beforeend",
     renderPanelMatchVersus(pseudo1, pseudo2, 5)
   )
 
-  // 2. Gère le countdown
   let seconds = 5
   const countdownEl = document.getElementById("modal-countdown")!
   const modalEl = document.getElementById("match-modal")!
@@ -276,19 +264,6 @@ function showMatchVersus(pseudo1: string, pseudo2: string, callback: () => void)
       callback()
     }
   }, 1000)
-}
-export function clearTournamentData() {
-  localStorage.removeItem("token_player2")
-  // Purge les joueurs 1–4 et l’état du tournoi
-  for (let i = 1; i <= 4; i++) {
-    localStorage.removeItem(`tournament_login_${i}`)
-    localStorage.removeItem(`tournament_userId_${i}`)
-    localStorage.removeItem(`tournament_token_${i}`)
-  }
-  localStorage.removeItem("tournament_phase")
-  localStorage.removeItem("tournament_winner1")
-  localStorage.removeItem("tournament_winner2")
-  localStorage.removeItem("returnToTournament")
 }
 
 export function gameEvent() {
@@ -337,7 +312,7 @@ export function gameEvent() {
   })
 
   root.querySelector('#btn-tst')?.addEventListener("click", () => {
-    // Vérifie que les 4 joueurs sont connectés et uniques)
+    // Vérifie que les 4 joueurs sont connectés et uniques
     const ids = [1,2,3,4].map(n => localStorage.getItem(`tournament_userId_${n}`))
     const tokens = [1,2,3,4].map(n => localStorage.getItem(`tournament_token_${n}`))
     const msg = document.getElementById("tournament-message")
@@ -461,110 +436,6 @@ function onKeyDownDuringBinding(e: KeyboardEvent) {
   document.getElementById("bind-p2-down-display")!.textContent = keyBinding.player2Down
 }
 
-/*
-  Simule la trajectoire de la balle avec sa position et sa vitesse:
-    - Copie les positions x et y puis les vitesses vx, vy.
-    - Tant que la balle va à droite et que x est à gauche du paddle de l'IA.
-    - Calcul du temps pour que la balle atteigne le haut (y=0) ou le bas (y=canvasHeight - ballSize):
-      - Si vy > 0 (se dirige vers le bas), timeToWall = (bas - y) / vy.
-      - Si vy < 0 (se dirige vers le haut), timeToWall = (0 - y) / vy = -y/vy.
-      - Si vy == 0 (se dirige parfaitement à l'horizontale), on met Infinity (pas de rebond).
-    - Calcul du temps pour que la balle atteigne la raquette droite (t=d/v, timeToPaddle=(raquette - position de la balle) / vitesse de la balle).
-    - Si que la balle atteint la raquette avant le mur, on sait que l'impact se fera ici. On peut donc break la boucle.
-    - Sinon la balle touche d'abord le mur (en inversant la vy pour qu'elle simule le rebond), donc on avance la balle jusqu'au moment ou elle atteint la raquette.
-    - Initialise le centre de la balle.
-    - On force le centre de la raquette à rester entre 50 (paddleHeight / 2) et 450 (canvasHeight - paddleHeight / 2), pour que la raquette ne déborde pas.
-    - Retourne le top y, donc place le centre de la raquette.
-*/
-function predictBallY(ball: { x: number; y: number; vx: number; vy: number }, canvasHeight: number) {
-  let x = ball.x
-  let y = ball.y
-  let vx = ball.vx
-  let vy = ball.vy
-  while (vx > 0 && x < rightPaddle.x) {
-    let timeToWall = vy > 0 ? (canvasHeight - ballSize - y) / vy : vy < 0 ? -y / vy : Infinity
-    let timeToPaddle = (rightPaddle.x - x) / vx
-    if (timeToPaddle < timeToWall) {
-      y += vy * timeToPaddle
-      x += vx * timeToPaddle
-      break
-    }
-    else {
-      x += vx * timeToWall
-      y += vy * timeToWall
-      vy = -vy
-    }
-  }
-  const centerY = y
-  const cCenterY = Math.max(paddleHeight / 2, Math.min(canvasHeight - paddleHeight / 2, centerY))
-
-  return cCenterY - paddleHeight / 2
-}
-
-/*
-  Cette fonction est appelée chaque frame quand mode = 'ai'. Elle calcul une fois par seconde la prochaine cible de l'IA:
-    - Lit le temps actuel en milliseconde.
-    - Si au moins 1 secondes s'est écoulé depuis la dernière mise à jour de la cible:
-      - Calcul le nombre de seconde réelle écoulée (proche de 1).
-      - On force Prev à rester entre 0 et 1. Sert à calculer t.
-      - Consitue la cible (au moment du rafraîchissement).
-      - Initialise currentInterTargetY = dernière position + (prochaine position - dernière) * 1. (Ne s'applique pas pour le premier appel)
-      - Copie la postion actuelle pour qu'elle devienne la dernière position.
-      - Prédit la future position (top y) de la raquette grâce à la balle.
-      - Prédit la future position (center y) de la raquette grâce à center y.
-      - Ajoute un random de pixel entre -120 et +120 pour easy, et -60 et +60 pour medium, et 0 en hard.
-      - Puis on initialise le centre de la prochaine cible en ajoutant le random.
-      - On force nextTargetY à rester entre 0 et canvasHeight - paddleHeight pour que le bord sup ne sort pas de la raquette.
-      - Enregistre le timestamp du dernier calcul pour repartir sur 1 seconde.
-    - Calcul le temps écoulé depuis la dernière mise à jour.
-    - Force la valeur à rester entre 0 et 1 pour éviter d’outrepasser la plage d’interpolation.
-    - Calcul la cible actuelle entre previous et next en fonction de t.
-    Lorsque t=0, la mise à jour n'est pas encore faite (currentTarget=previousTarget), si t=1, mise à jour est faite (donc currentTarget=nextTarget).
-    - Convertit le centre actuel en top y pour savoir où positionner la raquette.
-    - Calcul en pixels la distance entre le top y actuel et celui désiré.
-    - Initialise la constante de déplacement max pour l'IA.
-    - Si la distance est inférieure ou égale à MaxMove, on déplace exactement la raquette sur la cible.
-    - Sinon on avance la raquette d'un petit pas vers -maxmove ou +maxmove.
-    - On force une nouvelle fois la position de la raquette pour éviter toute erreur.
-*/
-function aiStep() {
-  const now = Date.now()
-  if (now - lastAiUpdate >= 1000) {
-    const sec = (now - lastAiUpdate) / 1000
-    const Prev = Math.min(Math.max(sec, 0), 1)
-    const currentInterTargetY = previousTargetY + (nextTargetY - previousTargetY) * Prev
-    previousTargetY = currentInterTargetY
-    
-    const predictTopY = predictBallY(ball, canvas!.height)
-    const predictCenterY = predictTopY + paddleHeight / 2
-    
-    let offset = 0
-    if (aiDifficulty === "easy")
-      offset = (Math.random() - 0.5) * 240
-    else if (aiDifficulty === "medium")
-      offset = (Math.random() - 0.5) * 120
-
-    const rawNextCenter = predictCenterY + offset
-    nextTargetY = Math.max(0, Math.min(canvas!.height - paddleHeight, rawNextCenter))
-    lastAiUpdate = now
-  }
-
-  const elapsed = (now - lastAiUpdate) / 1000
-  const t = Math.min(Math.max(elapsed, 0), 1)
-  const currentTargetY = previousTargetY + (nextTargetY - previousTargetY) * t
-  const desiredTopY = currentTargetY - paddleHeight / 2
-
-  const delta = desiredTopY - rightPaddle.y
-  const maxMove = baseSpeed * 2
-  if (Math.abs(delta) <= maxMove) {
-    rightPaddle.y = desiredTopY
-  }
-  else {
-    rightPaddle.y += Math.sign(delta) * maxMove
-  }
-  rightPaddle.y = Math.max(0, Math.min(canvas!.height - paddleHeight, rightPaddle.y))
-}
-
 function resetGame(): void {
   score.left = 0
   score.right = 0
@@ -637,7 +508,8 @@ async function endGame() {
   catch (err) {
     console.error("Erreur lors de l'enregistrement du match:", err)
   }
-  alert('Time is up! Final Score: Left - ' + score.left + ', Right - ' + score.right)
+  document.body.insertAdjacentHTML("beforeend", renderPanelResult())
+  attachResultEvents()
   resetGame()
   showOnly("menu")
   localStorage.removeItem("token_player2")
@@ -674,7 +546,53 @@ async function endGame() {
       return
     }
     if (phase === 3) {
-      alert("Tournoi terminé !")
+      // Récupère tous les logins
+      const login1 = localStorage.getItem("tournament_login_1")!
+      const login2 = localStorage.getItem("tournament_login_2")!
+      const login3 = localStorage.getItem("tournament_login_3")!
+      const login4 = localStorage.getItem("tournament_login_4")!
+        
+      // On sait que tournament_winner1/_2 contiennent les userId des demi‑finalistes gagnants
+      const winnerSemi1Id = localStorage.getItem("tournament_winner1")!
+      const winnerSemi2Id = localStorage.getItem("tournament_winner2")!
+        
+      // Mappe userId → login
+      const idToLogin: Record<string,string> = {
+        [localStorage.getItem("tournament_userId_1")!]: login1,
+        [localStorage.getItem("tournament_userId_2")!]: login2,
+        [localStorage.getItem("tournament_userId_3")!]: login3,
+        [localStorage.getItem("tournament_userId_4")!]: login4,
+      }
+        
+      // Pseudos des demi‑finalistes gagnants
+      const semi1Winner = idToLogin[winnerSemi1Id]
+      const semi2Winner = idToLogin[winnerSemi2Id]
+        
+      // Perdants des demi‑finales
+      const loserSemi1 = [login1, login2].find(p => p !== semi1Winner)!
+      const loserSemi2 = [login3, login4].find(p => p !== semi2Winner)!
+      
+      // Dans la finale, `winner` est "left" ou "right"
+      const finalWinner   = winner === "left"  ? semi1Winner : semi2Winner
+      const finalRunnerUp = winner === "left"  ? semi2Winner : semi1Winner
+        
+      // Construit le tableau dans l’ordre voulu
+      const finalScores: Score[] = [
+        { player: finalWinner,   score: 1 },
+        { player: finalRunnerUp, score: 2 },
+        { player: loserSemi2,    score: 3 },
+        { player: loserSemi1,    score: 3 },
+      ]
+
+      const modalHtml = renderPanelFinalScoreTable(finalScores)
+      document.body.insertAdjacentHTML("beforeend", modalHtml)
+
+      const modal = document.getElementById("score-modal")
+      const btn = document.getElementById("btn-next-result_rank")
+      btn?.addEventListener("click", () => {
+        modal?.remove()
+        setTimeout(() => {showOnly("menu")})
+      })
 
       const oriToken = localStorage.getItem("tournament_original_token")
       const oriUser = localStorage.getItem("tournament_original_userId")
@@ -691,7 +609,6 @@ async function endGame() {
         "tournament_original_userId"
       ]
       keysToRemove.forEach(key => localStorage.removeItem(key))
-      showOnly("menu")
       return
     }
   }
@@ -699,7 +616,7 @@ async function endGame() {
 
 function update() {
   if (mode === "ai")
-    aiStep()
+    aiStep(canvas)
   else {
     if (keyPressed[keyBinding.player2Up] && rightPaddle.y > 0)
       rightPaddle.y -= baseSpeed
@@ -780,7 +697,7 @@ function render() {
 function gameLoop() {
   update()
   render()
-  if (timer.isRunning) 
+  if (timer.isRunning)
     requestAnimationFrame(gameLoop)
 }
 

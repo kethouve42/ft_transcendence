@@ -228,6 +228,17 @@ export default {
       all_con: "Todos los jugadores deben estar conectados.",
     },
     upcoming_match: "Próximo partido",
-    con: "Connected !",
+    con: "¡Conectado!",
+    score: {
+      final_results: "¡El resultado final!",
+      player: "Jugador :",
+      score: "Posición :",
+    }
+  },
+  popup_result: {
+    title: "Resultado final",
+    score_left: "A la izquierda:",
+    score_right: " | A la derecha: ",
+    next: "Siguiente",
   }
 };

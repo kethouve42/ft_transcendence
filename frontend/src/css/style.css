@@ -259,3 +259,127 @@
   font-size: 2rem;
   color: #00e6e6;
 }
+
+.score-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+}
+
+/* 3. La “carte” du modal : taille max + scrolling interne */
+.score-modal-card {
+  box-sizing: border-box;
+  background: #111;
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* 4. Titre */
+.modal-title {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  flex: 1;
+  overflow-y: auto;
+  display: block;
+}
+
+.score-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+.score-table thead th {
+  text-align: left;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.score-table tbody {
+  display: block;
+  width: 100%;
+  max-height: calc(80vh - 4rem);
+  overflow-y: auto;
+}
+.score-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.score-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.score-table td {
+  padding: 0.5rem 0;
+}
+
+.player-cell {
+  font-weight: 600;
+}
+
+.rank-cell {
+  text-align: right;
+}
+
+.result-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 3000;
+}
+
+/* La carte du résultat */
+.result-modal-card {
+  box-sizing: border-box;
+  background: #111;
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 360px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+}
+
+.result-modal-card .modal-title {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+.result-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.result-text {
+  margin: 0;
+  line-height: 1.5;
+  text-align: center;
+}

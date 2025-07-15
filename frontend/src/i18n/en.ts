@@ -228,6 +228,17 @@ export default {
       all_con: "All players must be logged in.",
     },
     upcoming_match: "Upcoming match",
-    con: "¡Conectado!",
+    con: "Connected !",
+    score: {
+      final_results: "The final result !",
+      player: "Player :",
+      score: "Rank :",
+    },
+  },
+  popup_result: {
+    title: "Final score",
+    score_left: "Left: ",
+    score_right: " | Right: ",
+    next: "Next",
   }
 };

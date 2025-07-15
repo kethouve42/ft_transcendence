@@ -230,5 +230,16 @@ export default {
     },
     upcoming_match: "Match à venir",
     con: "Connecté !",
+    score: {
+      final_results: "Résultat final !",
+      player: "Joueur :",
+      score: "Classement :",
+    },
+  },
+  popup_result: {
+    title: "Score final",
+    score_left: "Gauche: ",
+    score_right: " | Droite: ",
+    next: "Suivant",
   }
 };
