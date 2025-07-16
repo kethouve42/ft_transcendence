@@ -106,7 +106,7 @@ export function aiStep(canvas:HTMLCanvasElement) {
   const desiredTopY = currentTargetY - paddleHeight / 2
 
   const delta = desiredTopY - rightPaddle.y
-  const maxMove = baseSpeed * 2
+  const maxMove = baseSpeed
   if (Math.abs(delta) <= maxMove) {
     rightPaddle.y = desiredTopY
   }

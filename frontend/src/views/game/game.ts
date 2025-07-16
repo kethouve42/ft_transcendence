@@ -615,7 +615,7 @@ async function endGame() {
 }
 //----------------------------------INIT DES VARIABLE FPS----------------------------------------//
 
-const TARGET_FPS = 120;
+const TARGET_FPS = 60;
 const FRAME_DURATION = 1000 / TARGET_FPS;
 let lastFrameTime = 0;
 
@@ -820,14 +820,11 @@ function handlePaddleCollision(
   const maxBounceAngle = Math.PI / 3;
   const bounceAngle = normalized * maxBounceAngle;
 
-  // La vitesse totale de la balle (pour la garder constante)
-  const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-
   // Détermine la direction (gauche ou droite)
   const direction = ball.vx > 0 ? -1 : 1;
 
   // Met à jour vx et vy selon l'angle de rebond
-  ball.vx = Math.cos(bounceAngle) * speed * direction;
-  ball.vy = Math.sin(bounceAngle) * speed;
+  ball.vx = Math.cos(bounceAngle) * ballSpeed * direction;
+  ball.vy = Math.sin(bounceAngle) * ballSpeed;
 }
 //---------------------------------------------------------------------------------------------------------------------//

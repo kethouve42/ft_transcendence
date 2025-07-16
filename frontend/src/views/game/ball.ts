@@ -8,7 +8,7 @@ export type Ball = {
 }
 
 export const ballSize = 10
-export let speed = 5
+export let speed = 10
 
 export const ball: Ball = {
   x: 0,
