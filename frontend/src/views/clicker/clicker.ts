@@ -1,10 +1,44 @@
 import { navigateTo } from "../../main";
 import { t } from "../../i18n/index.js"
 
+let versusTimer: ReturnType<typeof setInterval> | null = null;
+let versusCoolingTimer: ReturnType<typeof setInterval> | null = null;
+let versusGeneratorTimer: ReturnType<typeof setInterval> | null = null;
+
+// Purge les intrvalles précédents
+function clearAllVersusIntervals()
+  {
+    if (versusTimer) clearInterval(versusTimer);
+    if (versusCoolingTimer) clearInterval(versusCoolingTimer);
+    if (versusGeneratorTimer) clearInterval(versusGeneratorTimer);
+    versusTimer = null;
+    versusCoolingTimer = null;
+    versusGeneratorTimer = null;
+}
+
 export function clickerView(): string {
+
+  const topRightButtons = `
+    <div class="w-full flex flex-row justify-end items-center gap-4 mb-4 pr-8 pt-4">
+      ${localStorage.getItem("token_player2")
+        ? `<button id="quit-versus-btn" class="bg-gray-700 hover:bg-gray-500 text-white px-4 py-2 rounded shadow-lg">
+            ${t("click.exit")}
+          </button>`
+        : `<button id="versus-btn" class="bg-pink-600 hover:bg-pink-400 text-white px-4 py-2 rounded shadow-lg">
+            ${t("click.versus")}
+          </button>`
+      }
+    </div>
+  `;
   if (localStorage.getItem("token_player2"))
   {
     return `
+      ${topRightButtons}
+      <div class="w-full flex flex-row justify-center">
+        <div id="versus-timer" class="bg-gray-800 text-white px-6 py-2 rounded shadow-lg text-xl my-4">
+          ${t("click.time")} 60s
+        </div>
+      </div>
       <div class="flex flex-row items-center justify-center min-h-[60vh] gap-16">
         <!-- Joueur 1 -->
         <div class="flex flex-col items-center bg-gray-900/30 p-6 rounded-xl shadow-lg">
@@ -92,19 +126,13 @@ export function clickerView(): string {
             </div>
           </div>
         </div>
-        <!-- Bouton Quitter -->
-        <button
-          id="quit-versus-btn"
-          class="top-4 right-4 bg-gray-700 hover:bg-gray-500 text-white px-4 py-2 rounded shadow-lg z-50"
-        >
-           ${t("click.exit")}
-        </button>
       </div>
     `;
   }
   else
   {
   return `
+  ${topRightButtons}
     <div class="flex flex-row items-center justify-center min-h-[60vh]">
       <!-- Jauge de chaleur à gauche -->
       <div class="flex flex-col items-center mr-8">
@@ -128,7 +156,7 @@ export function clickerView(): string {
         <!-- Compteur à droite de l'image -->
         <div class="ml-8 flex flex-col items-center">
           <span class="text-lg text-cyan-300 font-bold">${t("click.pt")}</span>
-          <span id="point-count" class="text-3xl font-extrabold mt-2">0</span>
+          <span id="point-count" class="text-3xl font-extrabold mt-2 min-w-[4ch] text-center">0</span>
         </div>
       </div>
       <!-- Boutons d'achat sous l'image -->
@@ -152,15 +180,8 @@ export function clickerView(): string {
           <span id="coil-count" class="mt-2 text-2xl font-bold text-fuchsia-400">0</span>
           </div>
       </div>
-      <!-- Bouton Mode Versus -->
-      <button
-        id="versus-btn"
-        class="top-4 right-4 bg-pink-600 hover:bg-pink-400 text-white px-4 py-2 rounded shadow-lg z-50"
-      >
-        ${t("click.versus")}
-      </button>
-      </div>
-      `;
+    </div>
+    `;
     }
 }
 
@@ -468,6 +489,7 @@ export function clickerEvent(): void {
   
   if (localStorage.getItem("token_player2")) {
 
+    clearAllVersusIntervals();
 
   // Initialisation des variables pour le versus
   const quitBtn = document.getElementById("quit-versus-btn");
@@ -504,18 +526,13 @@ export function clickerEvent(): void {
   }
   updateVersusCosts();
 
-  // Crée et initialiser le timer versus   A REMPLACER !!!
-  let timerDiv = document.getElementById("versus-timer");
-  if (!timerDiv) {
-    timerDiv = document.createElement("div");
-    timerDiv.id = "versus-timer";
-    timerDiv.className = "fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow-lg z-50 text-xl";
-    document.body.appendChild(timerDiv);
+  // Crée et initialiser le timer versus
+  let timeLeft = 60;
+  const timerDiv = document.getElementById("versus-timer");
+  if (timerDiv) {
+    timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
   }
-  let timeLeft = 60; // secondes
-  timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
 
-  
   // Fonction pour mettre à jour les jauges visuellement
   function updateHeatBars() 
   {
@@ -535,12 +552,12 @@ export function clickerEvent(): void {
   }
 
   // Decrementer le timer
-  const versusTimer = setInterval(() => {
+  versusTimer = setInterval(() => {
     timeLeft--;
-    timerDiv!.textContent = `${t("click.time")} ${timeLeft}s`;
+    if (timerDiv) timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
     // Fin de la partie versus
     if (timeLeft <= 0) {
-      clearInterval(versusTimer);
+      clearAllVersusIntervals();
       
       // Nettoyage des donnees versus
       ["1", "2"].forEach((n) => {
@@ -552,7 +569,7 @@ export function clickerEvent(): void {
         localStorage.removeItem(`vs_${n}overheated`);
       });
       
-      timerDiv!.textContent = `${t("click.end")}`;
+      if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
       localStorage.removeItem("token_player2");
       localStorage.removeItem("userId_player2");
       setTimeout(() => {
@@ -562,9 +579,8 @@ export function clickerEvent(): void {
     }
   }, 1000);
 
-
   // Decrement chaleur
-  setInterval(() => {
+  versusCoolingTimer = setInterval(() => {
     ["1", "2"].forEach((n) => {
       // Refroidissement du réacteur pour chaque joueur
       let heat = Number(localStorage.getItem(`vs_${n}heat`)) || 0;
@@ -589,7 +605,7 @@ export function clickerEvent(): void {
   }, 500);
 
   // Production des generateurs auxiliaires
-  setInterval(() => {
+  versusGeneratorTimer = setInterval(() => {
     ["1", "2"].forEach((n) => {
       if (localStorage.getItem(`vs_${n}overheated`) === "false") {
         let score = Number(localStorage.getItem(`vs_${n}score`)) + Number(localStorage.getItem(`vs_${n}generator`));
@@ -736,7 +752,7 @@ export function clickerEvent(): void {
     });
     localStorage.removeItem("token_player2");
     localStorage.removeItem("userId_player2");
-    clearInterval(versusTimer)
+    clearAllVersusIntervals();
     if (timerDiv)
       timerDiv.remove();
     navigateTo("/clicker");
