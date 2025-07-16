@@ -36,6 +36,9 @@ export function dashboardEditView(): string {
         <button type="submit" class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition">${t("dashboard.save")}</button>
         <div id="edit-profile-message" class="mt-4 text-cyan-200"></div>
       </form>
+      <button type="button" id="avatar-delete" class="bg-red-600 hover:bg-red-400 text-white px-4 py-1 rounded-lg shadow transition mt-2">
+        ${t("dashboard.delete_avatar")}
+      </button>
       <section>
         <button onclick="toggleContrast()">Contraste élevé</button>
         <button onclick="changeFontSize(2)">A+</button>
@@ -114,6 +117,27 @@ export function attachDashboardEditEvents() {
         avatarPreview.style.display = "block";
       }
     }
+
+    const deleteAvatar = document.getElementById("avatar-delete");
+    if (deleteAvatar)
+    {
+      deleteAvatar.addEventListener("click", async () => {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/users/reset-avatar", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        } as any);
+        if (res.ok) {
+          localStorage.removeItem("userAvatar");
+          navigateTo("/dashboard");
+        } else {
+          const text = await res.text();
+          alert(t("dashboard.error_avatar_upload") + text);
+          return;
+        }
+      });
+    }
+
     const form = document.getElementById("edit-profile-form") as HTMLFormElement | null;
     if (form) {
       form.onsubmit = async (e) => {

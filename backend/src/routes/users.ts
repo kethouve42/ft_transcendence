@@ -435,7 +435,7 @@ export default async function userRoutes(app: FastifyInstance)
         }
 
 		// Sauvegarde le chemin relatif ou URL dans la DB
-		db.prepare(`UPDATE users SET avatar = NULL WHERE id = ?`).run('', user.id);
+		db.prepare(`UPDATE users SET avatar = NULL WHERE id = ?`).run(user.id);
 
 		return { success: true };
 	});
