@@ -613,6 +613,13 @@ async function endGame() {
     }
   }
 }
+//----------------------------------INIT DES VARIABLE FPS----------------------------------------//
+
+const TARGET_FPS = 120;
+const FRAME_DURATION = 1000 / TARGET_FPS;
+let lastFrameTime = 0;
+
+//-----------------------------------------------------------------------------------------------//
 
 function update() {
   if (mode === "ai")
@@ -635,24 +642,38 @@ function update() {
   if (ball.y <= 0 || ball.y >= canvas!.height - ballSize)
     ball.vy = -ball.vy
 
+  // Collision avec la raquette de gauche
   if (
     ball.x <= leftPaddle.x + paddleWidth &&
     ball.x + ballSize >= leftPaddle.x &&
     ball.y + ballSize > leftPaddle.y + epsilon &&
     ball.y < leftPaddle.y + paddleHeight - epsilon
   ) {
-    ball.x = leftPaddle.x + paddleWidth
-    ball.vx = Math.abs(ball.vx)
+	//-----------------------OLD--------------------------//
+	//ball.x = leftPaddle.x + paddleWidth
+    //ball.vx = Math.abs(ball.vx)
+	//----------------------------------------------------//
+	//-----------------------REMPLACEMENT DE L'ANCIEN CALCUL DE LA BALLE----------------------------------//
+    ball.x = leftPaddle.x + paddleWidth;
+    handlePaddleCollision(ball, leftPaddle);
+	//----------------------------------------------------------------------------------------------------//
   }
 
-  if ( 
+  // Collision avec la raquette de droite
+  if (
     ball.x + ballSize >= rightPaddle.x &&
     ball.x <= rightPaddle.x + paddleWidth &&
     ball.y + ballSize > rightPaddle.y + epsilon &&
     ball.y < rightPaddle.y + paddleHeight - epsilon
   ) {
-    ball.x = rightPaddle.x - ballSize
-    ball.vx = -Math.abs(ball.vx)
+	//-----------------------OLD--------------------------//
+	//ball.x = rightPaddle.x - ballSize
+    //ball.vx = -Math.abs(ball.vx)
+	//----------------------------------------------------//
+	//-----------------------REMPLACEMENT DE L'ANCIEN CALCUL DE LA BALLE----------------------------------//
+    ball.x = rightPaddle.x - ballSize;
+    handlePaddleCollision(ball, rightPaddle);
+	//----------------------------------------------------------------------------------------------------//
   }
 
   if (ball.x < 0 || ball.x > canvas!.width) {
@@ -694,12 +715,26 @@ function render() {
   drawTimer(ctx!, canvas!)
 }
 
-function gameLoop() {
+//--------------------------------OLD------------------------------//
+/*function gameLoop() {
   update()
   render()
   if (timer.isRunning)
     requestAnimationFrame(gameLoop)
+}*/
+//-----------------------------------------------------------------//
+//----------------------------------CHANGEMENT DE GAME LOOP POUR LE CALCUL DE LA LOOP SUR LES FPS---------------------------//
+function gameLoop(now = performance.now()) {
+  if (!timer.isRunning) return;
+
+  if (now - lastFrameTime >= FRAME_DURATION) {
+    update();
+    render();
+    lastFrameTime = now;
+  }
+  requestAnimationFrame(gameLoop);
 }
+//--------------------------------------------------------------------------------------------------------------------------//
 
 function startMatch() {
   let pseudo1 = "Joueur 1"
@@ -756,7 +791,10 @@ function startMatch() {
   resetTimer()
   const timerGame = Math.max(10, timerMod)
   startTimer(timerGame)
-  gameLoop()
+  //-------------------------------------REMPLACEMENT CALCULÉ SUR LES FPS-----------------------------------------------//
+  lastFrameTime = performance.now();
+  //--------------------------------------------------------------------------------------------------------------------//
+  gameLoop();
 }
 
 // window.addEventListener("load", () => {
@@ -767,3 +805,29 @@ function startMatch() {
 //   else
 //     showOnly("menu")
 // })
+
+//----------------------------------NOUVELLE FONCTION POUR LE CALCUL DE L'ANGLE DE LA BALLE-----------------------------//
+function handlePaddleCollision(
+  ball: { x: number; y: number; vx: number; vy: number },
+  paddle: { x: number; y: number }
+) {
+  const paddleCenter = paddle.y + paddleHeight / 2;
+  const ballCenter = ball.y + ballSize / 2;
+  const relativeIntersectY = ballCenter - paddleCenter;
+  const normalized = Math.max(-1, Math.min(1, relativeIntersectY / (paddleHeight / 2)));
+
+  // Définit un angle maximal (ex: 60°)
+  const maxBounceAngle = Math.PI / 3;
+  const bounceAngle = normalized * maxBounceAngle;
+
+  // La vitesse totale de la balle (pour la garder constante)
+  const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+
+  // Détermine la direction (gauche ou droite)
+  const direction = ball.vx > 0 ? -1 : 1;
+
+  // Met à jour vx et vy selon l'angle de rebond
+  ball.vx = Math.cos(bounceAngle) * speed * direction;
+  ball.vy = Math.sin(bounceAngle) * speed;
+}
+//---------------------------------------------------------------------------------------------------------------------//
