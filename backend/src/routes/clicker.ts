@@ -82,11 +82,11 @@ export default async function clickerRoutes(app: FastifyInstance)
         `).run(newScore, newCooler, user.id);
 
         // Répondre avec la nouvelle valeur
-        return reply.send({ newScore, newCooler });
+        return reply.send({ success: true, newScore, newCooler });
       }
       else
       {
-        return reply.status(400).send({ error: "Vous n'avez pas assez de points pour acheter un cooler." });
+        return reply.send({ success: false });
       }
     }
     catch (err: any)
@@ -133,11 +133,11 @@ export default async function clickerRoutes(app: FastifyInstance)
         `).run(newScore, newGenerator, user.id);
 
         // Répondre avec la nouvelle valeur
-        return reply.send({ newScore, newGenerator });
+        return reply.send({ success: true, newScore, newGenerator });
       }
       else
       {
-        return reply.status(400).send({ error: "Vous n'avez pas assez de points pour acheter un generateur." });
+        return reply.send({ success: false });
       }
     }
     catch (err: any)
@@ -184,11 +184,11 @@ export default async function clickerRoutes(app: FastifyInstance)
         `).run(newScore, newCoil, user.id);
 
         // Répondre avec la nouvelle valeur
-        return reply.send({ newScore, newCoil });
+        return reply.send({ success: true, newScore, newCoil });
       }
       else
       {
-        return reply.status(400).send({ error: "Vous n'avez pas assez de points pour acheter une bobine." });
+        return reply.send({ success: false });
       }
     }
     catch (err: any)
