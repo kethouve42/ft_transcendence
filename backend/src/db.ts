@@ -6,6 +6,11 @@ const db = new Database('/app/data/db.sqlite');
 // Active les foreign keys
 db.pragma('foreign_keys = ON');
 
+/*A rajouter dans users pour les vrai mail*/
+//email_verified INTEGER DEFAULT 0,
+//email_verify_token TEXT,
+//email_verify_expires INTEGER
+
 // Crée les tables
 db.exec(`
 
@@ -27,7 +32,7 @@ CREATE TABLE IF NOT EXISTS users (
   last_seen INTEGER,
   reset_token TEXT,
   reset_expires INTEGER
-);
+  );
 
 -- Table des relations d'amitié
 CREATE TABLE IF NOT EXISTS friends (

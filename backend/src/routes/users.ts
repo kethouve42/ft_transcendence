@@ -13,7 +13,18 @@ import crypto from "crypto";
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
-// Crée un transporteur SMTP de test (Ethereal)
+//-----------BREVO POUR VRAI MAIL (PENSER A MODIF DB.TS (VOIR COMMENTAIRE))-------------//
+// Crée un transporteur SMTP de test (Brevo)
+/*const transporter = nodemailer.createTransport({
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    auth: {
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS
+    }
+});*/
+
+// Crée un transporteur SMTP de test (Ethereal) A REMPLACER PAR BREVO POUR VERSION FINAL
 const transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
@@ -82,6 +93,21 @@ export default async function userRoutes(app: FastifyInstance)
 			const hashedPassword = await bcrypt.hash(password, 10); // 10 = "salt rounds" (2^10 itération = 1024 retravaille du mdp)
 			const result = stmt.run(login, email, hashedPassword, alias || null, avatar || null);
 			
+			// Envoi de l'email de vérification ACTIVER POUR TEST OU VERSION FINAL
+			/*const verifyToken = crypto.randomBytes(32).toString('hex');
+			const expires = Date.now() + 1000 * 60 * 30; // 30 min
+
+			db.prepare('UPDATE users SET email_verify_token = ?, email_verify_expires = ? WHERE id = ?')
+			  .run(verifyToken, expires, result.lastInsertRowid);
+
+			const verifyUrl = `https://localhost:8443/verify-email?token=${verifyToken}`;
+			await transporter.sendMail({
+			  from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+			  to: email,
+			  subject: 'Vérification de votre adresse email',
+			  text: `Cliquez sur ce lien pour vérifier votre email : ${verifyUrl} (valable 30 minutes)`
+			});
+*/
 			return { success: true, id: result.lastInsertRowid };
 		}
 		catch (err: any)
@@ -111,6 +137,22 @@ export default async function userRoutes(app: FastifyInstance)
 			if (result.changes === 0)
 				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
 
+			// Vérification de l'email ACTIVER POUR TEST OU VERSION FINAL
+			/*if (email && email !== user.email) {
+				const verifyToken = crypto.randomBytes(32).toString('hex');
+				const expires = Date.now() + 1000 * 60 * 30;
+				db.prepare('UPDATE users SET email_verified = 0, email_verify_token = ?, email_verify_expires = ? WHERE id = ?')
+				  .run(verifyToken, expires, user.id);
+
+				const verifyUrl = `https://localhost:8443/verify-email?token=${verifyToken}`;
+				await transporter.sendMail({
+				  from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+				  to: email,
+				  subject: 'Vérification de votre nouvelle adresse email',
+				  text: `Cliquez sur ce lien pour vérifier votre nouvel email : ${verifyUrl} (valable 30 minutes)`
+				});
+			}
+*/
 			return { success: true };
 		}
 		catch (err: any)
@@ -166,6 +208,9 @@ export default async function userRoutes(app: FastifyInstance)
 
 			if (!user)
         		return reply.status(401).send({ error: 'Email ou mot de passe incorrect' });
+			//----------------DECOMMENTER POUR LES VRAI MAIL (vérifie si le mail a été validé)--------------------------//
+			/*if (user.email_verified == 0)
+				return reply.status(401).send({ error: "Adresse mail non vérifié" });*/
 
 			const validPassword = await bcrypt.compare(password, user.password);
 			if (!validPassword || (user.email !== identifier && user.login !== identifier))
@@ -182,6 +227,9 @@ export default async function userRoutes(app: FastifyInstance)
 				
 				// Envoie le mail
 				await transporter.sendMail({
+					//-----------VRAI MAIL------------//
+					//from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
+					//---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
 					from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
 					to: user.email,
 					subject: 'Votre code 2FA',
@@ -213,8 +261,21 @@ export default async function userRoutes(app: FastifyInstance)
 
 	});
 
+	//Vérif de l'email
+	/*app.get('/verify-email', async (req, reply) =>
+	{
+		const { token } = req.query as { token: string };
+		if (!token)
+			return reply.status(400).send({ error: "Token requis" });
 
+		const user = db.prepare('SELECT id, email_verify_expires FROM users WHERE email_verify_token = ?').get(token) as { id: number, email_verify_expires: number } | undefined;
+		if (!user || !user.email_verify_expires || user.email_verify_expires < Date.now())
+			return reply.status(400).send({ error: "Token invalide ou expiré" });
 
+		db.prepare('UPDATE users SET email_verified = 1, email_verify_token = NULL, email_verify_expires = NULL WHERE id = ?').run(user.id);
+
+		return { success: true, message: "Email vérifié !" };
+	});*/
 
 	//Verification code 2FA pour la suite de l'authentification avec 2FA
 	app.post('/auth/2fa', { config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) => 

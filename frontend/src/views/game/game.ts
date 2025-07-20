@@ -19,6 +19,8 @@ export let aiDifficulty: 'easy' | 'medium' | 'hard' = 'easy'
 let ballSpeed = baseSpeed
 let timerMod = 10
 let scoreMod = 10
+let powerUpsEnabled = false;
+let previousPanel: Panel | null = null;
 
 let keyBinding = {
   player1Up: "w",
@@ -38,6 +40,13 @@ export let nextTargetY = 0
 
 let canvas: HTMLCanvasElement
 let ctx: CanvasRenderingContext2D
+
+// Chargement des settings sauvegardés
+if (localStorage.getItem("pong_ballSpeed")) ballSpeed = +localStorage.getItem("pong_ballSpeed")!
+if (localStorage.getItem("pong_timerMod")) timerMod = +localStorage.getItem("pong_timerMod")!
+if (localStorage.getItem("pong_scoreMod")) scoreMod = +localStorage.getItem("pong_scoreMod")!
+if (localStorage.getItem("pong_powerUpsEnabled")) powerUpsEnabled = localStorage.getItem("pong_powerUpsEnabled") === "1"
+if (localStorage.getItem("pong_keyBinding")) keyBinding = JSON.parse(localStorage.getItem("pong_keyBinding")!)
 
 // Prise en compte du DOM
 export function gameViews() {
@@ -108,42 +117,52 @@ function renderPanelRules() {
 
 function renderPanelSettings() {
   return `
-      <div id="panel-settings" class="settings-panel">
+    <div id="panel-settings" class="settings-panel">
       <h1>${t("settings.title")}</h1>
       <div class="settings-grid">
         <div class="settings-ball">
           <label class="settings-label">
-            ${t("settings.speed")} <span id="display-ball-speed">10</span>
+            ${t("settings.speed")} <span id="display-ball-speed">${ballSpeed}</span>
           </label>
           <input
             type="range"
             id="input-ball-speed"
             min="1" max="20"
+            value="${ballSpeed}"
             class="w-full"
           />
         </div>
         <div class="settings-timer">
           <label class="settings-label"></label>
-            ${t("settings.time")} <span id="display-timer-mod">60</span>
+            ${t("settings.time")} <span id="display-timer-mod">${timerMod}</span>
           <input
             type="number"
             id="input-timer-mod"
             min="10" max="300"
+            value="${timerMod}"
             class="ml-2 w-20 p-1 bg-gray-800 rounded"
           />
         </div>
         <div class="settings-score">
           <label class="settings-label"></label>
-            ${t("settings.points")} <span id="display-score-mod">10</span>
+            ${t("settings.points")} <span id="display-score-mod">${scoreMod}</span>
           <input
             type="number"
             id="input-score-mod"
             min="1"
+            value="${scoreMod}"
             class="ml-2 w-20 p-1 bg-gray-800 rounded"
           />
         </div>
+        <div class="settings-powerup">
+          <label class="settings-label">
+            Power-ups
+            <input type="checkbox" id="input-powerup-enabled" ${powerUpsEnabled ? "checked" : ""} />
+          </label>
+        </div>
       </div>
       <div class="settings-actions">
+        <button id="btn-keyconfig" class="menu-btn save-btn">Modifier les contrôles</button>
         <button id="btn-save-settings" class="menu-btn save-btn">${t("settings.save")}</button>
         <button id="btn-close-settings" class="menu-btn save-btn">${t("settings.cancel")}</button>
       </div>
@@ -160,25 +179,25 @@ function renderPanelKeys() {
         <div>
           <label>${t("local.up1")}</label>
           <button id="btn-bind-p1-up" class="menu-btn save-btn">
-            <span id="bind-p1-up-display">W</span>
+            <span id="bind-p1-up-display">${keyBinding.player1Up}</span>
           </button>
         </div>
         <div>
           <label>${t("local.down1")}</label>
           <button id="btn-bind-p1-down" class="menu-btn save-btn">
-            <span id="bind-p1-down-display">S</span>
+            <span id="bind-p1-down-display">${keyBinding.player1Down}</span>
           </button>
         </div>
         <div>
           <label>${t("local.up2")}</label>
           <button id="btn-bind-p2-up" class="menu-btn save-btn">
-            <span id="bind-p2-up-display">ArrowUp</span>
+            <span id="bind-p2-up-display">${keyBinding.player2Up}</span>
           </button>
         </div>
         <div>
           <label>${t("local.down2")}</label>
           <button id="btn-bind-p2-down" class="menu-btn save-btn">
-            <span id="bind-p2-down-display">ArrowDown</span>
+            <span id="bind-p2-down-display">${keyBinding.player2Down}</span>
           </button>
         </div>
       </div>
@@ -241,6 +260,7 @@ function renderGame() {
 }
 
 export function showOnly(panel: Panel) {
+  previousPanel = currentPanel;
   currentPanel = panel
   renderUI()
 }
@@ -277,6 +297,10 @@ export function gameEvent() {
     showOnly("keyConfig")
   })
 
+  root.querySelector('#input-powerup-enabled')?.addEventListener("change", e => {
+  powerUpsEnabled = (e.target as HTMLInputElement).checked;
+  });
+
   root.querySelector('#btn-ai')?.addEventListener("click", () => showOnly("ai"))
   root.querySelector('#btn-rules')?.addEventListener("click", () => showOnly("rules"))
   root.querySelector('#btn-settings')?.addEventListener("click", () => showOnly("settings"))
@@ -289,7 +313,10 @@ export function gameEvent() {
   root.querySelector('#btn-close-settings')?.addEventListener("click", () => showOnly("menu"))
   root.querySelector('#btn-close-ai')?.addEventListener("click", () => showOnly("menu"))
   root.querySelector('#btn-close-rules')?.addEventListener("click", () => showOnly("menu"))
-  root.querySelector('#btn-cancel-keyconfig')?.addEventListener("click", () => showOnly("menu"))
+  root.querySelector('#btn-cancel-keyconfig')?.addEventListener("click", () => {
+    showOnly(previousPanel || "menu");
+  });
+  root.querySelector('#btn-keyconfig')?.addEventListener("click", () => showOnly("keyConfig"))
 
   root.querySelector('#input-ball-speed')?.addEventListener("input", e => {
     ballSpeed = +(e.target as HTMLInputElement).value
@@ -308,6 +335,12 @@ export function gameEvent() {
     const signY = Math.sign(ball.vy)||1
     ball.vx = signX * ballSpeed
     ball.vy = signY * ballSpeed
+    // Sauvegarde les settings dans le localStorage
+    localStorage.setItem("pong_ballSpeed", ballSpeed.toString())
+    localStorage.setItem("pong_timerMod", timerMod.toString())
+    localStorage.setItem("pong_scoreMod", scoreMod.toString())
+    localStorage.setItem("pong_powerUpsEnabled", powerUpsEnabled ? "1" : "0")
+    localStorage.setItem("pong_keyBinding", JSON.stringify(keyBinding))
     showOnly("menu")
   })
 
@@ -374,7 +407,9 @@ export function gameEvent() {
         )) || "Vainqueur 2"
       }
       showMatchVersus(pseudo1, pseudo2, () => startMatch())
-    } 
+    }
+	else if (previousPanel === "settings")
+    	showOnly("settings");
     else
       startMatch()
   })
@@ -434,6 +469,7 @@ function onKeyDownDuringBinding(e: KeyboardEvent) {
   document.getElementById("bind-p1-down-display")!.textContent = keyBinding.player1Down
   document.getElementById("bind-p2-up-display")!.textContent = keyBinding.player2Up
   document.getElementById("bind-p2-down-display")!.textContent = keyBinding.player2Down
+  localStorage.setItem("pong_keyBinding", JSON.stringify(keyBinding))
 }
 
 function resetGame(): void {
@@ -635,7 +671,9 @@ function update() {
   if (keyPressed[keyBinding.player1Down] && leftPaddle.y < canvas!.height-paddleHeight)
     leftPaddle.y += baseSpeed
 
-  updatePowerUps(Date.now(), canvas!.width, canvas!.height, ball)
+  if (powerUpsEnabled) {
+    updatePowerUps(Date.now(), canvas!.width, canvas!.height, ball);
+  }
   ball.x += ball.vx
   ball.y += ball.vy
 
@@ -710,7 +748,9 @@ function render() {
   drawRectangle(ctx!, leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight)
   drawRectangle(ctx!, rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight)
   drawBall(ctx!)
-  drawPowerUp(ctx!)
+  if (powerUpsEnabled) {
+    drawPowerUp(ctx!);
+  }
   drawScore(ctx!, canvas!)
   drawTimer(ctx!, canvas!)
 }
