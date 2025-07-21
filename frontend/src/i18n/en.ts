@@ -8,6 +8,9 @@ export default {
     profile: "Profile",
     friends: "Friends",
     edit: "Edit",
+    Accessibilite: "Accessibility",
+    Contraste: "High contrast",
+    tailleTexte: "Text size",
   },
   welcome: "The Holy DATABASE Parish",
   home: {
@@ -99,6 +102,7 @@ export default {
     save: "Save",
     back_profile: "Back to profile",
     profile_updated: "Profile updated!",
+    mdp_updated: "Password updated!",
     error: "Error",
     error_avatar_upload: "Error uploading avatar: ",
     error_update: "Error updating profile",
@@ -123,6 +127,10 @@ export default {
     gdpr_confirm_delete4: "Last chance!",
     gdpr_deleted: "✅ Account deleted.",
     gdpr_error_delete: "❌ Error during deletion.",
+    mdpModif: "Password modification",
+    mdp: "Old password",
+    new_Mdp: "New password",
+    confirm_mdp: "Confirm password",
   },
   menu: {
     play_local: "Play locally",

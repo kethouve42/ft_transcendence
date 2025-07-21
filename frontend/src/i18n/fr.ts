@@ -8,6 +8,9 @@ export default {
     profile: "Profil",
     friends: "Amis",
     edit: "Éditer",
+    Accessibilite: "Accessibilité",
+    Contraste: "Contraste élevé",
+    tailleTexte: "Taille du texte",
   },
   welcome: "La paroisse de la Sainte DATABASE",
   home: {
@@ -44,7 +47,6 @@ export default {
   error: {
     not_found: "Page non trouvée",
     back_home: "Retour à l'accueil",
-    e_or_p: "Email ou mot de passe incorrect"
   },
   profile: {
     loading: "Chargement du profil...",
@@ -100,6 +102,7 @@ export default {
     save: "Sauvegarder",
     back_profile: "Retour au profil",
     profile_updated: "Profil mis à jour !",
+    mdp_updated: "Mot de passe mis à jour !",
     error: "Erreur",
     error_avatar_upload: "Erreur lors de l'upload de l'avatar : ",
     error_update: "Erreur lors de la mise à jour",
@@ -124,6 +127,11 @@ export default {
     gdpr_confirm_delete4: "Dernière chance !",
     gdpr_deleted: "✅ Compte supprimé.",
     gdpr_error_delete: "❌ Erreur lors de la suppression.",
+    mdpModif: "Modification du mot de passe",
+    mdp: "Ancien mot de passe",
+    new_Mdp: "Nouveau mot de passe",
+    confirm_mdp: "Confirmer le mot de passe",
+
   },
   menu: {
     play_local: "Jouer en local",

@@ -8,6 +8,9 @@ export default {
     profile: "Perfil",
     friends: "Amigos",
     edit: "Editar",
+    Accessibilite: "Accesibilidad",
+    Contraste: "Alto contraste",
+    tailleTexte: "Tamaño del texto",
   },
   welcome: "La parroquia de la Santa DATABASE",
   home: {
@@ -99,6 +102,7 @@ export default {
     save: "Guardar",
     back_profile: "Volver al perfil",
     profile_updated: "¡Perfil actualizado!",
+    mdp_updated: "¡Contraseña actualizada!",
     error: "Error",
     error_avatar_upload: "Error al subir el avatar: ",
     error_update: "Error al actualizar el perfil",
@@ -123,6 +127,10 @@ export default {
     gdpr_confirm_delete4: "¡Última oportunidad!",
     gdpr_deleted: "✅ Cuenta eliminada.",
     gdpr_error_delete: "❌ Error durante la eliminación.",
+    mdpModif: "Modificación de la contraseña",
+    mdp: "Contraseña antigua",
+    new_Mdp: "Nueva contraseña",
+    confirm_mdp: "Confirmar contraseña",
   },
   menu: {
     play_local: "Jugar localmente",

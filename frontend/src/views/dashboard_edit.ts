@@ -41,14 +41,6 @@ export function dashboardEditView(): string {
           <button id="2fa-toggle-btn" type="button" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-1 rounded-lg shadow transition">...</button>
           </div>
         </div>
-        <section>
-          <button onclick="toggleContrast()">Contraste élevé</button>
-          <div class="flex gap-2 items-center mt-4">
-            <button type="button" onclick="changeFontSize(2)" aria-label="Augmenter la taille du texte" class="bg-cyan-700 hover:bg-cyan-500 text-white font-bold px-3 py-1 rounded transition text-lg">A+</button>
-            <button type="button" onclick="changeFontSize(-2)" aria-label="Diminuer la taille du texte" class="bg-cyan-700 hover:bg-cyan-500 text-white font-bold px-3 py-1 rounded transition text-lg">A-</button>
-          </div>
-        </section>
-        </br>
         <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.mdpModif")}</label>
         <form id="new-mdp" class="flex flex-col gap-2 p-0">
           <div class="mb-1">
@@ -56,11 +48,11 @@ export function dashboardEditView(): string {
             <input name="mdp" type="password" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-1 py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" required />
           </div>
           <div class="mb-1">
-            <label class="block font-semibold mb-1 text-cyan-300">${t("dashboard.newMdp")}</label>
+            <label class="block font-semibold mb-1 text-cyan-300">${t("dashboard.new_Mdp")}</label>
             <input name="newMdp" type="password" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-1 py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" required />
           </div>
           <div class="mb-1">
-            <label class="block font-semibold mb-1 text-cyan-300">${t("dashboard.newMdp2")}</label>
+            <label class="block font-semibold mb-1 text-cyan-300">${t("dashboard.confirm_mdp")}</label>
             <input name="newMdp2" type="password" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-1 py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" />
           </div>
           <button type="submit" class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-2 py-1 rounded shadow-cyan-400/30 shadow transition">${t("dashboard.save")}</button>
@@ -159,7 +151,7 @@ fetch("/api/users/me", {
             body: JSON.stringify({ mdp, newPassword: newMdp })
           });
           if (res.ok) {
-            msg!.textContent = t("dashboard.profile_updated");
+            msg!.textContent = t("dashboard.mdp_updated");
             msg!.className = "mt-2 text-green-500";
           } else {
             const data = await res.json();
