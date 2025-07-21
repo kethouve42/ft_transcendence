@@ -8,7 +8,7 @@ import { renderPanelFinalScoreTable, Score } from './loginTournament.js'
 import { renderPanelResult, attachResultEvents, handleTournamentLogin } from './loginTournament.js'
 import { aiStep } from './ai_logic.js'
 import { t } from "../../i18n/index.js"
-import { navigateTo } from '../../main.js'
+import { navigateTo, attachLinkHandlers } from '../../main.js'
 import "../../css/style.css"
 
 type Panel =  "menu" | "settings" | "ai" | "keyConfig" | "rules" | "game" | "tournament"
@@ -457,6 +457,7 @@ function renderUI() {
   root.innerHTML = html
   gameEvent()
   attachNavbarEvents()
+  attachLinkHandlers();
 }
 
 function onKeyDownDuringBinding(e: KeyboardEvent) {

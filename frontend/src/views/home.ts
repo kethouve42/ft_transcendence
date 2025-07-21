@@ -5,7 +5,7 @@ export function homeView(): string {
   const count = Number(localStorage.getItem("homeCount") || 0);
   return `
     <div class="flex flex-col items-center justify-center min-h-[60vh]">
-      <h1 class="text-4xl font-bold text-cyan-300 mb-6 drop-shadow-[0_0_10px_cyan]">
+      <h1 class="text-4xl font-bold text-cyan-300 mb-6">
         ${t("welcome")}
       </h1>
       <div class="card p-8">

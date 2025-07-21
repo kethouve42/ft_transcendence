@@ -1,4 +1,3 @@
-@import './accessibility.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,10 +23,74 @@ body.high-contrast, .high-contrast * {
   outline-color: #fff !important;
 }
 
-.high-contrast a, .high-contrast button {
+.high-contrast a, 
+.high-contrast button, 
+.high-contrast input, 
+.high-contrast select, 
+.high-contrast textarea, 
+.high-contrast .btn, 
+.high-contrast .menu-btn, 
+.high-contrast .card, 
+.high-contrast .panel, 
+.high-contrast .dashboard-panel {
   color: #fff !important;
-  background-color: #222 !important;
+  background-color: #111 !important;
   border-color: #fff !important;
+  box-shadow: none !important;
+}
+
+body.high-contrast button,
+body.high-contrast .btn,
+body.high-contrast .menu-btn {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  transition: none !important;
+}
+
+body.high-contrast [class*="bg-"],
+body.high-contrast [class*="hover:bg-"] {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+body.high-contrast [class*="border-"] {
+  border-color: #fff !important;
+}
+
+.high-contrast input::placeholder,
+.high-contrast textarea::placeholder {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+body.high-contrast [class*="border-"],
+body.high-contrast [class^="border-"],
+body.high-contrast [class*="border"],
+body.high-contrast [class*="border-cyan"],
+body.high-contrast [class*="border-white"],
+body.high-contrast [class*="border-black"] {
+  border-color: #fff !important;
+  box-shadow: none !important;
+}
+
+body.high-contrast ::-webkit-scrollbar {
+  background: #000 !important;
+}
+/*  barre de défilement */
+body.high-contrast ::-webkit-scrollbar-thumb {
+  background: #fff !important;
+  border-radius: 8px !important;
+}
+
+/* Firefox barre de défilement*/
+body.high-contrast {
+  scrollbar-color: #fff #000 !important;
+  scrollbar-width: thin !important;
 }
 
 body {
@@ -54,7 +117,6 @@ h1, h2, h3 {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #38bdf8;
-  text-shadow: 0 0 16px #38bdf8, 0 0 32px #0ea5e9cc;
 }
 
 input, select, textarea {

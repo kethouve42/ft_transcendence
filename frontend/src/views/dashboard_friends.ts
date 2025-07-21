@@ -17,7 +17,7 @@ export function dashboardFriendsView(): string {
   if (friendsLoading) {
     return `
       <div class="max-w-xl mx-auto bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 mt-8 backdrop-blur-md">
-        <h2 class="text-3xl font-extrabold text-cyan-300 drop-shadow-[0_0_10px_cyan] tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
+        <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
         <div class="text-cyan-100">${t("dashboard.loading_friends")}</div>
       </div>
     `;
@@ -25,7 +25,7 @@ export function dashboardFriendsView(): string {
 
   return `
     <div class="max-w-xl mx-auto bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 mt-8 backdrop-blur-md">
-      <h2 class="text-3xl font-extrabold text-cyan-300 drop-shadow-[0_0_10px_cyan] tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
+      <h2 class="text-3xl font-extrabold text-cyan-30  tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
       ${
         friendsCache.length === 0
           ? `<div class="text-cyan-100">${t("dashboard.no_friends")}</div>`

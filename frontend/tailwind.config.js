@@ -16,13 +16,13 @@ module.exports = {
 
     // Borders et radius
     "border", "border-cyan-400", "border-cyan-400/20", "border-cyan-400/30", "border-cyan-500/30", "border-cyan-400/80", "border-2", "border-4",
-    "rounded", "rounded-lg", "rounded-xl", "rounded-2xl", "rounded-full",
+    "rounded", "rounded-rem-lg", "rounded-xl", "rounded-2xl", "rounded-rem-full",
 
     // Padding, margin, gap, spacing
-    "p-2", "p-3", "p-4", "p-6", "p-8", "p-10", "px-4", "px-6", "px-8", "px-10", "px-32", "px-40", "py-1", "py-2", "py-3", "py-4", "py-6", "py-8", "py-10", "mt-2", "mt-4", "mt-6", "mt-8", "mb-1", "mb-2", "mb-4", "mb-6", "mb-8", "mx-auto", "ml-auto", "mt-12", "mt-16", "gap-2", "gap-4", "gap-6", "gap-8", "gap-10", "space-y-1", "space-y-3", "space-y-4", "flex-col", "flex-row",
+    "p-2", "p-3", "p-rem-2", "p-6", "p-8", "p-10", "px-rem-4", "px-6", "px-8", "px-10", "px-32", "px-40", "py-1", "py-rem-2", "py-3", "py-4", "py-6", "py-8", "py-10", "mt-2", "mt-rem-4", "mt-6", "mt-8", "mb-1", "mb-2", "mb-4", "mb-rem-6", "mb-8", "mx-auto", "ml-auto", "mt-12", "mt-16", "gap-2", "gap-rem-2", "gap-rem-6", "gap-8", "gap-rem-10", "space-y-1", "space-y-3", "space-y-4", "flex-col", "flex-row",
 
     // Flex, grid, layout
-    "flex", "flex-1", "flex-col", "flex-row", "items-center", "items-start", "items-end", "justify-center", "justify-between", "justify-end", "justify-start", "gap-4", "gap-6", "gap-8", "gap-10", "grid", "grid-cols-2", "col-span-2", "min-h-screen", "min-h-[60vh]", "min-h-[50vh]", "max-w-md", "max-w-xl", "max-w-3xl", "max-w-[1800px]", "w-full", "w-24", "w-20", "w-10", "w-9", "h-full", "h-24", "h-20", "h-10", "h-9", "overflow-hidden", "overflow-y-auto", "max-h-52", "max-h-[600px]",
+    "flex", "flex-1", "flex-col", "flex-row", "items-center", "items-start", "items-end", "justify-center", "justify-between", "justify-end", "justify-start", "gap-rem-2", "gap-rem-6", "gap-8", "gap-rem-10", "grid", "grid-cols-2", "col-span-2", "min-h-screen", "min-h-[60vh]", "min-h-[50vh]", "max-w-md", "max-w-xl", "max-w-3xl", "max-w-[1800px]", "w-full", "w-24", "w-20", "w-10", "w-9", "h-full", "h-24", "h-20", "h-10", "h-9", "overflow-hidden", "overflow-y-auto", "max-h-52", "max-h-[600px]",
 
     // Font, shadow, transition, ring, tracking, uppercase, bold, etc.
     "font-bold", "font-extrabold", "font-semibold", "font-normal", "font-sans", "shadow", "shadow-lg", "shadow-xl", "shadow-md", "shadow-inner",

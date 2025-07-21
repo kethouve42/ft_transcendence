@@ -126,10 +126,21 @@ export function navigateTo(route: string) {
 window.onpopstate = () => render(location.pathname);
 render(location.pathname);
 
-let fontSize = 16;
-function changeFontSize(delta: number) {
-  fontSize = Math.max(12, fontSize + delta);
-  document.body.style.setProperty('--base-font-size', `${fontSize}px`);
+if (!localStorage.getItem("size"))
+  localStorage.setItem("size", "16");
+const root = document.documentElement;
+let next = Number(localStorage.getItem("size"));
+root.style.setProperty('--base-font-size', next + 'px');
+
+
+export function changeFontSize(delta: number) {
+  const root = document.documentElement;
+  let next = Number(localStorage.getItem("size"));
+  next = next + delta;
+  if (next < 12) next = 12;
+  if (next > 28) next = 28;
+  localStorage.setItem("size", next.toString());
+  root.style.setProperty('--base-font-size', next + 'px');
 }
 
 function toggleContrast() {
