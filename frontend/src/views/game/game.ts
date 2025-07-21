@@ -4,9 +4,9 @@ import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
 import { navbarView, attachNavbarEvents } from '../navbar.js'
-import { renderPanelFinalScoreTable, Score } from './loginTournament.js'
-import { renderPanelResult, attachResultEvents, handleTournamentLogin } from './loginTournament.js'
+import { renderPanelResult, attachResultEvents, handleTournamentLogin, renderPanelFinalScoreTable, Score } from './loginTournament.js'
 import { aiStep } from './ai_logic.js'
+import { drawObstacles, generateRandomObstacles, maps, Obstacle} from './map.js'
 import { t } from "../../i18n/index.js"
 import { navigateTo, attachLinkHandlers } from '../../main.js'
 import "../../css/style.css"
@@ -21,6 +21,8 @@ let timerMod = 10
 let scoreMod = 10
 let powerUpsEnabled = false;
 let previousPanel: Panel | null = null;
+let selectedMapIndex = 0
+let currentObstacles: Obstacle[] = []
 
 let keyBinding = {
   player1Up: "w",
@@ -38,8 +40,8 @@ export let lastAiUpdate = Date.now()
 export let previousTargetY = 0
 export let nextTargetY = 0
 
-let canvas: HTMLCanvasElement
-let ctx: CanvasRenderingContext2D
+let canvas: HTMLCanvasElement | null = null
+let ctx: CanvasRenderingContext2D | null = null
 
 // Chargement des settings sauvegardés
 if (localStorage.getItem("pong_ballSpeed")) ballSpeed = +localStorage.getItem("pong_ballSpeed")!
@@ -47,6 +49,7 @@ if (localStorage.getItem("pong_timerMod")) timerMod = +localStorage.getItem("pon
 if (localStorage.getItem("pong_scoreMod")) scoreMod = +localStorage.getItem("pong_scoreMod")!
 if (localStorage.getItem("pong_powerUpsEnabled")) powerUpsEnabled = localStorage.getItem("pong_powerUpsEnabled") === "1"
 if (localStorage.getItem("pong_keyBinding")) keyBinding = JSON.parse(localStorage.getItem("pong_keyBinding")!)
+if (localStorage.getItem("pong_selectMap")) selectedMapIndex = +localStorage.getItem("pong_selectMap")!
 
 // Prise en compte du DOM
 export function gameViews() {
@@ -156,13 +159,21 @@ function renderPanelSettings() {
         </div>
         <div class="settings-powerup">
           <label class="settings-label">
-            Power-ups
+            ${t("settings.powerUps")}
             <input type="checkbox" id="input-powerup-enabled" ${powerUpsEnabled ? "checked" : ""} />
+          </label>
+        </div>
+        <div class="settings-score">
+          <label class="settings-label">
+            Map: 
+            <select id="select-map">
+              ${maps.map((m, i) => `<option value="${i}" ${i === selectedMapIndex ? "selected" : ""}>${m.name}</option>`).join("")}
+            </select>
           </label>
         </div>
       </div>
       <div class="settings-actions">
-        <button id="btn-keyconfig" class="menu-btn save-btn">Modifier les contrôles</button>
+        <button id="btn-keyconfig" class="menu-btn save-btn">${t("settings.keybinds")}</button>
         <button id="btn-save-settings" class="menu-btn save-btn">${t("settings.save")}</button>
         <button id="btn-close-settings" class="menu-btn save-btn">${t("settings.cancel")}</button>
       </div>
@@ -330,6 +341,12 @@ export function gameEvent() {
     scoreMod = +(e.target as HTMLInputElement).value
     root.querySelector('#display-score-mod')!.textContent = scoreMod.toString()
   })
+
+  root.querySelector('#select-map')?.addEventListener("change", e => {
+    selectedMapIndex = +(e.target as HTMLSelectElement).value
+    localStorage.setItem("pong_selectMap", selectedMapIndex.toString())
+  })
+
   root.querySelector('#btn-save-settings')?.addEventListener("click", () => {
     const signX = Math.sign(ball.vx)||1
     const signY = Math.sign(ball.vy)||1
@@ -484,6 +501,7 @@ function resetGame(): void {
 }
 
 async function endGame() {
+  // Détermine le gagnant du match
   let winner: "left" | "right" | null = null
   if (score.left === scoreMod)
     winner = "left"
@@ -660,7 +678,7 @@ let lastFrameTime = 0;
 
 function update() {
   if (mode === "ai")
-    aiStep(canvas)
+    aiStep(canvas!)
   else {
     if (keyPressed[keyBinding.player2Up] && rightPaddle.y > 0)
       rightPaddle.y -= baseSpeed
@@ -677,6 +695,24 @@ function update() {
   }
   ball.x += ball.vx
   ball.y += ball.vy
+
+  // Collision pour les blocs
+  for (const obs of currentObstacles) {
+    if (ball.x < obs.x + obs.width &&
+      ball.x + ballSize > obs.x &&
+      ball.y < obs.y + obs.height &&
+      ball.y + ballSize > obs.y 
+    ) {
+      if (ball.x + ballSize - ball.vx <= obs.x || 
+        ball.x - ball.vx >= obs.x + obs.width
+      )
+        ball.vx = -ball.vx
+      if (ball.y + ballSize - ball.vy <= obs.y ||
+        ball.y - ball.vy >= obs.y + obs.height
+      )
+        ball.vy = -ball.vy
+    }
+  }
 
   if (ball.y <= 0 || ball.y >= canvas!.height - ballSize)
     ball.vy = -ball.vy
@@ -745,7 +781,10 @@ function update() {
 }
 
 function render() {
-  ctx!.clearRect(0,0,canvas!.width,canvas!.height)
+  ctx!.fillStyle = maps[selectedMapIndex].background
+  ctx!.fillRect(0, 0, canvas!.width, canvas!.height)
+
+  drawObstacles(ctx!, currentObstacles)
   drawRectangle(ctx!, leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight)
   drawRectangle(ctx!, rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight)
   drawBall(ctx!)
@@ -778,6 +817,14 @@ function gameLoop(now = performance.now()) {
 //--------------------------------------------------------------------------------------------------------------------------//
 
 function startMatch() {
+  const map = maps[selectedMapIndex]
+  if (map.randomObstacle)
+    currentObstacles = generateRandomObstacles(map.randomObstacle)
+  else if (map.obstacle)
+    currentObstacles = [...map.obstacle]
+  else
+    currentObstacles = []
+  
   let pseudo1 = "Joueur 1"
   let pseudo2 = "Joueur 2"  
   const phaseStr = localStorage.getItem("tournament_phase")

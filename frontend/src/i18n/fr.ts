@@ -175,6 +175,8 @@ export default {
     speed: "Vitesse de la balle: ",
     time: "Le temps en seconde du match: ",
     points: "Le nombre de points pour finir: ",
+    keybinds: "Modifier les contrôles",
+    powerUps: "Bonus: ",
     save: "Sauvegarder",
     cancel: "Fermer",
   },
