@@ -4,6 +4,7 @@ import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
 import { AuthUser, Match, Friend } from '../types/interfaces';
 import { verifyToken } from '../utils/jwt';
+import i18next from '../i18n/i18n';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -24,7 +25,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		const { date, duration, winner_id, score, player2_token } = req.body as { date: string, duration: number, winner_id: number, score: string, player2_token: string };
 
 		if (!date || !user1 || !duration || !user1.id || !score)
-			return reply.status(400).send({ error: "Données du match incomplétes" });
+			return reply.status(400).send({ error: i18next.t("match_data_incomplete") });
 
 		//Si PVP, token player 2 existe et on le verifie
 		let user2: AuthUser | null = null;
@@ -37,17 +38,17 @@ export default async function matchsRoutes(app: FastifyInstance)
 			}
 			catch (err)
 			{
-				return reply.status(401).send({ error: "Token du joueur 2 invalide" });
+				return reply.status(401).send({ error: i18next.t("player2_token_invalid") });
 			}
 		}
 
 		// Vérifie que les joueurs sont différents en PVP
 		if (user2 && user1.id === user2.id)
-			return reply.status(400).send({ error: "Un joueur ne peut pas jouer contre lui-même" });
+			return reply.status(400).send({ error: i18next.t("match_self") });
 
 		// Vérifie que le gagnant est l'un des deux
 		if (winner_id !== user1.id && (!user2 || winner_id !== user2.id) && winner_id !== null)
-			return reply.status(400).send({ error: "Le gagnant doit être l’un des deux joueurs" });
+			return reply.status(400).send({ error: i18next.t("match_winner_invalid") });
 
 		try
 		{
@@ -67,7 +68,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		}
 		catch (err: any)
 		{
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -78,7 +79,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		const match = db.prepare(`SELECT * FROM matchs WHERE id = ?`).get(id) as Match;
 
 		if (!match)
-			return reply.status(404).send({ error: 'Match non trouvé' });
+			return reply.status(404).send({ error: i18next.t("match_not_found") });
 		return match;
 	});
 
@@ -88,7 +89,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		const { id } = req.params as { id: number };
 		const result = db.prepare(`DELETE FROM matchs WHERE id = ?`).run(id);
 		if (result.changes === 0)
-			return reply.status(404).send({ error: "Match introuvable" });
+			return reply.status(404).send({ error: i18next.t("match_not_found") });
 		return { success: true };
 	});
 
@@ -100,7 +101,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		//vérifie que l'utilisateur existe
 		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id) as {id: number };
 		if (!userExists)
-			return reply.status(404).send({ error: "Utilisateur non trouvé" });
+			return reply.status(404).send({ error: i18next.t("user_not_found") });
 
 		// Récupère tous les matchs où l'utilisateur a participé
 		const matchs = db.prepare(`
@@ -120,7 +121,7 @@ export default async function matchsRoutes(app: FastifyInstance)
 		//vérifie que l'utilisateur existe
 		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id) as { id: number};
 		if (!userExists)
-			return reply.status(404).send({ error: "Utilisateur non trouvé" });
+			return reply.status(404).send({ error: i18next.t("user_not_found") });
 		
 		//compte des matchs
 		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM matchs WHERE user1_id = ? OR user2_id = ?`).get(user.id, user.id) as { total: number };

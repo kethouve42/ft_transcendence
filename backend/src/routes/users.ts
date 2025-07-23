@@ -10,6 +10,8 @@ import { FastifyRequest } from "fastify";
 import nodemailer from 'nodemailer';
 import { AuthUser, Match, Friend } from '../types/interfaces';
 import crypto from "crypto";
+import i18next from '../i18n/i18n';
+import { langMiddleware } from '../middlewares/lang';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -36,6 +38,7 @@ const transporter = nodemailer.createTransport({
 
 export default async function userRoutes(app: FastifyInstance)
 {
+	app.addHook('preHandler', langMiddleware);
 	// Récupérer tous les utilisateurs
 	app.get('/', async () => 
 	{
@@ -56,7 +59,7 @@ export default async function userRoutes(app: FastifyInstance)
 		`).get(id) as { id: number, login: string, alias: string, avatar: string, last_seen: number };
 
 		if (!user)
-			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			return reply.status(404).send({ error: i18next.t("user_not_found") });
 		return user;
 	});
 
@@ -70,7 +73,7 @@ export default async function userRoutes(app: FastifyInstance)
 		`).get(login) as { id:number, login: string, alias: string, avatar: string, last_seen: number};
 	
 		if (!user)
-			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			return reply.status(404).send({ error: i18next.t("user_not_found") });
 		return user;
 	});
 
@@ -81,7 +84,7 @@ export default async function userRoutes(app: FastifyInstance)
 
 		// Champs obligatoires
 		if (!login || !email || !password)
-			return reply.status(400).send({ error: 'login, email et password sont requis' });
+			return reply.status(400).send({ error: i18next.t("login_email_password_required") });
 
 		try
 		{
@@ -104,8 +107,8 @@ export default async function userRoutes(app: FastifyInstance)
 			await transporter.sendMail({
 			  from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
 			  to: email,
-			  subject: 'Vérification de votre adresse email',
-			  text: `Cliquez sur ce lien pour vérifier votre email : ${verifyUrl} (valable 30 minutes)`
+			  subject: i18next.t("verify_email_subject"),
+			  text: i18next.t("verify_email_text")
 			});
 */
 			return { success: true, id: result.lastInsertRowid };
@@ -113,8 +116,8 @@ export default async function userRoutes(app: FastifyInstance)
 		catch (err: any)
 		{
 			if (err.code === 'SQLITE_CONSTRAINT_UNIQUE')
-				return reply.status(409).send({ error: 'login ou email déjà utilisé' });
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+				return reply.status(409).send({ error: i18next.t("login_or_email_taken") });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -135,7 +138,7 @@ export default async function userRoutes(app: FastifyInstance)
 			const result = stmt.run(login, email, alias || null, avatar || null, user.id);
 
 			if (result.changes === 0)
-				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+				return reply.status(404).send({ error: i18next.t("user_not_found") });
 
 			// Vérification de l'email ACTIVER POUR TEST OU VERSION FINAL
 			/*if (email && email !== user.email) {
@@ -148,8 +151,8 @@ export default async function userRoutes(app: FastifyInstance)
 				await transporter.sendMail({
 				  from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
 				  to: email,
-				  subject: 'Vérification de votre nouvelle adresse email',
-				  text: `Cliquez sur ce lien pour vérifier votre nouvel email : ${verifyUrl} (valable 30 minutes)`
+				  subject: i18next.t("verify_new_email_subject"),
+				  text: i18next.t("verify_new_email_text")
 				});
 			}
 */
@@ -158,7 +161,7 @@ export default async function userRoutes(app: FastifyInstance)
 		catch (err: any)
 		{
 			console.error('Erreur lors de la mise à jour :', err);
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -171,25 +174,25 @@ export default async function userRoutes(app: FastifyInstance)
 		const hashedPassword = await bcrypt.hash(newPassword, 10);
 
 		if (!newPassword || !oldPassword)
-			return reply.status(400).send({ error: 'Le mot de passe est requis' });
+			return reply.status(400).send({ error: i18next.t("password_required") });
 
 		try
 		{
 			const userPass = db.prepare('SELECT password FROM users WHERE email = ? OR login = ?').get(user.email, user.login) as { password: string; };
 			const validPassword = await bcrypt.compare(oldPassword, userPass.password);
 			if (!validPassword)
-				return reply.status(400).send({ error: 'L\'ancien mot de passe est incorrect' });
+				return reply.status(400).send({ error: i18next.t("old_password_incorrect") });
 			const stmt = db.prepare(`UPDATE users SET password = ? WHERE id = ?`);
 			const result = stmt.run(hashedPassword, user.id);
 
 			if (result.changes === 0)
-				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+				return reply.status(404).send({ error: i18next.t("user_not_found") });
 			return { success: true };
 		}
 		catch (err: any)
 		{
 			console.error('Erreur lors de la mise a jour du mot de passe :', err);
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -205,21 +208,21 @@ export default async function userRoutes(app: FastifyInstance)
 		app.log.info('User logged in'); // <=== Log de connection
 		
 		if (!identifier || !password)
-			return reply.status(400).send({ error: 'Champs requis manquants' });
+			return reply.status(400).send({ error: i18next.t("fields_required") });
 
 		try
 		{
 			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; alias: string; avatar: string };
 
 			if (!user)
-        		return reply.status(401).send({ error: 'Email ou mot de passe incorrect' });
+        		return reply.status(401).send({ error: i18next.t("email_or_password_incorrect") });
 			//----------------DECOMMENTER POUR LES VRAI MAIL (vérifie si le mail a été validé)--------------------------//
 			/*if (user.email_verified == 0)
-				return reply.status(401).send({ error: "Adresse mail non vérifié" });*/
+				return reply.status(401).send({ error: i18next.t("email_not_verified") });*/
 
 			const validPassword = await bcrypt.compare(password, user.password);
 			if (!validPassword || (user.email !== identifier && user.login !== identifier))
-				return reply.status(401).send({ error: 'Email ou mot de passe incorrect' });
+				return reply.status(401).send({ error: i18next.t("email_or_password_incorrect") });
 
 			if (user.tfa_enabled) {
 				const code = generate2FACode();
@@ -237,15 +240,15 @@ export default async function userRoutes(app: FastifyInstance)
 					//---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
 					from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
 					to: user.email,
-					subject: 'Votre code 2FA',
-					text: `Votre code 2FA est : ${code}`
+					subject: i18next.t("2fa_subject"),
+					text: i18next.t("2fa_text")
 				});
 
 				return reply.send({
 					success: true,
 					step: '2fa_required',
 					identifier,
-					message: 'Un code 2FA a été envoyé à votre adresse e-mail. ',
+					message: i18next.t("2fa_sent"),
 					stayConnected: stayConnected ?? false,
 				});
     		}
@@ -261,7 +264,7 @@ export default async function userRoutes(app: FastifyInstance)
 		catch (err: any)
 		{
 			console.error('Erreur lors de l\'authentification :', err);
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 
 	});
@@ -271,15 +274,15 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const { token } = req.query as { token: string };
 		if (!token)
-			return reply.status(400).send({ error: "Token requis" });
+			return reply.status(400).send({ error: i18next.("token_required") });
 
 		const user = db.prepare('SELECT id, email_verify_expires FROM users WHERE email_verify_token = ?').get(token) as { id: number, email_verify_expires: number } | undefined;
 		if (!user || !user.email_verify_expires || user.email_verify_expires < Date.now())
-			return reply.status(400).send({ error: "Token invalide ou expiré" });
+			return reply.status(400).send({ error: i18next.t("token_invalid_or_expired") });
 
 		db.prepare('UPDATE users SET email_verified = 1, email_verify_token = NULL, email_verify_expires = NULL WHERE id = ?').run(user.id);
 
-		return { success: true, message: "Email vérifié !" };
+		return { success: true, message: i18next.t("email_verified") };
 	});*/
 
 	//Verification code 2FA pour la suite de l'authentification avec 2FA
@@ -288,19 +291,19 @@ export default async function userRoutes(app: FastifyInstance)
 		const { identifier, code, stayConnected} = req.body as { identifier: string; code: string; stayConnected: boolean};
 
 		if (!identifier || !code)
-			return reply.status(400).send({ error: 'Champs requis manquants' });
+			return reply.status(400).send({ error: i18next.t("fields_required") });
 
 		const user = db.prepare(`SELECT * FROM users WHERE email = ? OR login = ?`).get(identifier, identifier)as { id: number; login: string; email: string; tfa_code: string; tfa_expires: number; alias: string; avatar: string };
 
 		if (!user)
-			return reply.status(401).send({ error: 'Utilisateur inconnu' });
+			return reply.status(401).send({ error: i18next.t("user_unknown") });
 
 		if (!user.tfa_code || Date.now() > user.tfa_expires)
-			return reply.status(401).send({ error: 'Code 2FA expiré ou invalide' });
+			return reply.status(401).send({ error: i18next.t("2fa_expired_or_invalid") });
 
 		const isValid = await bcrypt.compare(code, user.tfa_code);
 		if (!isValid)
-			return reply.status(401).send({ error: 'Code 2FA incorrect' });
+			return reply.status(401).send({ error: i18next.t("2fa_incorrect") });
 
 		// On supprime le code 2FA et on retourne le success et le token
 		db.prepare(`UPDATE users SET tfa_code = NULL, tfa_expires = NULL WHERE id = ?`).run(user.id);
@@ -344,7 +347,7 @@ export default async function userRoutes(app: FastifyInstance)
 		const result = stmt.run(user.id);
 
 		if (result.changes === 0)
-			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			return reply.status(404).send({ error: i18next.t("user_not_found") });
 		return { success: true };
 	});
 
@@ -374,13 +377,13 @@ export default async function userRoutes(app: FastifyInstance)
 			const result = db.prepare(`UPDATE users SET tfa_enabled = 1 WHERE id = ?`).run(user.id);
 
 			if (result.changes === 0)
-				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+				return reply.status(404).send({ error: i18next.t("user_not_found") });
 
-			return { success: true, message: '2FA activé avec succès' };
+			return { success: true, message: i18next.t("2fa_enabled") };
 		}
 		catch (err: any) {
 			console.error('Erreur lors de l’activation du 2FA :', err);
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -393,13 +396,13 @@ export default async function userRoutes(app: FastifyInstance)
             const result = db.prepare(`UPDATE users SET tfa_enabled = 0, tfa_code = NULL, tfa_expires = NULL WHERE id = ?`).run(user.id);
 
             if (result.changes === 0)
-                return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+                return reply.status(404).send({ error: i18next.t("user_not_found") });
 
-            return { success: true, message: '2FA désactivé avec succès' };
+            return { success: true, message: i18next.t("2fa_disabled") };
         }
         catch (err: any) {
             console.error('Erreur lors de la désactivation du 2FA :', err);
-            return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+            return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
         }
     });
 
@@ -411,13 +414,13 @@ export default async function userRoutes(app: FastifyInstance)
 		{
 			const result = db.prepare(`UPDATE users SET last_seen = ? WHERE id = ?`).run(Date.now(), user.id);
 			if (result.changes === 0)
-				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+				return reply.status(404).send({ error: i18next.t("user_not_found") });
 			return { success: true };
 		}
 		catch (err: any)
 		{
 			console.error('Erreur lors du ping :', err);
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -475,7 +478,7 @@ export default async function userRoutes(app: FastifyInstance)
 		}
 
 		if (!uploaded)
-			return reply.status(400).send({ error: 'Aucun fichier reçu' });
+			return reply.status(400).send({ error: i18next.t("no_file_received") });
 	});
 
 	//Reset d'avatar
@@ -559,7 +562,7 @@ export default async function userRoutes(app: FastifyInstance)
 		catch (err: any)
 		{
 			console.error('Erreur lors de l\'anonymisation :', err);
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -568,7 +571,7 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const { email } = req.body as { email: string };
 		if (!email)
-        	return reply.status(400).send({ error: "Email requis" });
+        	return reply.status(400).send({ error: i18next.t("email_required") });
 
 		// Vérifie si l'utilisateur existe
 		const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email) as { id: number, email: string } | undefined;
@@ -587,8 +590,8 @@ export default async function userRoutes(app: FastifyInstance)
 		await transporter.sendMail({
 			from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
 			to: user.email,
-			subject: 'Réinitialisation de votre mot de passe',
-			text: `Pour réinitialiser votre mot de passe, cliquez sur ce lien : ${resetUrl} (valable 15 minutes)`
+			subject: i18next.t("reset_email_subject"),
+			text: i18next.t("reset_email_text")
 		});
 
     	return { success: true };
@@ -598,12 +601,12 @@ export default async function userRoutes(app: FastifyInstance)
 	app.post('/reset-password', async (req, reply) => {
 		const { token, newPassword } = req.body as { token: string, newPassword: string };
 		if (!token || !newPassword)
-			return reply.status(400).send({ error: "Token et nouveau mot de passe requis" });
+			return reply.status(400).send({ error: i18next.t("Token_password_required") });
 
 		// Vérifie le token
 		const user = db.prepare('SELECT id, reset_expires FROM users WHERE reset_token = ?').get(token) as { id: number, reset_expires: number } | undefined;
 		if (!user || !user.reset_expires || user.reset_expires < Date.now())
-			return reply.status(400).send({ error: "Token invalide ou expiré" });
+			return reply.status(400).send({ error: i18next.t("token_invalid_or_expired") });
 
 		// Met à jour le mot de passe
 		const hashedPassword = await bcrypt.hash(newPassword, 10);

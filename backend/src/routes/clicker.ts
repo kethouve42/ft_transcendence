@@ -4,6 +4,7 @@ import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
 import { AuthUser, Match, Friend } from '../types/interfaces';
 import { verifyToken } from '../utils/jwt';
+import i18next from '../i18n/i18n';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -25,7 +26,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 
       if (!result)
       {
-        return reply.status(404).send({ error: "Utilisateur introuvable." });
+        return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
       // Incrémenter le score
@@ -42,7 +43,7 @@ export default async function clickerRoutes(app: FastifyInstance)
     catch (err: any)
     {
       console.error("❌ Erreur lors de la mise à jour du score :", err.message);
-      return reply.status(500).send({ error: "Erreur interne du serveur." });
+      return reply.status(500).send({ error: i18next.t("internal_error") });
     }
   });
 
@@ -60,7 +61,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 
       if (!result)
       {
-        return reply.status(404).send({ error: "Utilisateur introuvable." });
+        return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
       // Calculer le coût du cooler en fonction de son niveau
@@ -92,7 +93,7 @@ export default async function clickerRoutes(app: FastifyInstance)
     catch (err: any)
     {
       console.error("❌ Erreur lors de l'achat du cooler :", err.message);
-      return reply.status(500).send({ error: "Erreur interne du serveur." });
+      return reply.status(500).send({ error: i18next.t("internal_error") });
     }
   });
 
@@ -110,7 +111,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 
       if (!result)
       {
-        return reply.status(404).send({ error: "Utilisateur introuvable." });
+        return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
 
@@ -143,7 +144,7 @@ export default async function clickerRoutes(app: FastifyInstance)
     catch (err: any)
     {
       console.error("❌ Erreur lors de l'achat du generator :", err.message);
-      return reply.status(500).send({ error: "Erreur interne du serveur." });
+      return reply.status(500).send({ error: i18next.t("internal_error") });
     }
   });
 
@@ -161,7 +162,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 
       if (!result)
       {
-        return reply.status(404).send({ error: "Utilisateur introuvable." });
+        return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
       // Calculer le coût du generator en fonction de son niveau
@@ -194,7 +195,7 @@ export default async function clickerRoutes(app: FastifyInstance)
     catch (err: any)
     {
       console.error("❌ Erreur lors de l'achat du coil :", err.message);
-      return reply.status(500).send({ error: "Erreur interne du serveur." });
+      return reply.status(500).send({ error: i18next.t("internal_error") });
     }
   });
 
@@ -212,7 +213,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 
       if (!result)
       {
-        return reply.status(404).send({ error: "Utilisateur introuvable." });
+        return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
       // Répondre avec les stats
@@ -226,7 +227,7 @@ export default async function clickerRoutes(app: FastifyInstance)
     catch (err: any)
     {
       console.error("❌ Erreur lors de la récupération des stats :", err.message);
-      return reply.status(500).send({ error: "Erreur interne du serveur." });
+      return reply.status(500).send({ error: i18next.t("internal_error") });
     }
   });
 
@@ -244,7 +245,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 
       if (!result)
       {
-        return reply.status(404).send({ error: "Utilisateur introuvable." });
+        return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
       // Incrémenter le score
@@ -261,7 +262,7 @@ export default async function clickerRoutes(app: FastifyInstance)
     catch (err: any)
     {
       console.error("❌ Erreur lors de la mise à jour du score :", err.message);
-      return reply.status(500).send({ error: "Erreur interne du serveur." });
+      return reply.status(500).send({ error: i18next.t("internal_error") });
     }
   });
 
@@ -279,7 +280,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 
       if (!result)
       {
-        return reply.status(404).send({ error: "Utilisateur introuvable." });
+        return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
       // Incrémenter le score
@@ -296,7 +297,7 @@ export default async function clickerRoutes(app: FastifyInstance)
     catch (err: any)
     {
       console.error("❌ Erreur lors de la mise à jour du score :", err.message);
-      return reply.status(500).send({ error: "Erreur interne du serveur." });
+      return reply.status(500).send({ error: i18next.t("internal_error") });
     }
   });
 
@@ -307,7 +308,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 		const { date, user1_score, user2_score, player2_token } = req.body as { date: string, user1_score: number, user2_score: number, player2_token: string };
 
 		if (!date || !user1_score || !user2_score || !user1.id)
-			return reply.status(400).send({ error: "Données du match incomplétes" });
+			return reply.status(400).send({ error: i18next.t("match_data_incomplete") });
 
 		//Si PVP, token player 2 existe et on le verifie
 		let user2: AuthUser | null = null;
@@ -320,13 +321,13 @@ export default async function clickerRoutes(app: FastifyInstance)
 			}
 			catch (err)
 			{
-				return reply.status(401).send({ error: "Token du joueur 2 invalide" });
+				return reply.status(401).send({ error: i18next.t("player2_token_invalid") });
 			}
 		}
 
 		// Vérifie que les joueurs sont différents en versus
 		if (user2 && user1.id === user2.id)
-			return reply.status(400).send({ error: "Un joueur ne peut pas jouer contre lui-même" });
+			return reply.status(400).send({ error: i18next.t("match_self") });
 
 		try
 		{
@@ -345,7 +346,7 @@ export default async function clickerRoutes(app: FastifyInstance)
 		}
 		catch (err: any)
 		{
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 }

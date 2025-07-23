@@ -3,6 +3,7 @@ import db from '../db';
 import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
 import { AuthUser, Match, Friend } from '../types/interfaces';
+import i18next from '../i18n/i18n';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
@@ -16,16 +17,16 @@ export default async function friendsRoutes(app: FastifyInstance)
 		const user_id = user.id; // On prend l'id du token
 
 		if (!friend_id)
-			return reply.status(400).send({ error: "Données incomplètes" });
+			return reply.status(400).send({ error: i18next.t("fields_required") });
 
 		// Vérifie que les users sont différents
 		if (user_id === friend_id)
-			return reply.status(400).send({ error: "Un utilisateur ne peut s'ajouter comme ami" });
+			return reply.status(400).send({ error: i18next.t("friendship_self") });
 
 		// Vérifie que les users existent
 		const getUser = db.prepare(`SELECT id FROM users WHERE id = ?`);
 		if (!getUser.get(user_id) || !getUser.get(friend_id)) 
-			return reply.status(404).send({ error: "Un ou plusieurs des utilisateurs n'existe pas" });
+			return reply.status(404).send({ error: i18next.t("user_deleted_or_missing") });
 
 		try
 		{
@@ -37,8 +38,8 @@ export default async function friendsRoutes(app: FastifyInstance)
 		catch (err: any)
 		{
 			if (err.code === 'SQLITE_CONSTRAINT_PRIMARYKEY')
-				return reply.status(409).send({ error: "Amitié déjà existante" });
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+				return reply.status(409).send({ error: i18next.t("friendship_exists") });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
@@ -50,14 +51,14 @@ export default async function friendsRoutes(app: FastifyInstance)
 		const user_id = user.id;
 
 		if (!friend_id)
-			return reply.status(400).send({ error: "Données incomplètes" });
+			return reply.status(400).send({ error: i18next.t("fields_required") });
 
 		if (user_id === friend_id)
-			return reply.status(400).send({ error: "Un utilisateur ne peut s'ajouter/supprimer lui-même comme ami" });
+			return reply.status(400).send({ error: i18next.t("friendship_self") });
 
 		const getUser = db.prepare(`SELECT id FROM users WHERE id = ?`);
 		if (!getUser.get(user_id) || !getUser.get(friend_id)) 
-			return reply.status(404).send({ error: "Un ou plusieurs des utilisateurs n'existe pas" });
+			return reply.status(404).send({ error: i18next.t("user_deleted_or_missing") });
 
 		try
 		{
@@ -66,13 +67,13 @@ export default async function friendsRoutes(app: FastifyInstance)
 			const result2 = stmt.run(friend_id, user_id);
 
 			if (result1.changes === 0)
-				return reply.status(404).send({ error: "Amitié non trouvée" });
+				return reply.status(404).send({ error: i18next.t("friendship_not_found") });
 
 			return { success: true };
 		}
 		catch (err: any)
 		{
-			return reply.status(500).send({ error: 'Erreur interne', message: err.message });
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
 
