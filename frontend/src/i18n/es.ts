@@ -148,6 +148,7 @@ export default {
     down2: "Jugador 2: Bajar",
     start: "Jugar",
     cancel: "Cerrar",
+    giveup: "Abandonar",
   },
   ai: {
     title: "Dificultad de la IA",
@@ -229,7 +230,7 @@ export default {
     end: "¡Se acabó el juego !"
   },
   tournament: {
-    title: "Torneo de 4 jugadores.",
+    title: "Torneo",
     start: "Iniciar el torneo",
     cancel: "Cerrar",
     login_page: {
@@ -243,7 +244,8 @@ export default {
       final_results: "¡El resultado final!",
       player: "Jugador :",
       score: "Posición :",
-    }
+    },
+    choose_players: "Selección del número de jugadores."
   },
   popup_result: {
     title: "Resultado final",

@@ -148,6 +148,7 @@ export default {
     down2: "Player 2: Down",
     start: "Play",
     cancel: "Close",
+    giveup: "Give up",
   },
   ai: {
     title: "AI Difficulty",
@@ -229,7 +230,7 @@ export default {
     end: "End of game !"
   },
   tournament: {
-    title: "4 player tournament.",
+    title: "Tournament",
     start: "Launch the tournament",
     cancel: "Close",
     login_page: {
@@ -244,6 +245,7 @@ export default {
       player: "Player :",
       score: "Rank :",
     },
+    choose_players: "Choice of number of players."
   },
   popup_result: {
     title: "Final score",
