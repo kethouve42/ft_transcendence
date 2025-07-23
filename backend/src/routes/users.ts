@@ -167,19 +167,24 @@ export default async function userRoutes(app: FastifyInstance)
 	{
 		const user = (req as AuthenticatedRequest).user;
 
-		const { newPassword } = req.body as { newPassword: string };
+		const { oldPassword, newPassword } = req.body as { oldPassword: string, newPassword: string };
 		const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-		if (!newPassword)
+		if (!newPassword || !oldPassword)
 			return reply.status(400).send({ error: 'Le mot de passe est requis' });
 
 		try
 		{
+			const userPass = db.prepare('SELECT password FROM users WHERE email = ? OR login = ?').get(user.email, user.login) as { password: string; };
+			const validPassword = await bcrypt.compare(oldPassword, userPass.password);
+			if (!validPassword)
+				return reply.status(400).send({ error: 'L\'ancien mot de passe est incorrect' });
 			const stmt = db.prepare(`UPDATE users SET password = ? WHERE id = ?`);
 			const result = stmt.run(hashedPassword, user.id);
 
 			if (result.changes === 0)
 				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			return { success: true };
 		}
 		catch (err: any)
 		{

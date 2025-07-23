@@ -135,20 +135,20 @@ fetch("/api/users/me", {
 
     formMdp.onsubmit = async (e) => {
       e.preventDefault();
-      const mdp = (formMdp.login as HTMLInputElement).value;
-      const newMdp = (formMdp.alias as HTMLInputElement).value;
-      const newMdp2 = (formMdp.email as HTMLInputElement).value;
+	  const mdp = (formMdp.elements.namedItem("mdp") as HTMLInputElement).value;
+	  const newMdp = (formMdp.elements.namedItem("newMdp") as HTMLInputElement).value;
+	  const newMdp2 = (formMdp.elements.namedItem("newMdp2") as HTMLInputElement).value;
       const msg = document.getElementById("edit-profile-message");
       if (newMdp == newMdp2)
       {
         try {
-          const res = await fetch("/me/password", {
+          const res = await fetch("/api/users/me/password", {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({ mdp, newPassword: newMdp })
+            body: JSON.stringify({ oldPassword: mdp, newPassword: newMdp })
           });
           if (res.ok) {
             msg!.textContent = t("dashboard.mdp_updated");
