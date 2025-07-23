@@ -4,6 +4,7 @@ import { t } from "../../i18n/index.js"
 let versusTimer: ReturnType<typeof setInterval> | null = null;
 let versusCoolingTimer: ReturnType<typeof setInterval> | null = null;
 let versusGeneratorTimer: ReturnType<typeof setInterval> | null = null;
+let soloKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
 // Purge les intrvalles précédents
 function clearAllVersusIntervals()
@@ -26,7 +27,11 @@ export function clickerView(): string {
           </button>`
         : `<button id="versus-btn" class="bg-pink-600 hover:bg-pink-400 text-white px-4 py-2 rounded shadow-lg">
             ${t("click.versus")}
-          </button>`
+          </button>
+		  <button id="solo-key-config-btn" class="bg-blue-600 hover:bg-blue-400 text-white px-4 py-2 rounded shadow-lg">
+    		${t("click.config_keys")}
+  		  </button>`
+		  
       }
     </div>
   `;
@@ -133,6 +138,7 @@ export function clickerView(): string {
   {
   return `
   ${topRightButtons}
+  <div class="flex flex-row items-center justify-center min-h-[60vh]">
     <div class="flex flex-row items-center justify-center min-h-[60vh]">
       <!-- Jauge de chaleur à gauche -->
       <div class="flex flex-col items-center mr-8">
@@ -185,6 +191,146 @@ export function clickerView(): string {
     }
 }
 
+//Config des touche avant match
+function showKeyConfigModal(onValidate: (config: any) => void) {
+  const modal = document.createElement("div");
+  const currentConfig = JSON.parse(localStorage.getItem("keyConfig") || "{}");
+  const j1 = currentConfig.j1 || { click: "z", cooler: "q", generator: "s", coil: "d" };
+  const j2 = currentConfig.j2 || { click: "i", cooler: "j", generator: "k", coil: "l" };
+
+  modal.innerHTML = `
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-black p-8 rounded shadow-lg flex flex-col gap-4">
+        <h2 class="text-xl font-bold mb-4">${t("click.versus_key_config")}</h2>
+        <div class="mb-2 text-white text-sm">
+          <b>${t("click.current_keys_j1")}</b>
+		  ${t("click.key_click")}: <span>${j1.click}</span> &nbsp;
+		  ${t("click.key_cooler")}: <span>${j1.cooler}</span> &nbsp;
+		  ${t("click.key_generator")}: <span>${j1.generator}</span> &nbsp;
+		  ${t("click.key_coil")}: <span>${j1.coil}</span>
+		  <br>
+		  <b>${t("click.current_keys_j2")}</b>
+		  ${t("click.key_click")}: <span>${j2.click}</span> &nbsp;
+		  ${t("click.key_cooler")}: <span>${j2.cooler}</span> &nbsp;
+		  ${t("click.key_generator")}: <span>${j2.generator}</span> &nbsp;
+		  ${t("click.key_coil")}: <span>${j2.coil}</span>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label>${t("click.key_click")} : <input type="text" id="key-j1-click" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_cooler")}: <input type="text" id="key-j1-cooler" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_generator")} : <input type="text" id="key-j1-generator" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_coil")} : <input type="text" id="key-j1-coil" maxlength="1" class="border p-1 w-12 text-center" /></label>
+        </div>
+        <div class="flex flex-col gap-2 mt-4">
+          <label>${t("click.key_click")} : <input type="text" id="key-j2-click" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_cooler")} : <input type="text" id="key-j2-cooler" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_generator")} : <input type="text" id="key-j2-generator" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_coil")} : <input type="text" id="key-j2-coil" maxlength="1" class="border p-1 w-12 text-center" /></label>
+        </div>
+        <button id="validate-keys" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">${t("click.validate")}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector("#validate-keys")!.addEventListener("click", () => {
+    const j1 = {
+      click: (modal.querySelector("#key-j1-click") as HTMLInputElement).value || "z",
+      cooler: (modal.querySelector("#key-j1-cooler") as HTMLInputElement).value || "q",
+      generator: (modal.querySelector("#key-j1-generator") as HTMLInputElement).value || "s",
+      coil: (modal.querySelector("#key-j1-coil") as HTMLInputElement).value || "d",
+    };
+    const j2 = {
+      click: (modal.querySelector("#key-j2-click") as HTMLInputElement).value || "i",
+      cooler: (modal.querySelector("#key-j2-cooler") as HTMLInputElement).value || "j",
+      generator: (modal.querySelector("#key-j2-generator") as HTMLInputElement).value || "k",
+      coil: (modal.querySelector("#key-j2-coil") as HTMLInputElement).value || "l",
+    };
+
+    // Vérifie unicité des touches pour chaque joueur
+    const keysJ1 = [j1.click, j1.cooler, j1.generator, j1.coil];
+    const keysJ2 = [j2.click, j2.cooler, j2.generator, j2.coil];
+    const uniqueJ1 = new Set(keysJ1);
+    const uniqueJ2 = new Set(keysJ2);
+
+    if (uniqueJ1.size !== keysJ1.length) {
+      alert(t("click.unique_keys_j1"));
+      return;
+    }
+    if (uniqueJ2.size !== keysJ2.length) {
+      alert(t("click.unique_keys_j2"));
+      return;
+    }
+
+    //Empêcher que deux joueurs aient la même touche pour la même action
+    if (j1.click === j2.click || j1.cooler === j2.cooler || j1.generator === j2.generator || j1.coil === j2.coil) {
+      alert(t("click.same_key_both_players"));
+      return;
+    }
+
+    const config = { j1, j2 };
+    localStorage.setItem("keyConfig", JSON.stringify(config));
+    modal.remove();
+    onValidate(config);
+  });
+}
+
+//Config touche en solo
+function showSoloKeyConfigModal(onValidate: (config: any) => void) {
+  // Récupère la config actuelle
+  const currentConfig = JSON.parse(localStorage.getItem("soloKeyConfig") || "{}");
+  if (soloKeydownHandler) {
+	document.removeEventListener("keydown", soloKeydownHandler);
+  }
+
+  const modal = document.createElement("div");
+  modal.innerHTML = `
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-black p-8 rounded shadow-lg flex flex-col gap-4">
+        <h2 class="text-xl font-bold mb-4">${t("click.solo_key_config")}</h2>
+        <div class="mb-2 text-white text-sm">
+          <b>${t("click.current_config")} :</b><br>
+          ${t("click.key_click")} : <span id="current-key-click">${currentConfig.click || "z"}</span> &nbsp;
+          ${t("click.key_cooler")} : <span id="current-key-cooler">${currentConfig.cooler || "q"}</span> &nbsp;
+          ${t("click.key_generator")} : <span id="current-key-generator">${currentConfig.generator || "s"}</span> &nbsp;
+          ${t("click.key_coil")}: <span id="current-key-coil">${currentConfig.coil || "d"}</span>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label>${t("click.key_click")} : <input type="text" id="key-solo-click" maxlength="1" class="border p-1 w-12 text-center" value="${currentConfig.click || "z"}" /></label>
+          <label>${t("click.key_cooler")} : <input type="text" id="key-solo-cooler" maxlength="1" class="border p-1 w-12 text-center" value="${currentConfig.cooler || "q"}" /></label>
+          <label>${t("click.key_generator")} : <input type="text" id="key-solo-generator" maxlength="1" class="border p-1 w-12 text-center" value="${currentConfig.generator || "s"}" /></label>
+          <label>${t("click.key_coil")} : <input type="text" id="key-solo-coil" maxlength="1" class="border p-1 w-12 text-center" value="${currentConfig.coil || "d"}" /></label>
+        </div>
+        <button id="validate-solo-keys" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">${t("click.validate")}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector("#validate-solo-keys")!.addEventListener("click", () => {
+  const click = (modal.querySelector("#key-solo-click") as HTMLInputElement).value || "z";
+  const cooler = (modal.querySelector("#key-solo-cooler") as HTMLInputElement).value || "q";
+  const generator = (modal.querySelector("#key-solo-generator") as HTMLInputElement).value || "s";
+  const coil = (modal.querySelector("#key-solo-coil") as HTMLInputElement).value || "d";
+
+  const keys = [click, cooler, generator, coil];
+  const uniqueKeys = new Set(keys);
+
+  if (uniqueKeys.size !== keys.length) {
+    alert(t("click.unique_keys_solo"));
+    return;
+  }
+
+  const config = { click, cooler, generator, coil };
+  localStorage.setItem("soloKeyConfig", JSON.stringify(config));
+  modal.remove();
+  onValidate(config);
+  if (soloKeydownHandler) {
+    document.addEventListener("keydown", soloKeydownHandler);
+  }
+});
+}
+
 export function clickerEvent(): void {
 
 //#region mode solo
@@ -194,24 +340,48 @@ export function clickerEvent(): void {
   //let overheated = false;
   const maxHeat = 100;
   const versusBtn = document.getElementById("versus-btn");
-
+  
   if (!localStorage.getItem("token_player2")) {
+	  
+	  // Elements de la page
+	  const heatBar = document.getElementById("heat-bar");
+	  const heatValue = document.getElementById("heat-value");
+	  const clickBtn = document.getElementById("click-btn");
+	  const pointCount = document.getElementById("point-count");
+	  const costCooler = document.getElementById("cost-cooler");
+	  const coolerCount = document.getElementById("cooler-count");
+	  const buyCoolerBtn = document.getElementById("buy-cooler");
+	  const costGenerator = document.getElementById("cost-generator");
+	  const generatorCount = document.getElementById("generator-count");
+	  const buyGeneratorBtn = document.getElementById("buy-generator");
+	  const costCoil = document.getElementById("cost-coil");
+	  const coilCount = document.getElementById("coil-count");
+	  const buyCoilBtn = document.getElementById("buy-coil");
+	  const soloKeyConfigBtn = document.getElementById("solo-key-config-btn"); //inclut les touche clavier
+	  if (soloKeyConfigBtn) {
+		  soloKeyConfigBtn.addEventListener("click", () => {
+			showSoloKeyConfigModal(() => {});
+		  });
+	  }
 
-  // Elements de la page
-  const heatBar = document.getElementById("heat-bar");
-  const heatValue = document.getElementById("heat-value");
-  const clickBtn = document.getElementById("click-btn");
-  const pointCount = document.getElementById("point-count");
-  const costCooler = document.getElementById("cost-cooler");
-  const coolerCount = document.getElementById("cooler-count");
-  const buyCoolerBtn = document.getElementById("buy-cooler");
-  const costGenerator = document.getElementById("cost-generator");
-  const generatorCount = document.getElementById("generator-count");
-  const buyGeneratorBtn = document.getElementById("buy-generator");
-  const costCoil = document.getElementById("cost-coil");
-  const coilCount = document.getElementById("coil-count");
-  const buyCoilBtn = document.getElementById("buy-coil");
-
+  //Ecoute des touche clavier
+  if (soloKeydownHandler) {
+  document.removeEventListener("keydown", soloKeydownHandler);
+	}
+	soloKeydownHandler = (e: KeyboardEvent) => {
+	if (localStorage.getItem("token_player2")) return;
+	const config = JSON.parse(localStorage.getItem("soloKeyConfig") || "{}");
+	const keyClick = config.click || "z";
+	const keyCooler = config.cooler || "q";
+	const keyGenerator = config.generator || "s";
+	const keyCoil = config.coil || "d";
+	if (e.key === keyClick) document.getElementById("click-btn")?.click();
+	if (e.key === keyCooler) document.getElementById("buy-cooler")?.click();
+	if (e.key === keyGenerator) document.getElementById("buy-generator")?.click();
+	if (e.key === keyCoil) document.getElementById("buy-coil")?.click();
+	};
+	document.addEventListener("keydown", soloKeydownHandler);
+	  
   // Verification de l'etat de surchauffe
   if (localStorage.getItem("overheated") === null) {
   localStorage.setItem("overheated", "false");
@@ -488,6 +658,14 @@ export function clickerEvent(): void {
   }
   
   if (localStorage.getItem("token_player2")) {
+  // Affiche la config des touches AVANT de lancer le jeu
+  showKeyConfigModal(() => {
+    startVersusGame();
+  });
+  return; // On attend la validation des touches
+}
+
+function startVersusGame() {
 
     clearAllVersusIntervals();
 
@@ -501,6 +679,32 @@ export function clickerEvent(): void {
   localStorage.setItem(`vs_${n}coil`, "0");
   localStorage.setItem(`vs_${n}overheated`, "false");
   });
+
+  //Désactivation de la souris pour le versus
+  ["1", "2"].forEach((n) => {
+  ["click-btn", "buy-cooler", "buy-generator", "buy-coil"].forEach((btn) => {
+    const el = document.getElementById(`${btn}-${n}`) as HTMLButtonElement;
+    if (el) el.style.pointerEvents = "none";
+  });
+});
+
+//Ecoute des touche clavier configuré
+document.addEventListener("keydown", (e) => {
+  const config = JSON.parse(localStorage.getItem("keyConfig") || "{}");
+  if (!config.j1 || !config.j2) return;
+
+  // Joueur 1
+  if (e.key === config.j1.click) document.getElementById("click-btn-1")?.click();
+  if (e.key === config.j1.cooler) document.getElementById("buy-cooler-1")?.click();
+  if (e.key === config.j1.generator) document.getElementById("buy-generator-1")?.click();
+  if (e.key === config.j1.coil) document.getElementById("buy-coil-1")?.click();
+
+  // Joueur 2
+  if (e.key === config.j2.click) document.getElementById("click-btn-2")?.click();
+  if (e.key === config.j2.cooler) document.getElementById("buy-cooler-2")?.click();
+  if (e.key === config.j2.generator) document.getElementById("buy-generator-2")?.click();
+  if (e.key === config.j2.coil) document.getElementById("buy-coil-2")?.click();
+});
 
   // Fonction pour mettre à jour dynamiquement les coûts pour chaque joueur
   function updateVersusCosts() {

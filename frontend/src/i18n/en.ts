@@ -227,7 +227,22 @@ export default {
     versus: "Duel mode",
     time: "Remaining time :",
     overh: "Overheating !",
-    end: "End of game !"
+    end: "End of game !",
+	config_keys: "Configuration",
+	unique_keys_solo: "Each action must have a different key!",
+	unique_keys_j1: "Each action for Player 1 must have a different key!",
+	unique_keys_j2: "Each action for Player 2 must have a different key!",
+	same_key_both_players: "Both players must not have the same key for the same action!",
+	solo_key_config: "Key configuration (Solo)",
+	versus_key_config: "Key configuration (Versus)",
+	current_keys_j1: "Current keys Player 1:",
+    current_keys_j2: "Current keys Player 2:",
+	current_config: "Current_keys",
+    key_click: "Click",
+    key_cooler: "Cooler",
+    key_generator: "Generator",
+    key_coil: "Coil",
+	validate: "Validate"
   },
   tournament: {
     title: "Tournament",

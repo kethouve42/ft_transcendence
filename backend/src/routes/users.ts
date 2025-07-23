@@ -38,7 +38,9 @@ const transporter = nodemailer.createTransport({
 
 export default async function userRoutes(app: FastifyInstance)
 {
-	app.addHook('preHandler', langMiddleware);
+	//A activer quand les langue seront envoyé
+	//app.addHook('preHandler', langMiddleware);
+
 	// Récupérer tous les utilisateurs
 	app.get('/', async () => 
 	{

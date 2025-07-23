@@ -227,7 +227,22 @@ export default {
     versus: "Modo duelo",
     time: "Tiempo restante :",
     overh: "¡Sobrecalentamiento !",
-    end: "¡Se acabó el juego !"
+    end: "¡Se acabó el juego !",
+	config_keys: "configuración",
+	unique_keys_solo: "¡Cada acción debe tener una tecla diferente!",
+	unique_keys_j1: "¡Cada acción del Jugador 1 debe tener una tecla diferente!",
+	unique_keys_j2: "¡Cada acción del Jugador 2 debe tener una tecla diferente!",
+	same_key_both_players: "¡Los dos jugadores no deben tener la misma tecla para la misma acción!",
+	solo_key_config: "Configuración de teclas (Solo)",
+	versus_key_config: "Configuración de teclas (Versus)",
+	current_keys_j1: "Teclas actuales Jugador 1:",
+    current_keys_j2: "Teclas actuales Jugador 2:",
+	current_config: "Teclas actuales",
+    key_click: "Click",
+    key_cooler: "Enfriador",
+    key_generator: "Generador",
+    key_coil: "Bobina",
+	validate: "Validar"
   },
   tournament: {
     title: "Torneo",

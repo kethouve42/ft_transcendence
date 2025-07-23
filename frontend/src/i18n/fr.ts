@@ -228,7 +228,22 @@ export default {
     versus: "Mode Duel",
     time: "Temps restant :",
     overh: "Surchauffe !",
-    end: "Fin de la partie !"
+    end: "Fin de la partie !",
+	config_keys: "Configuration",
+	unique_keys_solo: "Chaque action doit avoir une touche différente !",
+	unique_keys_j1: "Chaque action du Joueur 1 doit avoir une touche différente !",
+	unique_keys_j2: "Chaque action du Joueur 2 doit avoir une touche différente !",
+	same_key_both_players: "Les deux joueurs ne doivent pas avoir la même touche pour la même action !",
+	solo_key_config: "Configuration des touches (Solo)",
+	versus_key_config: "Configuration des touches (Versus)",
+	current_keys_j1: "Touches actuelles Joueur 1 :",
+    current_keys_j2: "Touches actuelles Joueur 2 :",
+	current_config: "Touches actuelles",
+    key_click: "Click",
+    key_cooler: "Cooler",
+    key_generator: "Générateur",
+    key_coil: "Bobine",
+	validate: "Valider"
   },
   tournament: {
     title: "Tournoi",
