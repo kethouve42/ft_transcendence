@@ -35,6 +35,11 @@ export default {
     error_connexion: "Erreur lors de la connexion :",
     register: "Créer un compte",
     stayConnected: "Rester connecté",
+    forgot_password: "Mot de passe oublié ?",
+    forgot_password_desc: "Entrez votre email pour recevoir un lien de réinitialisation.",
+    error_email_required: "Email requis.",
+    forgot_password_success: "Un email de réinitialisation a été envoyé.",
+    email: "Email",
   },
   register: {
     title: "Inscription",
@@ -272,5 +277,16 @@ export default {
     score_left: "Gauche: ",
     score_right: " | Droite: ",
     next: "Suivant",
-  }
+  },
+  reset_password: {
+    success_message: "Mot de passe réinitialisé avec succès. Vous allez être redirigé vers la page de connexion.",
+    error_message: "Erreur lors de la réinitialisation du mot de passe. Veuillez réessayer.",
+    submit: "Réinitialiser le mot de passe",
+    password_placeholder: "Entrez votre nouveau mot de passe",
+    title: "Réinitialisation du mot de passe",
+  },
+  emailConfirm: {
+    success_message: "Votre adresse e-mail a été confirmée avec succès. Vous allez être redirigé vers la page de connexion.",
+    error_message: "Erreur lors de la confirmation de l'adresse e-mail. Veuillez réessayer.",
+  },
 };

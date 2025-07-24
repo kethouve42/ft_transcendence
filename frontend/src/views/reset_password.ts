@@ -40,6 +40,7 @@ export function resetPasswordEvents() {
             const response = await fetch("/api/reset_password", {
                 method: "POST",
                 headers: {
+                    "Accept-Language": localStorage.getItem("lang") || "fr",
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ token: getRedirectUrl(), newPassword: password }),

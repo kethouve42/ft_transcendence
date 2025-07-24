@@ -35,6 +35,11 @@ export default {
     error_connexion: "Error durante la conexión:",
     register: "Crear una cuenta",
     stayConnected: "Mantener la sesión iniciada",
+    forgot_password: "¿Olvidaste tu contraseña?",
+    forgot_password_desc: "Introduce tu correo electrónico para recibir un enlace de restablecimiento de contraseña.",
+    error_email_required: "El correo electrónico es obligatorio.",
+    forgot_password_success: "Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.",
+    email: "Correo electrónico",
   },
   register: {
     title: "Registro",
@@ -271,5 +276,16 @@ export default {
     score_left: "A la izquierda:",
     score_right: " | A la derecha: ",
     next: "Siguiente",
-  }
+  },
+  reset_password: {
+    success_message: "¡Contraseña restablecida con éxito! Serás redirigido a la página de inicio de sesión.",
+    error_message: "Error al restablecer la contraseña. Por favor, inténtalo de nuevo.",
+    submit: "Restablecer contraseña",
+    password_placeholder: "Introduce tu nueva contraseña",
+    title: "Restablecer contraseña",
+  },
+  emailConfirm: {
+    success_message: "¡Correo electrónico confirmado con éxito! Serás redirigido a la página de inicio de sesión.",
+    error_message: "Error al confirmar el correo electrónico. Por favor, inténtalo de nuevo.",
+  },
 };

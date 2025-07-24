@@ -13,6 +13,7 @@ import { privacyView } from "./views/privacy";
 import { loginTournamentView, attachLoginTournamentEvents } from "./views/game/loginTournament"
 import { registerRedirectView, attachRegisterRedirectEvents } from "./views/register_Redirect";
 import { resetPasswordView, resetPasswordEvents } from "./views/reset_password"
+import { mailConfirmView, mailConfirmEvents } from "./views/mail_confirm";
 import { t } from "./i18n";
 
 // Ajoute ici toutes les routes de ton app
@@ -31,6 +32,7 @@ const routes: Record<string, RouteHandler> = {
   "/loginTournament" : loginTournamentView,
   "/resetPassword" : resetPasswordView,
   "/registerRedirect": registerRedirectView,
+  "/mailConfirm": mailConfirmView,
 };
 
 function pingUser() {
@@ -38,7 +40,7 @@ function pingUser() {
   if (!token) return;
   fetch("/api/users/ping", {
     method: "PUT",
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
   })
   .then(res => {
     if (res.status === 401) {
@@ -71,6 +73,7 @@ function render(route: string) {
   const protectedRoutes_lr = [
     "/login",
     "/resetPassword",
+    "/mailConfirm",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");
@@ -107,6 +110,7 @@ function attachEvents(route: string) {
   if (route === "/loginTournament") attachLoginTournamentEvents()
   if (route === "/resetPassword") resetPasswordEvents()
   if (route === "/registerRedirect") attachRegisterRedirectEvents();
+  if (route === "/mailConfirm") mailConfirmEvents();
 }
 
 export function attachLinkHandlers() {

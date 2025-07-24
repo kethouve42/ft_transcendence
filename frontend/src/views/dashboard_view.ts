@@ -64,7 +64,7 @@ export function attachDashboardViewEvents() {
         showPopup(t(t("dashboard.gdpr_confirm_anonymize")), async () => {
           const res = await fetch("/api/users/me/anonymize", {
             method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
           });
           if (res.ok) {
             localStorage.clear();
@@ -81,7 +81,7 @@ export function attachDashboardViewEvents() {
     if (exportBtn) {
       exportBtn.addEventListener("click", async () => {
         const res = await fetch("/api/users/me/export", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
@@ -107,7 +107,7 @@ export function attachDashboardViewEvents() {
               showPopup(t("dashboard.gdpr_confirm_delete4"), async () => {
                 const res = await fetch("/api/users/me", {
                   method: "DELETE",
-                  headers: { Authorization: `Bearer ${token}` }
+                  headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
                 });
                 if (res.ok) {
                   localStorage.clear();
@@ -125,7 +125,7 @@ export function attachDashboardViewEvents() {
   }, 0);
   
   fetch("/api/users/profil", {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
   })
     .then(res => res.json())
     .then(user => {
@@ -143,7 +143,7 @@ export function attachDashboardViewEvents() {
 
       // 2. Récupère tous les utilisateurs pour mapping id → alias/login
       return fetch("/api/users", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())
         .then(users => {
@@ -157,7 +157,7 @@ export function attachDashboardViewEvents() {
     .then(({ user, userMap }) => {
       // 3. Récupère les matchs de l'utilisateur connecté
       fetch(`/api/matchs/user/me`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())
         .then((matches: any[]) => {
@@ -188,7 +188,7 @@ export function attachDashboardViewEvents() {
 
       // 4. Récupère les stats de l'utilisateur connecté
       fetch(`/api/matchs/user/me/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())
         .then((userStats: any) => {

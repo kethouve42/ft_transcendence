@@ -31,9 +31,12 @@ db.serialize(() => {
       tfa_enabled BOOLEAN DEFAULT 0,
       tfa_code TEXT,
       tfa_expires INTEGER,
-	  last_seen INTEGER,
-	reset_token TEXT,
-	reset_expires INTEGER
+      last_seen INTEGER,
+      reset_token TEXT,
+      reset_expires INTEGER,
+      email_verified INTEGER DEFAULT 0,
+      email_verify_token TEXT,
+      email_verify_expires INTEGER
     )
   `);
 

@@ -35,6 +35,11 @@ export default {
     error_connexion: "Error during login:",
     register: "Create an account",
     stayConnected: "Stay signed in",
+    forgot_password: "Forgot your password?",
+    forgot_password_desc: "Enter your email address to receive a link to reset your password.",
+    error_email_required: "Email is required.",
+    forgot_password_success: "An email has been sent to reset your password.",
+    email: "Email",
   },
   register: {
     title: "Inscription",
@@ -271,5 +276,16 @@ export default {
     score_left: "Left: ",
     score_right: " | Right: ",
     next: "Next",
-  }
+  },
+  reset_password: {
+    success_message: "Password reset successfully. You will be redirected to the login page.",
+    error_message: "An error occurred while resetting the password.",
+    submit: "Reset Password",
+    password_placeholder: "Enter your new password",
+    title: "Reset Password",
+  },
+  emailConfirm: {
+    success_message: "Your email has been successfully confirmed. You will be redirected to the login page.",
+    error_message: "An error occurred while confirming your email.",
+  },
 };
