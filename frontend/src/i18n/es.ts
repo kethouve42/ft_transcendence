@@ -1,4 +1,8 @@
 export default {
+  all: {
+    yes: "Sí",
+    no: "No",
+  },
   nav: {
     home: "Inicio",
     dashboard: "Panel",

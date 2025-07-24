@@ -1,4 +1,8 @@
 export default {
+  all: {
+    yes: "Yes",
+    no: "No",
+  },
   nav: {
     home: "Home",
     dashboard: "Dashboard",

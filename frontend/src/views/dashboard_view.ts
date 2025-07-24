@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { navigateTo, escapeHTML } from "../main";
+import { navigateTo, escapeHTML, showPopup } from "../main";
 
 export function dashboardView(): string {
   return `
@@ -9,14 +9,29 @@ export function dashboardView(): string {
       </div>
       <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
         <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 max-h-[600px] overflow-y-auto">
+
           <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.last_matches")}</h3>
           <ul id="match-list" class="space-y-3"></ul>
+          
+        </div>
+        <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 flex flex-col">
+
+          <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.global_stats")}</h3>
+          <div id="stats"></div>
+
+        </div>
+      </div>
+      <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
+        <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 max-h-[600px] overflow-y-auto">
+          <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.last_matches")}</h3>
+          <ul id="match-clicker-list" class="space-y-3"></ul>
         </div>
         <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 flex flex-col">
           <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.global_stats")}</h3>
-          <div id="stats"></div>
+          <div id="stats-clicker"></div>
         </div>
       </div>
+
       <div class="w-full max-w-[1800px] mx-auto mt-10 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-6">
         <h3 class="text-xl font-bold text-cyan-200 mb-4">${t("dashboard.gdpr_title") || "Vie privée & GDPR"}</h3>
         <div class="flex flex-col md:flex-row gap-4">
@@ -45,18 +60,20 @@ export function attachDashboardViewEvents() {
 
     const anonymBtn = document.getElementById("gdpr-anonymize");
     if (anonymBtn) {
-      anonymBtn.addEventListener("click", async () => {
-        if (!confirm(t("dashboard.gdpr_confirm_anonymize"))) return;
-        const res = await fetch("/api/users/me/anonymize", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` }
+      anonymBtn.addEventListener("click", () => {
+        showPopup(t(t("dashboard.gdpr_confirm_anonymize")), async () => {
+          const res = await fetch("/api/users/me/anonymize", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            localStorage.clear();
+            msg!.textContent = t("dashboard.gdpr_anonymized");
+            setTimeout(() => navigateTo("/"), 1000);
+          } else {
+            msg!.textContent = t("dashboard.gdpr_error_anonymize");
+          }
         });
-        if (res.ok) {
-          msg!.textContent = t("dashboard.gdpr_anonymized");
-          setTimeout(() => window.location.reload(), 1000);
-        } else {
-          msg!.textContent = t("dashboard.gdpr_error_anonymize");
-        }
       });
     }
 
@@ -83,22 +100,26 @@ export function attachDashboardViewEvents() {
 
     const deleteBtn = document.getElementById("gdpr-delete");
     if (deleteBtn) {
-      deleteBtn.addEventListener("click", async () => {
-        if (!confirm(t("dashboard.gdpr_confirm_delete"))) return;
-        if (!confirm(t("dashboard.gdpr_confirm_delete2"))) return;
-        if (!confirm(t("dashboard.gdpr_confirm_delete3"))) return;
-        if (!confirm(t("dashboard.gdpr_confirm_delete4"))) return;
-        const res = await fetch("/api/users/me", {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` }
+      deleteBtn.addEventListener("click", () => {
+        showPopup(t("dashboard.gdpr_confirm_delete"), () => {
+          showPopup(t("dashboard.gdpr_confirm_delete2"), () => {
+            showPopup(t("dashboard.gdpr_confirm_delete3"), () => {
+              showPopup(t("dashboard.gdpr_confirm_delete4"), async () => {
+                const res = await fetch("/api/users/me", {
+                  method: "DELETE",
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+                if (res.ok) {
+                  localStorage.clear();
+                  msg!.textContent = t("dashboard.gdpr_deleted");
+                  setTimeout(() => navigateTo("/"), 1500);
+                } else {
+                  msg!.textContent = t("dashboard.gdpr_error_delete");
+                }
+              });
+            });
+          });
         });
-        if (res.ok) {
-          localStorage.clear();
-          msg!.textContent = t("dashboard.gdpr_deleted");
-          setTimeout(() => navigateTo("/"), 1500);
-        } else {
-          msg!.textContent = t("dashboard.gdpr_error_delete");
-        }
       });
     }
   }, 0);

@@ -11,6 +11,9 @@ import { gameViews, gameEvent} from "./views/game/game"
 import { loginPlayer2View, attachLoginPlayer2Events } from "./views/login_player2"
 import { privacyView } from "./views/privacy";
 import { loginTournamentView, attachLoginTournamentEvents } from "./views/game/loginTournament"
+import { registerRedirectView, attachRegisterRedirectEvents } from "./views/register_Redirect";
+import { resetPasswordView, resetPasswordEvents } from "./views/reset_password"
+import { t } from "./i18n";
 
 // Ajoute ici toutes les routes de ton app
 type RouteHandler = (params?: any) => string | Promise<string>;
@@ -26,6 +29,8 @@ const routes: Record<string, RouteHandler> = {
   "/loginUser2": loginPlayer2View,
   "/privacy": privacyView,
   "/loginTournament" : loginTournamentView,
+  "/resetPassword" : resetPasswordView,
+  "/registerRedirect": registerRedirectView,
 };
 
 function pingUser() {
@@ -65,6 +70,7 @@ function render(route: string) {
 
   const protectedRoutes_lr = [
     "/login",
+    "/resetPassword",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");
@@ -99,6 +105,8 @@ function attachEvents(route: string) {
   if (route === "/pong") gameEvent();
   if (route === "/loginUser2") attachLoginPlayer2Events();
   if (route === "/loginTournament") attachLoginTournamentEvents()
+  if (route === "/resetPassword") resetPasswordEvents()
+  if (route === "/registerRedirect") attachRegisterRedirectEvents();
 }
 
 export function attachLinkHandlers() {
@@ -158,5 +166,37 @@ export function escapeHTML(str: string) {
     .replace(/'/g, "&#039;");
 }
 
+export function showPopup(message: string, onConfirm: () => void) {
+
+  const modal = document.createElement("div");
+  modal.id = "confirm-modal";
+  modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
+  modal.innerHTML = `
+    <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true" aria-label="${t("dashboard.confirmation")}">
+      <p class="text-cyan-200 mb-6">${message}</p>
+      <div class="flex gap-4">
+        <button id="confirm-yes" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold">${t("all.yes")}</button>
+        <button id="confirm-no" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded font-bold">${t("all.no")}</button>
+      </div>
+    </div>
+  `;
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+
+    document.body.appendChild(modal);
+
+    document.getElementById("confirm-yes")?.addEventListener("click", () => {
+      modal.remove();
+      onConfirm();
+    });
+    document.getElementById("confirm-no")?.addEventListener("click", () => {
+      modal.remove();
+    });
+
+    document.getElementById("confirm-yes")?.focus();
+}
+
 (window as any).toggleContrast = toggleContrast;
 (window as any).changeFontSize = changeFontSize;
+(window as any).navigateTo = navigateTo;
