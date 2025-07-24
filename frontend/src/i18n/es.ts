@@ -276,5 +276,16 @@ export default {
     score_left: "A la izquierda:",
     score_right: " | A la derecha: ",
     next: "Siguiente",
-  }
+  },
+  reset_password: {
+    success_message: "¡Contraseña restablecida con éxito! Serás redirigido a la página de inicio de sesión.",
+    error_message: "Error al restablecer la contraseña. Por favor, inténtalo de nuevo.",
+    submit: "Restablecer contraseña",
+    password_placeholder: "Introduce tu nueva contraseña",
+    title: "Restablecer contraseña",
+  },
+  emailConfirm: {
+    success_message: "¡Correo electrónico confirmado con éxito! Serás redirigido a la página de inicio de sesión.",
+    error_message: "Error al confirmar el correo electrónico. Por favor, inténtalo de nuevo.",
+  },
 };

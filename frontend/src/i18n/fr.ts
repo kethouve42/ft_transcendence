@@ -277,5 +277,16 @@ export default {
     score_left: "Gauche: ",
     score_right: " | Droite: ",
     next: "Suivant",
-  }
+  },
+  reset_password: {
+    success_message: "Mot de passe réinitialisé avec succès. Vous allez être redirigé vers la page de connexion.",
+    error_message: "Erreur lors de la réinitialisation du mot de passe. Veuillez réessayer.",
+    submit: "Réinitialiser le mot de passe",
+    password_placeholder: "Entrez votre nouveau mot de passe",
+    title: "Réinitialisation du mot de passe",
+  },
+  emailConfirm: {
+    success_message: "Votre adresse e-mail a été confirmée avec succès. Vous allez être redirigé vers la page de connexion.",
+    error_message: "Erreur lors de la confirmation de l'adresse e-mail. Veuillez réessayer.",
+  },
 };

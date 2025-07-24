@@ -276,5 +276,16 @@ export default {
     score_left: "Left: ",
     score_right: " | Right: ",
     next: "Next",
-  }
+  },
+  reset_password: {
+    success_message: "Password reset successfully. You will be redirected to the login page.",
+    error_message: "An error occurred while resetting the password.",
+    submit: "Reset Password",
+    password_placeholder: "Enter your new password",
+    title: "Reset Password",
+  },
+  emailConfirm: {
+    success_message: "Your email has been successfully confirmed. You will be redirected to the login page.",
+    error_message: "An error occurred while confirming your email.",
+  },
 };
