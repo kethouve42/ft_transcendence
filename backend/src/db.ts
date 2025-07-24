@@ -31,7 +31,10 @@ CREATE TABLE IF NOT EXISTS users (
   tfa_expires INTEGER,
   last_seen INTEGER,
   reset_token TEXT,
-  reset_expires INTEGER
+  reset_expires INTEGER,
+  email_verified INTEGER DEFAULT 0,
+  email_verify_token TEXT,
+  email_verify_expires INTEGER
   );
 
 -- Table des relations d'amitié

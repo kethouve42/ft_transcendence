@@ -35,6 +35,11 @@ export default {
     error_connexion: "Erreur lors de la connexion :",
     register: "Créer un compte",
     stayConnected: "Rester connecté",
+    forgot_password: "Mot de passe oublié ?",
+    forgot_password_desc: "Entrez votre email pour recevoir un lien de réinitialisation.",
+    error_email_required: "Email requis.",
+    forgot_password_success: "Un email de réinitialisation a été envoyé.",
+    email: "Email",
   },
   register: {
     title: "Inscription",

@@ -40,6 +40,9 @@ export function loginView(): string {
             ${t("login.stayConnected")}
           </label>
         </div>
+        <div class="flex justify-between items-center">
+          <a id="forgot-password" class="text-cyan-400 hover:text-cyan-200 underline" aria-label="${t("login.forgot_password")}"> ${t("login.forgot_password")} </a>
+        </div>
         <button
           type="submit"
           class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition"
@@ -54,11 +57,18 @@ export function loginView(): string {
 }
 
 export function attachLoginEvents() {
+  const forgotPassword = document.getElementById("forgot-password");
+  if (forgotPassword)
+  {
+    forgotPassword.onclick = () => {
+      forgotPasswordPopup();
+    }
+  }
+
   const form = document.getElementById("login-form") as HTMLFormElement | null;
   const msg = document.getElementById("login-message");
   const field2fa = document.getElementById("2fa-field") as HTMLDivElement | null;
   if (!form) return;
-
   let identifierFor2FA: string | null = null;
 
   form.onsubmit = async (e) => {
@@ -132,4 +142,52 @@ export function attachLoginEvents() {
       msg!.textContent = t("login.error_connexion") + " " + err.message;
     }
   };
+}
+
+export function forgotPasswordPopup() {
+
+  const modal = document.createElement("div");
+  modal.id = "confirm-modal";
+  modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
+  modal.innerHTML = `
+  <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true" aria-label="${t("dashboard.confirmation")}">
+  <p class="text-cyan-200 mb-6">${t("login.forgot_password_desc")}</p>
+  <input type="email" id="forgot-email" placeholder="${t("login.email")}" class="bg-cyan-800 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow mb-4 w-full" required>
+  <div id="forgot-message" class="text-red-400"></div>
+  <div class="flex gap-4">
+  <button id="confirm-yes" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold">${t("all.yes")}</button>
+  <button id="confirm-no" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded font-bold">${t("all.no")}</button>
+  </div>
+  </div>
+  `;
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+
+    document.body.appendChild(modal);
+  const msgForgot = document.getElementById("forgot-message");
+    document.getElementById("confirm-yes")?.addEventListener("click", async () => {
+      const emailInput = document.getElementById("forgot-email") as HTMLInputElement;
+      try {
+        const res = await fetch("/api/users/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: emailInput.value }),
+        })
+        if (!res.ok) {
+          throw new Error(t("login.error_email_required"));
+        }
+        msgForgot!.textContent = t("login.forgot_password_success");
+        setTimeout(() => {
+          modal.remove();
+        }, 1000);
+      } catch (err: any) {
+        msgForgot!.textContent = err.message;
+      }
+    });
+    document.getElementById("confirm-no")?.addEventListener("click", () => {
+      modal.remove();
+    });
+
+    document.getElementById("confirm-yes")?.focus();
 }
