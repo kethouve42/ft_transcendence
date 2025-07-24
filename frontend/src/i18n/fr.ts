@@ -248,11 +248,15 @@ export default {
 	current_keys_j1: "Touches actuelles Joueur 1 :",
     current_keys_j2: "Touches actuelles Joueur 2 :",
 	current_config: "Touches actuelles",
-    key_click: "Click",
-    key_cooler: "Cooler",
+    key_click: "Clique",
+    key_cooler: "Refroidisseur",
     key_generator: "Générateur",
     key_coil: "Bobine",
-	validate: "Valider"
+	validate: "Valider",
+	versus_mode: "Mode",
+	versus_mode_timer: "Chrono",
+	versus_mode_score: "Score",
+	versus_target: "Objectif"
   },
   tournament: {
     title: "Tournoi",

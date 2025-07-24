@@ -5,11 +5,14 @@ import { FastifyRequest } from "fastify";
 import { AuthUser, Match, Friend } from '../types/interfaces';
 import { verifyToken } from '../utils/jwt';
 import i18next from '../i18n/i18n';
+import { langMiddleware } from '../middlewares/lang';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
 export default async function clickerRoutes(app: FastifyInstance)
 {
+	app.addHook('preHandler', langMiddleware);
+
   // Route pour incrémenter le score
   app.post('/update', { preHandler: authMiddleware }, async (req, reply) =>
   {

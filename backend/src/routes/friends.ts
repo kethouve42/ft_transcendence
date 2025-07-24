@@ -4,11 +4,14 @@ import { authMiddleware } from '../middlewares/auth';
 import { FastifyRequest } from "fastify";
 import { AuthUser, Match, Friend } from '../types/interfaces';
 import i18next from '../i18n/i18n';
+import { langMiddleware } from '../middlewares/lang';
 
 type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
 export default async function friendsRoutes(app: FastifyInstance)
 {
+	app.addHook('preHandler', langMiddleware);
+	
 	// Rajout d'un ami
 	app.post('/', { preHandler: authMiddleware }, async (req, reply) => 
 	{

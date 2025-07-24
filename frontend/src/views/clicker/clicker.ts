@@ -220,16 +220,16 @@ function showKeyConfigModal(onValidate: (config: any) => void) {
 		  ${t("click.key_coil")}: <span>${j2.coil}</span>
         </div>
         <div class="flex flex-col gap-2">
-          <label>${t("click.key_click")} : <input type="text" id="key-j1-click" maxlength="1" class="border p-1 w-12 text-center" /></label>
-          <label>${t("click.key_cooler")}: <input type="text" id="key-j1-cooler" maxlength="1" class="border p-1 w-12 text-center" /></label>
-          <label>${t("click.key_generator")} : <input type="text" id="key-j1-generator" maxlength="1" class="border p-1 w-12 text-center" /></label>
-          <label>${t("click.key_coil")} : <input type="text" id="key-j1-coil" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_click")} : <input type="text" id="key-j1-click" maxlength="1" class="border p-1 w-12 text-center" value="${j1.click}" /></label>
+          <label>${t("click.key_cooler")}: <input type="text" id="key-j1-cooler" maxlength="1" class="border p-1 w-12 text-center" value="${j1.cooler}" /></label>
+          <label>${t("click.key_generator")} : <input type="text" id="key-j1-generator" maxlength="1" class="border p-1 w-12 text-center" value="${j1.generator}" /></label>
+          <label>${t("click.key_coil")} : <input type="text" id="key-j1-coil" maxlength="1" class="border p-1 w-12 text-center" value="${j1.coil}" /></label>
         </div>
         <div class="flex flex-col gap-2 mt-4">
-          <label>${t("click.key_click")} : <input type="text" id="key-j2-click" maxlength="1" class="border p-1 w-12 text-center" /></label>
-          <label>${t("click.key_cooler")} : <input type="text" id="key-j2-cooler" maxlength="1" class="border p-1 w-12 text-center" /></label>
-          <label>${t("click.key_generator")} : <input type="text" id="key-j2-generator" maxlength="1" class="border p-1 w-12 text-center" /></label>
-          <label>${t("click.key_coil")} : <input type="text" id="key-j2-coil" maxlength="1" class="border p-1 w-12 text-center" /></label>
+          <label>${t("click.key_click")} : <input type="text" id="key-j2-click" maxlength="1" class="border p-1 w-12 text-center" value="${j2.click}" /></label>
+          <label>${t("click.key_cooler")} : <input type="text" id="key-j2-cooler" maxlength="1" class="border p-1 w-12 text-center" value="${j2.cooler}" /></label>
+          <label>${t("click.key_generator")} : <input type="text" id="key-j2-generator" maxlength="1" class="border p-1 w-12 text-center" value="${j2.generator}" /></label>
+          <label>${t("click.key_coil")} : <input type="text" id="key-j2-coil" maxlength="1" class="border p-1 w-12 text-center" value="${j2.coil}" /></label>
         </div>
 
 
@@ -469,6 +469,7 @@ export function clickerEvent(): void {
       fetch("/api/clicker/generator", {
         method: "POST",
         headers: {
+		  "Accept-Language": localStorage.getItem("lang") || "fr",
           Authorization: `Bearer ${token}`,
         }
       })
@@ -508,6 +509,7 @@ export function clickerEvent(): void {
         fetch("/api/clicker/overheat", {
         method: "POST",
         headers: {
+		  "Accept-Language": localStorage.getItem("lang") || "fr",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
         })
@@ -529,6 +531,7 @@ export function clickerEvent(): void {
       fetch("/api/clicker/update", {
         method: "POST",
         headers: {
+		  "Accept-Language": localStorage.getItem("lang") || "fr",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
       })
@@ -551,6 +554,7 @@ export function clickerEvent(): void {
       fetch("/api/clicker/buyCooler", {
         method: "POST",
         headers: {
+		  "Accept-Language": localStorage.getItem("lang") || "fr",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
       })
@@ -581,6 +585,7 @@ export function clickerEvent(): void {
       fetch("/api/clicker/buyGenerator", {
         method: "POST",
         headers: {
+		  "Accept-Language": localStorage.getItem("lang") || "fr",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
       })
@@ -610,6 +615,7 @@ export function clickerEvent(): void {
       fetch("/api/clicker/buyCoil", {
         method: "POST",
         headers: {
+		  "Accept-Language": localStorage.getItem("lang") || "fr",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
       })
@@ -637,6 +643,7 @@ export function clickerEvent(): void {
   fetch("/api/clicker/stats", {
       method: "GET",
       headers: {
+		"Accept-Language": localStorage.getItem("lang") || "fr",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       }
     })
@@ -780,6 +787,7 @@ console.log("Payload envoyé au backend :", payload);
     fetch("/api/clicker/versus", {
       method: "POST",
       headers: {
+		"Accept-Language": localStorage.getItem("lang") || "fr",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json"
       },
@@ -804,7 +812,7 @@ console.log("Payload envoyé au backend :", payload);
         localStorage.removeItem(`vs_${n}overheated`);
       });
 
-      if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
+      //if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
       localStorage.removeItem(`versusMode`);
       localStorage.removeItem(`versusTarget`);
       localStorage.removeItem("token_player2");
@@ -1065,7 +1073,7 @@ console.log("Payload envoyé au backend :", payload);
         localStorage.removeItem(`vs_${n}overheated`);
       });
 
-      if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
+      //if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
       localStorage.removeItem(`versusMode`);
       localStorage.removeItem(`versusTarget`);
       localStorage.removeItem("token_player2");

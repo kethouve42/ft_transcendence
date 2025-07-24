@@ -232,7 +232,7 @@ export default {
     buy_re: "Comprar nevera",
     buy_ge: "Comprar generador",
     buy_bob: "Comprar carretes",
-    exit: "Deja",
+    exit: "Dejar",
     versus: "Modo duelo",
     time: "Tiempo restante :",
     overh: "¡Sobrecalentamiento !",
@@ -247,11 +247,15 @@ export default {
 	current_keys_j1: "Teclas actuales Jugador 1:",
     current_keys_j2: "Teclas actuales Jugador 2:",
 	current_config: "Teclas actuales",
-    key_click: "Click",
+    key_click: "Clic",
     key_cooler: "Enfriador",
     key_generator: "Generador",
     key_coil: "Bobina",
-	validate: "Validar"
+	validate: "Validar",
+	versus_mode: "Modo",
+	versus_mode_timer: "Cronómetro",
+	versus_mode_score: "Puntuación",
+	versus_target: "Objetivo"
   },
   tournament: {
     title: "Torneo",

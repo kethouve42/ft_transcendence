@@ -251,7 +251,11 @@ export default {
     key_cooler: "Cooler",
     key_generator: "Generator",
     key_coil: "Coil",
-	validate: "Validate"
+	validate: "Validate",
+	versus_mode: "Mode",
+	versus_mode_timer: "Timer",
+	versus_mode_score: "Score",
+	versus_target: "Target"
   },
   tournament: {
     title: "Tournament",
