@@ -56,7 +56,7 @@ export function attachRegisterEvents() {
     try {
       const res = await fetch("/api/users", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
         body: JSON.stringify({ login, email, password }),
       });
       if (!res.ok) throw new Error(t("register.error_api") + res.status);

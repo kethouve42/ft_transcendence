@@ -83,7 +83,7 @@ export function attachDashboardEditEvents() {
     }
     
 fetch("/api/users/me", {
-  headers: { Authorization: `Bearer ${token}` }
+  headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
 })
   .then(res => res.json())
   .then(user => {
@@ -100,18 +100,18 @@ fetch("/api/users/me", {
         btn.disabled = true;
         status.textContent = t("dashboard.processing");
         const currentUserRes = await fetch("/api/users/me", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
         });
         const currentUser = await currentUserRes.json();
         const is2FA = !!currentUser.tfa_enabled;
         try {
           const res = await fetch(`/api/users/${is2FA ? "disable-2fa" : "enable-2fa"}`, {
             method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
           });
           if (res.ok) {
             const userRes = await fetch("/api/users/me", {
-              headers: { Authorization: `Bearer ${token}` }
+              headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
             });
             const user = await userRes.json();
             update2FAStatus(user);
@@ -145,6 +145,7 @@ fetch("/api/users/me", {
           const res = await fetch("/api/users/me/password", {
             method: "PATCH",
             headers: {
+              "Accept-Language": localStorage.getItem("lang") || "fr",
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`
             },
@@ -174,7 +175,7 @@ fetch("/api/users/me", {
 
     
     fetch("/api/users/profil", {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
       .then(user => {
@@ -211,7 +212,7 @@ fetch("/api/users/me", {
               const token = localStorage.getItem("token");
               const res = await fetch("/api/users/reset-avatar", {
                 method: "POST",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` },
               } as any);
               if (res.ok) {
                 localStorage.removeItem("userAvatar");
@@ -253,7 +254,7 @@ fetch("/api/users/me", {
           const token = localStorage.getItem("token");
           const res = await fetch("/api/users/upload-avatar", {
             method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` },
             body: formData,
           } as any);
           if (res.ok) {
@@ -273,6 +274,7 @@ fetch("/api/users/me", {
           const res = await fetch("/api/users/me", {
             method: "PUT",
             headers: {
+              "Accept-Language": localStorage.getItem("lang") || "fr",
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`
             },

@@ -75,7 +75,7 @@ export function attachLoginPlayer2Events() {
       try {
         const res = await fetch("/api/users/auth/2fa", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
           body: JSON.stringify({ identifier, code }),
         });
         const data = await res.json();
@@ -102,7 +102,7 @@ export function attachLoginPlayer2Events() {
     try {
       const res = await fetch("/api/users/auth", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
         body: JSON.stringify({ identifier: login, password }),
       });
       const data = await res.json();
@@ -171,7 +171,7 @@ export function forgotPasswordPopup() {
       try {
         const res = await fetch("/api/users/forgot-password", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
           body: JSON.stringify({ email: emailInput.value }),
         })
         if (!res.ok) {

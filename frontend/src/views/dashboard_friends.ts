@@ -69,7 +69,7 @@ export function attachDashboardFriendsEvents() {
     updateFriendsView();
 
     fetch("/api/friends/me/friends", {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
     })
       .then((res) => res.json())
       .then((data) => {
@@ -85,7 +85,7 @@ export function attachDashboardFriendsEvents() {
   };
 
   if (!userId) {
-    fetch("/api/users/me", { headers: { Authorization: `Bearer ${token}` } })
+    fetch("/api/users/me", { headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` } })
       .then(res => res.json())
       .then(data => {
         if (data && data.id) {

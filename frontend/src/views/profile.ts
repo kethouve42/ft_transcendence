@@ -19,7 +19,9 @@ export function attachProfileEvents(userId: string | number) {
 
   if (!content) return;
 
-  fetch(`/api/users/${userId}`)
+  fetch("/api/users/${userId}", {
+      headers: { "Accept-Language": localStorage.getItem("lang") || "fr"}
+  })
     .then(res => res.json())
     .then(user => {
       if (!user || user.error) {
@@ -54,7 +56,7 @@ export function attachProfileEvents(userId: string | number) {
 function checkFriendStatus(profileId: number, currentUserId: string | null, content: HTMLElement, actionMsg: HTMLElement | null) {
   if (!currentUserId) return;
   fetch("/api/friends/me/friends", {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${localStorage.getItem("token")}` }
   })
     .then(res => res.json())
     .then(data => {
@@ -74,6 +76,7 @@ function checkFriendStatus(profileId: number, currentUserId: string | null, cont
             const res = await fetch(`/api/friends/`, {
               method: "DELETE",
               headers: {
+                "Accept-Language": localStorage.getItem("lang") || "fr",
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
               },
@@ -110,7 +113,7 @@ function attachAddFriendBtn(profileId: number, currentUserId: string, actionsDiv
       actionMsg!.textContent = "";
       const res = await fetch("/api/friends", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: JSON.stringify({ friend_id: profileId }),
       });
       if (res.ok) {
@@ -126,7 +129,7 @@ function attachAddFriendBtn(profileId: number, currentUserId: string, actionsDiv
             actionMsg!.textContent = "";
             const res = await fetch("/api/friends/", {
               method: "DELETE",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+              headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
               body: JSON.stringify({ friend_id: profileId }),
             });
             if (res.ok) {

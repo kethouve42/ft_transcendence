@@ -38,7 +38,7 @@ function pingUser() {
   if (!token) return;
   fetch("/api/users/ping", {
     method: "PUT",
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
   })
   .then(res => {
     if (res.status === 401) {
