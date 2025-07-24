@@ -5,6 +5,7 @@ let versusTimer: ReturnType<typeof setInterval> | null = null;
 let versusCoolingTimer: ReturnType<typeof setInterval> | null = null;
 let versusGeneratorTimer: ReturnType<typeof setInterval> | null = null;
 let soloKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
+let versusKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
 // Purge les intrvalles précédents
 function clearAllVersusIntervals()
@@ -191,12 +192,15 @@ export function clickerView(): string {
     }
 }
 
-//Config des touche avant match
+//Config des touche avant versus
 function showKeyConfigModal(onValidate: (config: any) => void) {
   const modal = document.createElement("div");
   const currentConfig = JSON.parse(localStorage.getItem("keyConfig") || "{}");
   const j1 = currentConfig.j1 || { click: "z", cooler: "q", generator: "s", coil: "d" };
   const j2 = currentConfig.j2 || { click: "i", cooler: "j", generator: "k", coil: "l" };
+
+  const currentMode = localStorage.getItem("versusMode") || "timer";
+  const currentTarget = localStorage.getItem("versusTarget") || (currentMode === "timer" ? "60" : "1000");
 
   modal.innerHTML = `
     <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -227,6 +231,19 @@ function showKeyConfigModal(onValidate: (config: any) => void) {
           <label>${t("click.key_generator")} : <input type="text" id="key-j2-generator" maxlength="1" class="border p-1 w-12 text-center" /></label>
           <label>${t("click.key_coil")} : <input type="text" id="key-j2-coil" maxlength="1" class="border p-1 w-12 text-center" /></label>
         </div>
+
+
+        <div class="flex flex-col gap-2 mt-4 p-2 rounded bg-gray-800">
+          <label class="text-white font-semibold mb-1">${t("click.versus_mode")}</label>
+          <select id="versus-mode-select" class="border p-1 rounded">
+            <option value="timer" ${currentMode === "timer" ? "selected" : ""}>${t("click.versus_mode_timer")}</option>
+            <option value="score" ${currentMode === "score" ? "selected" : ""}>${t("click.versus_mode_score")}</option>
+          </select>
+          <label for="versus-target-input" class="text-white mt-2">${t("click.versus_target")}</label>
+          <input type="number" id="versus-target-input" class="border p-1 rounded w-24" min="1" value="${currentTarget}">
+        </div>
+
+
         <button id="validate-keys" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">${t("click.validate")}</button>
       </div>
     </div>
@@ -246,6 +263,17 @@ function showKeyConfigModal(onValidate: (config: any) => void) {
       generator: (modal.querySelector("#key-j2-generator") as HTMLInputElement).value || "k",
       coil: (modal.querySelector("#key-j2-coil") as HTMLInputElement).value || "l",
     };
+
+
+
+    // Récupère le mode et la target
+    const versusMode = (modal.querySelector("#versus-mode-select") as HTMLSelectElement).value;
+    const versusTarget = Number((modal.querySelector("#versus-target-input") as HTMLInputElement).value);
+    // Enregistre le mode et la target
+    localStorage.setItem("versusMode", versusMode);
+    localStorage.setItem("versusTarget", versusTarget.toString());
+
+
 
     // Vérifie unicité des touches pour chaque joueur
     const keysJ1 = [j1.click, j1.cooler, j1.generator, j1.coil];
@@ -369,6 +397,7 @@ export function clickerEvent(): void {
   document.removeEventListener("keydown", soloKeydownHandler);
 	}
 	soloKeydownHandler = (e: KeyboardEvent) => {
+  if (e.repeat) return;
 	if (localStorage.getItem("token_player2")) return;
 	const config = JSON.parse(localStorage.getItem("soloKeyConfig") || "{}");
 	const keyClick = config.click || "z";
@@ -530,11 +559,14 @@ export function clickerEvent(): void {
           return res.json();
         })
         .then(data => {
-          pointCount!.textContent = data.newScore;
-          coolerCount!.textContent = data.newCooler;
-          let coolerLevel = Number(coolerCount!.textContent) || 0;
-          let coolerCost = coolerLevel === 0 ? 50 : Math.round(50 * Math.pow(1.15, coolerLevel));
-          if (costCooler) costCooler.textContent = `(${coolerCost})`;
+          if(data.success)
+          {
+            pointCount!.textContent = data.newScore;
+            coolerCount!.textContent = data.newCooler;
+            let coolerLevel = Number(coolerCount!.textContent) || 0;
+            let coolerCost = coolerLevel === 0 ? 50 : Math.round(50 * Math.pow(1.15, coolerLevel));
+            if (costCooler) costCooler.textContent = `(${coolerCost})`;
+          }
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -557,11 +589,14 @@ export function clickerEvent(): void {
           return res.json();
         })
         .then(data => {
-          pointCount!.textContent = data.newScore;
-          generatorCount!.textContent = data.newGenerator;
-          let generatorLevel = Number(generatorCount!.textContent) || 0;
-          let generatorCost = generatorLevel === 0 ? 150 : Math.round(150 * Math.pow(1.25, generatorLevel));
-          if (costGenerator) costGenerator.textContent = `(${generatorCost})`;
+          if(data.success)
+          {
+            pointCount!.textContent = data.newScore;
+            generatorCount!.textContent = data.newGenerator;
+            let generatorLevel = Number(generatorCount!.textContent) || 0;
+            let generatorCost = generatorLevel === 0 ? 150 : Math.round(150 * Math.pow(1.25, generatorLevel));
+            if (costGenerator) costGenerator.textContent = `(${generatorCost})`;
+          }
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -583,11 +618,14 @@ export function clickerEvent(): void {
           return res.json();
         })
         .then(data => {
-          pointCount!.textContent = data.newScore;
-          coilCount!.textContent = data.newCoil;
-          let coilLevel = Number(coilCount!.textContent) || 0;
-          let coilCost = coilLevel === 0 ? 75 : Math.round(75 * Math.pow(1.15, coilLevel));
-          if (costCoil) costCoil.textContent = `(${coilCost})`;
+          if(data.success)
+          {
+            pointCount!.textContent = data.newScore;
+            coilCount!.textContent = data.newCoil;
+            let coilLevel = Number(coilCount!.textContent) || 0;
+            let coilCost = coilLevel === 0 ? 75 : Math.round(75 * Math.pow(1.15, coilLevel));
+            if (costCoil) costCoil.textContent = `(${coilCost})`;
+          }
         })
         .catch(err => {
           console.error("❌ Erreur :", err.message);
@@ -667,7 +705,7 @@ export function clickerEvent(): void {
 
 function startVersusGame() {
 
-    clearAllVersusIntervals();
+  clearAllVersusIntervals();
 
   // Initialisation des variables pour le versus
   const quitBtn = document.getElementById("quit-versus-btn");
@@ -685,26 +723,96 @@ function startVersusGame() {
   ["click-btn", "buy-cooler", "buy-generator", "buy-coil"].forEach((btn) => {
     const el = document.getElementById(`${btn}-${n}`) as HTMLButtonElement;
     if (el) el.style.pointerEvents = "none";
+    });
   });
-});
 
-//Ecoute des touche clavier configuré
-document.addEventListener("keydown", (e) => {
-  const config = JSON.parse(localStorage.getItem("keyConfig") || "{}");
-  if (!config.j1 || !config.j2) return;
 
-  // Joueur 1
-  if (e.key === config.j1.click) document.getElementById("click-btn-1")?.click();
-  if (e.key === config.j1.cooler) document.getElementById("buy-cooler-1")?.click();
-  if (e.key === config.j1.generator) document.getElementById("buy-generator-1")?.click();
-  if (e.key === config.j1.coil) document.getElementById("buy-coil-1")?.click();
+  // Dans startVersusGame(), avant d’ajouter le listener :
+    if (versusKeydownHandler) {
+      document.removeEventListener("keydown", versusKeydownHandler);
+    }
+    versusKeydownHandler = (e: KeyboardEvent) => {
+    if (e.repeat) return;
+    const config = JSON.parse(localStorage.getItem("keyConfig") || "{}");
+    if (!config.j1 || !config.j2) return;
+    if (e.key === config.j1.click) document.getElementById("click-btn-1")?.click();
+    if (e.key === config.j1.cooler) document.getElementById("buy-cooler-1")?.click();
+    if (e.key === config.j1.generator) document.getElementById("buy-generator-1")?.click();
+    if (e.key === config.j1.coil) document.getElementById("buy-coil-1")?.click();
+    if (e.key === config.j2.click) document.getElementById("click-btn-2")?.click();
+    if (e.key === config.j2.cooler) document.getElementById("buy-cooler-2")?.click();
+    if (e.key === config.j2.generator) document.getElementById("buy-generator-2")?.click();
+    if (e.key === config.j2.coil) document.getElementById("buy-coil-2")?.click();
+    };
+    document.addEventListener("keydown", versusKeydownHandler);
 
-  // Joueur 2
-  if (e.key === config.j2.click) document.getElementById("click-btn-2")?.click();
-  if (e.key === config.j2.cooler) document.getElementById("buy-cooler-2")?.click();
-  if (e.key === config.j2.generator) document.getElementById("buy-generator-2")?.click();
-  if (e.key === config.j2.coil) document.getElementById("buy-coil-2")?.click();
-});
+  // Met fin a la partie versus (toute source confondue)
+  function endVersus()
+  {
+    clearAllVersusIntervals();
+      
+    if (versusKeydownHandler)
+    {
+      document.removeEventListener("keydown", versusKeydownHandler);
+      versusKeydownHandler = null;
+    }
+
+    let winner_id;
+    if (Number(localStorage.getItem("vs_1score")) > Number(localStorage.getItem("vs_2score")))
+      winner_id = localStorage.getItem("userId") || "";
+    else
+       winner_id = localStorage.getItem("userId_player2") || "";
+
+    let game_mode = localStorage.getItem("versusMode");
+
+
+const payload = {
+  date: new Date().toISOString(),
+  user1_score: Number(localStorage.getItem("vs_1score")) || 0,
+  user2_score: Number(localStorage.getItem("vs_2score")) || 0,
+  player2_token: localStorage.getItem("token_player2") || "",
+  winner_id: Number(winner_id) || 0,
+  game_mode: game_mode,
+  target: Number(localStorage.getItem("versusTarget")) || 0
+};
+console.log("Payload envoyé au backend :", payload);
+
+    fetch("/api/clicker/versus", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Erreur lors de la fin du match.");
+      return res.json();
+    })
+    .catch(err => {
+      console.error("❌ Erreur :", err.message);
+    });
+
+
+      // Nettoyage des donnees versus
+      ["1", "2"].forEach((n) => {
+        localStorage.removeItem(`vs_${n}score`);
+        localStorage.removeItem(`vs_${n}heat`);
+        localStorage.removeItem(`vs_${n}cooler`);
+        localStorage.removeItem(`vs_${n}generator`);
+        localStorage.removeItem(`vs_${n}coil`);
+        localStorage.removeItem(`vs_${n}overheated`);
+      });
+
+      if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
+      localStorage.removeItem(`versusMode`);
+      localStorage.removeItem(`versusTarget`);
+      localStorage.removeItem("token_player2");
+      localStorage.removeItem("userId_player2");
+      if (timerDiv)
+        timerDiv.remove();
+      navigateTo("/clicker");   
+  }
 
   // Fonction pour mettre à jour dynamiquement les coûts pour chaque joueur
   function updateVersusCosts() {
@@ -732,6 +840,10 @@ document.addEventListener("keydown", (e) => {
 
   // Crée et initialiser le timer versus
   let timeLeft = 60;
+  if (localStorage.getItem("versusMode") == "timer")
+  {
+    timeLeft = Number(localStorage.getItem("versusTarget"));
+  }
   const timerDiv = document.getElementById("versus-timer");
   if (timerDiv) {
     timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
@@ -755,33 +867,19 @@ document.addEventListener("keydown", (e) => {
     });
   }
 
-  // Decrementer le timer
-  versusTimer = setInterval(() => {
-    timeLeft--;
-    if (timerDiv) timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
-    // Fin de la partie versus
-    if (timeLeft <= 0) {
-      clearAllVersusIntervals();
-      
-      // Nettoyage des donnees versus
-      ["1", "2"].forEach((n) => {
-        localStorage.removeItem(`vs_${n}score`);
-        localStorage.removeItem(`vs_${n}heat`);
-        localStorage.removeItem(`vs_${n}cooler`);
-        localStorage.removeItem(`vs_${n}generator`);
-        localStorage.removeItem(`vs_${n}coil`);
-        localStorage.removeItem(`vs_${n}overheated`);
-      });
-      
-      if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
-      localStorage.removeItem("token_player2");
-      localStorage.removeItem("userId_player2");
-      setTimeout(() => {
-        timerDiv!.remove();
-      }, 2000);
-      navigateTo("/clicker");
-    }
-  }, 1000);
+  // Decrementer le timer (si timer mode)
+  if (localStorage.getItem("versusMode") == "timer")
+  {
+    versusTimer = setInterval(() => {
+      timeLeft--;
+      if (timerDiv) timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
+      // Fin de la partie versus
+      if (timeLeft <= 0)
+      {
+        endVersus();
+      }
+    }, 1000);
+  }
 
   // Decrement chaleur
   versusCoolingTimer = setInterval(() => {
@@ -857,6 +955,11 @@ document.addEventListener("keydown", (e) => {
         let currentScore = scoreBigInt + BigInt(1) + BigInt(Number(localStorage.getItem(`vs_${n}coil`)));
         localStorage.setItem(`vs_${n}score`, currentScore.toString());
         pointCount!.textContent = currentScore.toString();
+
+        if(currentScore >= Number(localStorage.getItem("versusTarget")) && localStorage.getItem("versusMode") == "score")
+        {
+          endVersus();
+        }
       });
     }
   });
@@ -945,24 +1048,33 @@ document.addEventListener("keydown", (e) => {
 
   // Bouton Quitter
   quitBtn!.addEventListener("click", () => {
-    // Nettoyage des donnees versus
-    ["1", "2"].forEach((n) => {
-      localStorage.removeItem(`vs_${n}score`);
-      localStorage.removeItem(`vs_${n}heat`);
-      localStorage.removeItem(`vs_${n}cooler`);
-      localStorage.removeItem(`vs_${n}generator`);
-      localStorage.removeItem(`vs_${n}coil`);
-      localStorage.removeItem(`vs_${n}overheated`);
-    });
-    localStorage.removeItem("token_player2");
-    localStorage.removeItem("userId_player2");
     clearAllVersusIntervals();
-    if (timerDiv)
-      timerDiv.remove();
-    navigateTo("/clicker");
+      
+    if (versusKeydownHandler)
+    {
+      document.removeEventListener("keydown", versusKeydownHandler);
+      versusKeydownHandler = null;
+    }
+      // Nettoyage des donnees versus
+      ["1", "2"].forEach((n) => {
+        localStorage.removeItem(`vs_${n}score`);
+        localStorage.removeItem(`vs_${n}heat`);
+        localStorage.removeItem(`vs_${n}cooler`);
+        localStorage.removeItem(`vs_${n}generator`);
+        localStorage.removeItem(`vs_${n}coil`);
+        localStorage.removeItem(`vs_${n}overheated`);
+      });
+
+      if (timerDiv) timerDiv.textContent = `${t("click.end")}`;
+      localStorage.removeItem(`versusMode`);
+      localStorage.removeItem(`versusTarget`);
+      localStorage.removeItem("token_player2");
+      localStorage.removeItem("userId_player2");
+      if (timerDiv)
+        timerDiv.remove();
+      navigateTo("/clicker");
   });
 }
-
 
 //#endregion
 
@@ -972,6 +1084,6 @@ document.addEventListener("keydown", (e) => {
 // ============= TO DO : ============= //
 // =================================== //
 
-// Gerer le fait de quitter le versus en pleine partie
+// -Revoir le placement css des elements du solo
 // -Faire une route correcte et l'appeler a la fin du versus (voir avec Ken)
 // -Faire un ecran de selection pour choisir la target (score ou duree modulaire ?) du versus (voir avec Thibault)

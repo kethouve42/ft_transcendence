@@ -72,8 +72,12 @@ db.serialize(() => {
       user2_id INTEGER NOT NULL,
       user1_score INTEGER NOT NULL,
       user2_score INTEGER NOT NULL,
+      winner_id INTEGER NOT NULL,
+      game_mode TEXT NOT NULL,
+      target INTEGER NOT NULL,
       FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE
+      FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE SET NULL
     )
   `);
 });

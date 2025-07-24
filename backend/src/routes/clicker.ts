@@ -305,9 +305,9 @@ export default async function clickerRoutes(app: FastifyInstance)
 	app.post('/versus', { preHandler: authMiddleware }, async (req, reply) => 
 	{
 		const user1 = (req as AuthenticatedRequest).user;
-		const { date, user1_score, user2_score, player2_token } = req.body as { date: string, user1_score: number, user2_score: number, player2_token: string };
+		const { date, user1_score, user2_score, player2_token, winner_id, game_mode, target } = req.body as { date: string, user1_score: number, user2_score: number, player2_token: string, winner_id: number, game_mode: string, target: number };
 
-		if (!date || !user1_score || !user2_score || !user1.id)
+		if (!date || user1_score === undefined || user2_score === undefined || !winner_id || !target || !game_mode)
 			return reply.status(400).send({ error: i18next.t("match_data_incomplete") });
 
 		//Si PVP, token player 2 existe et on le verifie
@@ -331,15 +331,18 @@ export default async function clickerRoutes(app: FastifyInstance)
 
 		try
 		{
-			const stmt = db.prepare(`INSERT INTO clicker_matchs (date, user1_id, user2_id, user1_score, user2_score)
-									 VALUES (?, ?, ?, ?, ?)
+			const stmt = db.prepare(`INSERT INTO clicker_matchs (date, user1_id, user2_id, user1_score, user2_score, winner_id, game_mode, target)
+									 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 				`);
 			const result = stmt.run(
 									date,
 									user1.id,
 									user2 ? user2.id : null,
 									user1_score,
-                  user2_score
+                  user2_score,
+                  winner_id,
+                  game_mode,
+                  target
 									);
 
 			return { success: true, id: result.lastInsertRowid };
