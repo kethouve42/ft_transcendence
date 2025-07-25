@@ -141,6 +141,14 @@ export default {
     new_Mdp: "Nueva contraseña",
     confirm_mdp: "Confirmar contraseña",
   },
+  friends: {
+    friends: "Amigos",
+    searchFriends: "Buscar amigos",
+    navFriends: "Buscar un amigo por su login o alias",
+    not_found: "Amigo no encontrado.",
+    network_error: "Error de red durante la búsqueda.",
+    empty_search: "Por favor, introduce un login o alias.",
+  },
   menu: {
     play_local: "Jugar localmente",
     play_ai: "Jugar contra la IA",

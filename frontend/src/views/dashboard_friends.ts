@@ -25,7 +25,13 @@ export function dashboardFriendsView(): string {
 
   return `
     <div class="card-friends">
-      <h2 class="text-3xl font-extrabold text-cyan-300  tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
+      <p class="text-cyan-200 mb-6">${t("friends.searchFriends")}</p>
+      <form id="friends-search-form" autocomplete="off">
+        <input id="nav-friends" type="text" placeholder="${t("friends.navFriends")}" class="input-main mb-4 w-full" required>
+        <button type="submit" style="display:none"></button>
+      </form>
+      <div id="nav-friends-message" class="text-red-400"></div>
+      <h2 class="text-3xl font-extrabold text-cyan-300  tracking-widest uppercase mb-8">${t("friends.friends")}</h2>
       ${
         friendsCache.length === 0
           ? `<div class="text-cyan-100">${t("dashboard.no_friends")}</div>`
@@ -66,7 +72,7 @@ export function attachDashboardFriendsEvents() {
   let userId = localStorage.getItem("userId");
   const fetchFriends = (id: string) => {
     friendsLoading = true;
-    updateFriendsView();
+    //updateFriendsView();
 
     fetch("/api/friends/me/friends", {
       headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
@@ -75,12 +81,12 @@ export function attachDashboardFriendsEvents() {
       .then((data) => {
         friendsCache = Array.isArray(data) ? data : [];
         friendsLoading = false;
-        updateFriendsView();
+        //updateFriendsView();
       })
       .catch(() => {
         friendsCache = [];
         friendsLoading = false;
-        updateFriendsView();
+        //updateFriendsView();
       });
   };
 
@@ -95,23 +101,72 @@ export function attachDashboardFriendsEvents() {
         } else {
           friendsCache = [];
           friendsLoading = false;
-          updateFriendsView();
+          //updateFriendsView();
         }
       })
       .catch(() => {
         friendsCache = [];
         friendsLoading = false;
-        updateFriendsView();
+        //updateFriendsView();
       });
   } else {
     fetchFriends(userId);
   }
+  const navFriends = document.getElementById("nav-friends");
+  if (navFriends)
+  {
+    const form = document.getElementById("friends-search-form") as HTMLFormElement | null;
+    const msg = document.getElementById("nav-friends-message");
+    if (!form) return;
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const friends = document.getElementById("nav-friends") as HTMLInputElement | null;
+      if (!friends) return;
+      const search = friends.value.trim();
+      fetch("/api/users", {
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          if (!res.ok) {
+            if (msg) msg.textContent = t("friends.network_error");
+            return;
+          }
+          if (!search) {
+            if (msg) msg.textContent = t("friends.empty_search");
+            return;
+          }
+          return res.json();
+        })
+        .then(users => {
+          const userMap: Record<number, {  id?: number; alias?: string; login: string }> = {};
+          users.forEach((u: any) => {
+            userMap[u.id] = { id: u.id, alias: u.alias, login: u.login };
+          });
+          let found = false;
+          for (const id in userMap) {
+            const user = userMap[id];
+            if (search == user.alias || search == user.login)
+            {
+              found = true;
+              navigateTo(`/profile/${user.id}`);
+            }
+          }
+          if (!found)
+            msg!.textContent = t("friends.not_found") + " " + search;
+        })
+        .catch((err) => {
+          if (!msg) return;
+          if (err === "Unauthorized") return;
+          msg.textContent = t("friends.network_error");
+        });
+    });
+  }
 }
-
+/*
 function updateFriendsView() {
   const content = document.getElementById("dashboard-content");
   if (content) {
     content.innerHTML = dashboardFriendsView();
     attachLinkHandlers();
   }
-}
+}*/

@@ -60,9 +60,9 @@ export function attachLoginEvents() {
   const forgotPassword = document.getElementById("forgot-password");
   if (forgotPassword)
   {
-    forgotPassword.onclick = () => {
+    forgotPassword.addEventListener("click", () => {
       forgotPasswordPopup();
-    }
+    });
   }
 
   const form = document.getElementById("login-form") as HTMLFormElement | null;
