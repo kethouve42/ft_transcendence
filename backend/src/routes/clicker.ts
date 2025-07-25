@@ -355,4 +355,62 @@ export default async function clickerRoutes(app: FastifyInstance)
 			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
 		}
 	});
+
+	//Obtenir les matchs d'un joueur
+	app.get('/user/me', { preHandler: authMiddleware }, async (req, reply) =>
+	{
+		const user = (req as AuthenticatedRequest).user;
+
+		//vérifie que l'utilisateur existe
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id) as {id: number };
+		if (!userExists)
+			return reply.status(404).send({ error: i18next.t("user_not_found") });
+
+		// Récupère tous les matchs où l'utilisateur a participé
+		const matchs = db.prepare(`
+			SELECT *
+			FROM clicker_matchs
+			WHERE user1_id = ? OR user2_id = ?
+			ORDER BY date DESC
+		`).all(user.id, user.id) as Match[];
+
+		return matchs;
+	});
+
+	//Obtenir les stats d'un joueur
+	app.get('/user/me/stats', { preHandler: authMiddleware }, async (req, reply) => {
+		const user = (req as AuthenticatedRequest).user;
+
+		//vérifie que l'utilisateur existe
+		const userExists = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user.id) as { id: number};
+		if (!userExists)
+			return reply.status(404).send({ error: i18next.t("user_not_found") });
+		
+		//compte des matchs
+		const totalMatches = db.prepare(`SELECT COUNT(*) as total FROM clicker_matchs WHERE user1_id = ? OR user2_id = ?`).get(user.id, user.id) as { total: number };
+
+		//compte des matchs chrono
+		const chronMatches = db.prepare(`SELECT COUNT(*) as total FROM clicker_matchs WHERE game_mode = 'score'`).get() as { total: number};
+
+		//compte des matchs timer
+		const timerMatches = db.prepare(`SELECT COUNT(*) as total FROM clicker_matchs WHERE game_mode = 'timer'`).get() as { total: number };
+
+		//victoires total
+		const totalWins = db.prepare(`SELECT COUNT(*) as wins FROM clicker_matchs WHERE winner_id = ?`).get(user.id) as { wins: number };
+
+		//défaites total
+		const totalLosses = totalMatches.total - totalWins.wins;
+
+		//Pourcentage global
+		const globalWinRate = totalMatches.total > 0 ? Math.round((totalWins.wins / totalMatches.total) * 100) : 0;
+
+		return {
+				totalMatches: totalMatches.total,
+				chronoMatches: chronMatches.total,
+				timerMatches: timerMatches.total,
+				wins: totalWins.wins,
+				losses: totalLosses,
+				winRate: globalWinRate
+		};
+	});
 }

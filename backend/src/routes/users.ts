@@ -281,6 +281,7 @@ export default async function userRoutes(app: FastifyInstance)
 		return { success: true, message: i18next.t("email_verified") };
 	});
 
+	//renvoie de l'email de verification
 	app.post('/resend-verification', async (req, reply) =>
 	{
 		const { email } = req.body as { email: string };
@@ -381,7 +382,7 @@ export default async function userRoutes(app: FastifyInstance)
 		return data;
 	});
 
-	//Permet de récupérer ses infos
+	//Permet de récupérer ses propres infos
 	app.get('/profil', { preHandler: authMiddleware }, async (req, reply) =>
 	{
 		const user = (req as AuthenticatedRequest).user;
