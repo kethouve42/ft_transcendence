@@ -5,7 +5,7 @@ export function dashboardView(): string {
   return `
     <div class="dashboard-bg">
       <div class="w-full flex flex-col items-center mb-10">
-        <div class="w-full max-w-[1800px] class="card-main px-10 py-6 flex flex-col items-center"" id="profile-info"></div>
+        <div class="w-full max-w-[1800px] card-main px-10 py-6 flex flex-col items-center"" id="profile-info"></div>
       </div>
       <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
         <div class="card-section max-h-[600px] overflow-y-auto">
@@ -141,7 +141,6 @@ export function attachDashboardViewEvents() {
         `;
       }
 
-      // 2. Récupère tous les utilisateurs pour mapping id → alias/login
       return fetch("/api/users", {
         headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })
@@ -155,7 +154,6 @@ export function attachDashboardViewEvents() {
         });
     })
     .then(({ user, userMap }) => {
-      // 3. Récupère les matchs de l'utilisateur connecté
       fetch(`/api/matchs/user/me`, {
         headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })

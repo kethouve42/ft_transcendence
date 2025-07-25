@@ -30,7 +30,7 @@ const routes: Record<string, RouteHandler> = {
   "/loginUser2": loginPlayer2View,
   "/privacy": privacyView,
   "/loginTournament" : loginTournamentView,
-  "/resetPassword" : resetPasswordView,
+  "/reset-password" : resetPasswordView,
   "/registerRedirect": registerRedirectView,
   "/mailConfirm": mailConfirmView,
 };
@@ -59,7 +59,7 @@ function render(route: string) {
   const app = document.getElementById("app");
   if (!app) return;
 
-  const allowedPrefixes = ["/resetPassword/", "/mailConfirm/"];
+  const allowedPrefixes = ["/reset-password/", "/mailConfirm/"];
 
     const protectedRoutes = [
     "/dashboard",
@@ -74,7 +74,7 @@ function render(route: string) {
 
   const protectedRoutes_lr = [
     "/login",
-    "/resetPassword",
+    "/reset-password",
     "/mailConfirm",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
@@ -114,7 +114,7 @@ function attachEvents(route: string) {
   if (route === "/pong") gameEvent();
   if (route === "/loginUser2") attachLoginPlayer2Events();
   if (route === "/loginTournament") attachLoginTournamentEvents()
-  if (route === "/resetPassword") resetPasswordEvents()
+  if (route === "/reset-password") resetPasswordEvents()
   if (route === "/registerRedirect") attachRegisterRedirectEvents();
   if (route === "/mailConfirm") mailConfirmEvents();
 }

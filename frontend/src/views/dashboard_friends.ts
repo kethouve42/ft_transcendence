@@ -25,7 +25,7 @@ export function dashboardFriendsView(): string {
 
   return `
     <div class="card-friends">
-      <h2 class="text-3xl font-extrabold text-cyan-30  tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
+      <h2 class="text-3xl font-extrabold text-cyan-300  tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
       ${
         friendsCache.length === 0
           ? `<div class="text-cyan-100">${t("dashboard.no_friends")}</div>`

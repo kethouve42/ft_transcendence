@@ -4,7 +4,7 @@ import { t } from "../i18n";
 export function dashboardEditView(): string {
   return `
     <div class="dashboard-bg">
-      <h2 class="title-dashboard items-center ">${t("dashboard.edit_profile")}</h2>
+      <h2 class="title-dashboard text-center ">${t("dashboard.edit_profile")}</h2>
       <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
         <div class="flex-[2] bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 flex flex-col">
           <form id="edit-profile-form" class="flex flex-col gap-6">
@@ -58,6 +58,7 @@ export function dashboardEditView(): string {
           <button type="submit" class="btn-main px-2 py-1">${t("dashboard.save")}</button>
           <div id="new-mdp" class="mt-1 text-cyan-200"></div>
         </form>
+        <div id="edit-password-message" class="mt-4 text-cyan-200"></div>
         </div>
       </div>
       <a href="/dashboard" class="text-cyan-400 underline mt-4 inline-block">${t("dashboard.back_profile")}</a>
@@ -138,7 +139,7 @@ fetch("/api/users/me", {
 	  const mdp = (formMdp.elements.namedItem("mdp") as HTMLInputElement).value;
 	  const newMdp = (formMdp.elements.namedItem("newMdp") as HTMLInputElement).value;
 	  const newMdp2 = (formMdp.elements.namedItem("newMdp2") as HTMLInputElement).value;
-      const msg = document.getElementById("edit-profile-message");
+    const msgMdp = document.getElementById("edit-password-message");
       if (newMdp == newMdp2)
       {
         try {
@@ -152,22 +153,25 @@ fetch("/api/users/me", {
             body: JSON.stringify({ oldPassword: mdp, newPassword: newMdp })
           });
           if (res.ok) {
-            msg!.textContent = t("dashboard.mdp_updated");
-            msg!.className = "mt-2 text-green-500";
+            msgMdp!.textContent = t("dashboard.mdp_updated");
+            msgMdp!.className = "mt-2 text-green-500";
+            setTimeout(() => {
+              navigateTo("/dashboard");
+            }, 1000);
           } else {
             const data = await res.json();
-            msg!.textContent = data.error || t("dashboard.error_update");
-            msg!.className = "mt-2 text-red-400";
+            msgMdp!.textContent = data.error || t("dashboard.error_update");
+            msgMdp!.className = "mt-2 text-red-400";
           }
         } catch {
-          msg!.textContent = t("dashboard.network_error");
-          msg!.className = "mt-2 text-red-400";
+          msgMdp!.textContent = t("dashboard.network_error");
+          msgMdp!.className = "mt-2 text-red-400";
         }
       }
       else
       {
-        msg!.textContent = t("dashboard.network_error");
-        msg!.className = "mt-2 text-red-400";
+        msgMdp!.textContent = t("dashboard.network_error");
+        msgMdp!.className = "mt-2 text-red-400";
       }
     };
   }

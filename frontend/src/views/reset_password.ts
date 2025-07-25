@@ -19,8 +19,8 @@ export function resetPasswordView(): string {
             >
             ${t("reset_password.submit")}
             </button>
-            <div id="reset-password-message" class="text-red-400"></div>
         </form>
+        <div id="reset-password-message" class="text-red-400"></div>
         </div>
     `;
 }
@@ -37,7 +37,7 @@ export function resetPasswordEvents() {
         const password = (form.password as HTMLInputElement).value;
 
         try {
-            const response = await fetch("/api/reset_password", {
+            const response = await fetch("/api/users/reset-password", {
                 method: "POST",
                 headers: {
                     "Accept-Language": localStorage.getItem("lang") || "fr",

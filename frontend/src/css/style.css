@@ -476,12 +476,15 @@
 .register-container {
   @apply w-full min-h-[50vh] px-8 md:px-32 flex items-center justify-center pt-8;
 }
-.avatar-profile {
-  @apply w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover;
-}
 .btn-access {
   @apply bg-cyan-700 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded transition;
 }
+.avatar-profile {
+  @apply w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover;
+}
 .avatar-circle {
   @apply inline-block w-9 h-9 rounded-full bg-cyan-900 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg overflow-hidden;
+}
+.avatar-medium {
+  @apply w-20 h-20 object-cover rounded-full border border-cyan-400;
 }
