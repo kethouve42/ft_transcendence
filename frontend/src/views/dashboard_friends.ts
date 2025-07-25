@@ -16,15 +16,15 @@ let friendsLoading = false;
 export function dashboardFriendsView(): string {
   if (friendsLoading) {
     return `
-      <div class="max-w-xl mx-auto bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 mt-8 backdrop-blur-md">
-        <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
+      <div class="card-friends">
+        <h2 class="title-dashboard">${t("dashboard.friends")}</h2>
         <div class="text-cyan-100">${t("dashboard.loading_friends")}</div>
       </div>
     `;
   }
 
   return `
-    <div class="max-w-xl mx-auto bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 mt-8 backdrop-blur-md">
+    <div class="card-friends">
       <h2 class="text-3xl font-extrabold text-cyan-30  tracking-widest uppercase mb-8">${t("dashboard.friends")}</h2>
       ${
         friendsCache.length === 0
@@ -34,7 +34,7 @@ export function dashboardFriendsView(): string {
                 .map(
                   (friend) => `
                   <li class="flex items-center gap-4">
-                    <span class="inline-block w-10 h-10 rounded-full bg-cyan-900 border-2 border-cyan-400 overflow-hidden">
+                    <span class="avatar-circle">
                       ${
                         friend.avatar
                           ? `<img src="${friend.avatar}" alt="avatar" class="w-full h-full object-cover" />`
@@ -42,7 +42,7 @@ export function dashboardFriendsView(): string {
                       }
                     </span>
                     <span class="text-cyan-200 font-semibold">${escapeHTML(friend.alias || friend.login)}</span>
-                    <a href="/profile/${friend.id}" class="ml-auto bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-1 rounded-lg shadow transition">
+                    <a href="/profile/${friend.id}" class="ml-auto btn-small">
                       ${t("dashboard.view_profile")}
                     </a>
                   </li>

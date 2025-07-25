@@ -21,17 +21,38 @@ body.high-contrast, .high-contrast * {
   color: #fff !important;
   border-color: #fff !important;
   outline-color: #fff !important;
+  font-family: Arial, sans-serif !important;
+  --tw-gradient-from: #000 !important;
+  --tw-gradient-to: #000 !important;
+  --tw-gradient-stops: #000 !important;
+  background-image: none !important;
 }
 
-.high-contrast a, 
-.high-contrast button, 
-.high-contrast input, 
-.high-contrast select, 
-.high-contrast textarea, 
-.high-contrast .btn, 
-.high-contrast .menu-btn, 
-.high-contrast .card, 
-.high-contrast .panel, 
+/* Tous les éléments avec une classe de fond ou de bordure */
+body.high-contrast [class*="bg-"],
+body.high-contrast [class*="hover:bg-"],
+body.high-contrast [class*="border-"],
+body.high-contrast [class^="border-"],
+body.high-contrast [class*="border"],
+body.high-contrast [class*="border-cyan"],
+body.high-contrast [class*="border-white"],
+body.high-contrast [class*="border-black"] {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* Liens, boutons, inputs, etc. */
+.high-contrast a,
+.high-contrast button,
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea,
+.high-contrast .btn,
+.high-contrast .menu-btn,
+.high-contrast .card,
+.high-contrast .panel,
 .high-contrast .dashboard-panel {
   color: #fff !important;
   background-color: #111 !important;
@@ -39,6 +60,7 @@ body.high-contrast, .high-contrast * {
   box-shadow: none !important;
 }
 
+/* Boutons spécifiques */
 body.high-contrast button,
 body.high-contrast .btn,
 body.high-contrast .menu-btn {
@@ -51,43 +73,21 @@ body.high-contrast .menu-btn {
   transition: none !important;
 }
 
-body.high-contrast [class*="bg-"],
-body.high-contrast [class*="hover:bg-"] {
-  background: #000 !important;
-  color: #fff !important;
-  border-color: #fff !important;
-}
-
-body.high-contrast [class*="border-"] {
-  border-color: #fff !important;
-}
-
+/* Placeholder */
 .high-contrast input::placeholder,
 .high-contrast textarea::placeholder {
   color: #fff !important;
   opacity: 1 !important;
 }
 
-body.high-contrast [class*="border-"],
-body.high-contrast [class^="border-"],
-body.high-contrast [class*="border"],
-body.high-contrast [class*="border-cyan"],
-body.high-contrast [class*="border-white"],
-body.high-contrast [class*="border-black"] {
-  border-color: #fff !important;
-  box-shadow: none !important;
-}
-
+/* Scrollbars */
 body.high-contrast ::-webkit-scrollbar {
   background: #000 !important;
 }
-/*  barre de défilement */
 body.high-contrast ::-webkit-scrollbar-thumb {
   background: #fff !important;
   border-radius: 8px !important;
 }
-
-/* Firefox barre de défilement*/
 body.high-contrast {
   scrollbar-color: #fff #000 !important;
   scrollbar-width: thin !important;
@@ -135,36 +135,6 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 12px #38bdf8;
 }
 
-button, .btn, .menu-btn {
-  border-radius: 10px;
-  border: 1px solid #38bdf8;
-  background: linear-gradient(90deg, #0f2027 0%, #38bdf8 100%);
-  color: #e0f7fa;
-  font-weight: 700;
-  padding: 0.7em 1.5em;
-  font-size: 1em;
-  cursor: pointer;
-  box-shadow: 0 2px 8px #0ea5e955;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-button:hover, .btn:hover, .menu-btn:hover {
-  background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%);
-  color: #232526;
-  border-color: #67e8f9;
-  box-shadow: 0 4px 16px #38bdf8aa;
-  transform: translateY(-2px) scale(1.04);
-}
-
-.card, .panel, .dashboard-panel {
-  background: rgba(255,255,255,0.07);
-  border: 1.5px solid #38bdf8;
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 32px 0 #38bdf855;
-  backdrop-filter: blur(8px);
-  padding: 2em;
-  margin: 2em auto;
-  color: #e0f7fa;
-}
 
 ::-webkit-scrollbar {
   width: 8px;

@@ -3,46 +3,46 @@ import { navigateTo, escapeHTML, showPopup } from "../main";
 
 export function dashboardView(): string {
   return `
-    <div class="w-full min-h-screen px-8 md:px-32 bg-gradient-to-br from-[#232526] via-[#0f2027] to-[#2c5364] py-10">
+    <div class="dashboard-bg">
       <div class="w-full flex flex-col items-center mb-10">
-        <div class="w-full max-w-[1800px] bg-cyan-900/40 rounded-2xl shadow-xl border border-cyan-400/30 px-10 py-6 flex flex-col items-center" id="profile-info"></div>
+        <div class="w-full max-w-[1800px] class="card-main px-10 py-6 flex flex-col items-center"" id="profile-info"></div>
       </div>
       <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
-        <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 max-h-[600px] overflow-y-auto">
+        <div class="card-section max-h-[600px] overflow-y-auto">
 
-          <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.last_matches")}</h3>
+          <h3 class="h3-dashboard">${t("dashboard.last_matches")}</h3>
           <ul id="match-list" class="space-y-3"></ul>
           
         </div>
-        <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 flex flex-col">
+        <div class="card-section flex flex-col">
 
-          <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.global_stats")}</h3>
+          <h3 class="h3-dashboard">${t("dashboard.global_stats")}</h3>
           <div id="stats"></div>
 
         </div>
       </div>
       <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
-        <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 max-h-[600px] overflow-y-auto">
-          <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.last_matches")}</h3>
+        <div class="card-section max-h-[600px] overflow-y-auto">
+          <h3 class="h3-dashboard">${t("dashboard.last_matches")}</h3>
           <ul id="match-clicker-list" class="space-y-3"></ul>
         </div>
-        <div class="flex-1 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 flex flex-col">
-          <h3 class="text-xl font-bold text-cyan-200 mb-4 text-center">${t("dashboard.global_stats")}</h3>
+        <div class="card-section flex flex-col">
+          <h3 class="h3-dashboard">${t("dashboard.global_stats")}</h3>
           <div id="stats-clicker"></div>
         </div>
       </div>
 
-      <div class="w-full max-w-[1800px] mx-auto mt-10 bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-6">
+      <div class="gdpr-section">
         <h3 class="text-xl font-bold text-cyan-200 mb-4">${t("dashboard.gdpr_title") || "Vie privée & GDPR"}</h3>
         <div class="flex flex-col md:flex-row gap-4">
-          <button id="gdpr-anonymize" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition">${t("dashboard.gdpr_anonymize") || "Anonymiser mes données"}</button>
-          <button id="gdpr-export" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">${t("dashboard.gdpr_export") || "Exporter mes données"}</button>
-          <button id="gdpr-delete" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">${t("dashboard.gdpr_delete") || "Supprimer mon compte"}</button>
+          <button id="gdpr-anonymize" class=" grpd-main">${t("dashboard.gdpr_anonymize") || "Anonymiser mes données"}</button>
+          <button id="gdpr-export" class=" grpd-main">${t("dashboard.gdpr_export") || "Exporter mes données"}</button>
+          <button id="gdpr-delete" class=" grpd-main">${t("dashboard.gdpr_delete") || "Supprimer mon compte"}</button>
           <a href="/privacy" class="text-cyan-400 underline self-center">${t("dashboard.gdpr_policy") || "Politique de confidentialité"}</a>
         </div>
         <div id="gdpr-message" class="mt-4 text-center"></div>
       </div>
-      <a href="/" class="text-cyan-400 underline mt-8 inline-block">${t("dashboard.back_home")}</a>
+      <a href="/" class="link-main mt-8 inline-block">${t("dashboard.back_home")}</a>
     </div>
   `;
 }
@@ -132,7 +132,7 @@ export function attachDashboardViewEvents() {
       const info = document.getElementById("profile-info");
       if (info) {
         info.innerHTML = `
-          <img src="${user.avatar || "/uploads/default-avatar.png"}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />
+          <img src="${user.avatar || "/uploads/default-avatar.png"}" alt="Avatar" class="avatar-profile" />
           <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-2">${escapeHTML(user.login)}</h2>
           <div class="flex gap-6 text-cyan-100 text-lg">
             <span><b>${t("dashboard.alias")} :</b> ${escapeHTML(user.alias) || `<span class="italic text-cyan-400">${t("dashboard.none")}</span>`}</span>

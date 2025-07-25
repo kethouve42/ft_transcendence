@@ -46,15 +46,15 @@ export function navbarView(): string {
           </button>
           <div
             id="accessibility-menu"
-            class="absolute right-0 mt-2 w-56 bg-cyan-900 border border-cyan-400 rounded shadow-lg z-50 hidden flex-col"
+            class="dropdown-menu hidden"
             role="menu"
             aria-label="Accessibilité"
           >
             <button type="button" onclick="toggleContrast()" class="text-left px-4 py-2 hover:bg-cyan-800 w-full">${t("nav.Contraste")}</button>
             <div class="flex gap-2 px-4 py-2 items-center">
               <span class="text-cyan-200">${t("nav.tailleTexte")}</span>
-              <button type="button" onclick="changeFontSize(2)" aria-label="Augmenter la taille du texte" class="bg-cyan-700 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded transition">A+</button>
-              <button type="button" onclick="changeFontSize(-2)" aria-label="Diminuer la taille du texte" class="bg-cyan-700 hover:bg-cyan-500 text-white font-bold px-2 py-1 rounded transition">A-</button>
+              <button type="button" onclick="changeFontSize(2)" aria-label="Augmenter la taille du texte" class="btn-access">A+</button>
+              <button type="button" onclick="changeFontSize(-2)" aria-label="Diminuer la taille du texte" class="btn-access">A-</button>
             </div>
           </div>
         </div>
@@ -62,7 +62,7 @@ export function navbarView(): string {
           isLogged
             ? `
               <a href="/dashboard" class="flex items-center gap-2 font-semibold text-cyan-200 hover:text-cyan-400 transition">
-                <span class="inline-block w-9 h-9 rounded-full bg-cyan-900 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg overflow-hidden">
+                <span class="avatar-circle">
                 <img
                   src="${userAvatar && userAvatar.trim() !== '' ? userAvatar : '/uploads/default-avatar.png'}"
                   alt="avatar"
@@ -71,7 +71,7 @@ export function navbarView(): string {
                 </span>
                 <span class="uppercase tracking-wider">${escapeHTML(userAlias || userLogin || "Profil")}</span>
               </a>
-              <button id="logout-btn" class="bg-cyan-700/80 text-white border border-cyan-400 px-5 py-2 rounded-full font-semibold shadow-cyan-400/30 shadow-md hover:bg-cyan-500/80 hover:text-black transition">
+              <button id="logout-btn" class="btn-main px-5 py-2 rounded-full">
                 ${t("nav.logout")}
               </button>
             `

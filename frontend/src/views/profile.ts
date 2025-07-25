@@ -4,7 +4,7 @@ import { escapeHTML } from "../main"
 export function profileView(userId: string | number): string {
   return `
     <div class="w-full min-h-screen px-8 md:px-32">
-      <div class="w-full max-w-3xl mx-auto bg-cyan-900/60 border-2 border-cyan-400/30 rounded-2xl shadow-2xl p-10 backdrop-blur-md mt-16">
+      <div class="card-profile">
         <div id="profile-content">${t("profile.loading")}</div>
         <div id="profile-action-msg" class="mt-4 text-cyan-200"></div>
       </div>
@@ -18,7 +18,7 @@ export function attachProfileEvents(userId: string | number) {
   const currentUserId = localStorage.getItem("userId");
 
   if (!content) return;
-
+  console.log(`Loading profile for user ID: ${userId}`);
   fetch("/api/users/${userId}", {
       headers: { "Accept-Language": localStorage.getItem("lang") || "fr"}
   })
@@ -65,7 +65,7 @@ function checkFriendStatus(profileId: number, currentUserId: string | null, cont
       if (!actionsDiv) return;
       if (isFriend) {
         actionsDiv.innerHTML = `
-          <button id="remove-friend-btn" class="bg-red-600 hover:bg-red-400 text-white px-4 py-2 rounded-lg shadow transition">
+          <button id="remove-friend-btn" class="btn-danger px-4 py-2">
             ${t("profile.remove_friend")}
           </button>
         `;
@@ -84,7 +84,7 @@ function checkFriendStatus(profileId: number, currentUserId: string | null, cont
             });
             if (res.ok) {
               actionsDiv.innerHTML = `
-                <button id="add-friend-btn" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-2 rounded-lg shadow transition">
+                <button id="add-friend-btn" class="btn-main px-4 py-2">
                   ${t("profile.add_friend")}
                 </button>
               `;
@@ -97,7 +97,7 @@ function checkFriendStatus(profileId: number, currentUserId: string | null, cont
         }
       } else {
         actionsDiv.innerHTML = `
-          <button id="add-friend-btn" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-2 rounded-lg shadow transition">
+          <button id="add-friend-btn" class="btn-main px-4 py-2">
             ${t("profile.add_friend")}
           </button>
         `;
@@ -118,7 +118,7 @@ function attachAddFriendBtn(profileId: number, currentUserId: string, actionsDiv
       });
       if (res.ok) {
         actionsDiv.innerHTML = `
-          <button id="remove-friend-btn" class="bg-red-600 hover:bg-red-400 text-white px-4 py-2 rounded-lg shadow transition">
+          <button id="remove-friend-btn" class="btn-danger px-4 py-2">
             ${t("profile.remove_friend")}
           </button>
         `;
@@ -134,7 +134,7 @@ function attachAddFriendBtn(profileId: number, currentUserId: string, actionsDiv
             });
             if (res.ok) {
               actionsDiv.innerHTML = `
-                <button id="add-friend-btn" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-2 rounded-lg shadow transition">
+                <button id="add-friend-btn" class="btn-main px-4 py-2">
                   ${t("profile.add_friend")}
                 </button>
               `;

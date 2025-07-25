@@ -3,22 +3,22 @@ import { t } from "../i18n";
 
 export function loginPlayer2View(): string {
   return `
-    <div class="max-w-md mx-auto mt-12 bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 backdrop-blur-md">
-      <h2 class="text-2xl font-bold mb-6 text-cyan-300 tracking-widest uppercase">Login Player 2</h2>
+    <div class="card-auth">
+      <h2 class="title-auth">Login Player 2</h2>
       <form id="login-player2-form" class="flex flex-col gap-6">
         <input
           type="text"
           name="login"
           placeholder="${t("login.username")}"
           required
-          class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
+          class="input-main"
         />
         <input
           type="password"
           name="password"
           placeholder="${t("login.password")}"
           required
-          class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
+          class="input-main"
         />
         <div id="2fa-field-player2" style="display:none;">
           <input
@@ -26,20 +26,20 @@ export function loginPlayer2View(): string {
             name="code2fa"
             placeholder="${t("login.code2fa")}"
             maxlength="6"
-            class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow mt-2"
+            class="input-main mt-2"
           />
         </div>
         <div class="flex justify-between items-center">
-          <a id="forgot-password" class="text-cyan-400 hover:text-cyan-200 underline" aria-label="${t("login.forgot_password")}"> ${t("login.forgot_password")} </a>
+          <a id="forgot-password" class="link-main mt-4 inline-block" aria-label="${t("login.forgot_password")}"> ${t("login.forgot_password")} </a>
         </div>
         <button
           type="submit"
-          class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition"
+          class="btn-main"
         >
           ${t("login.submit")}
         </button>
         <div id="login-player2-message" class="text-red-400"></div>
-        <a href="/registerRedirect?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}" class="text-cyan-400 underline mt-4 inline-block">${t("login.register")}</a>
+        <a href="/registerRedirect?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}" class="link-main mt-4 inline-block">${t("login.register")}</a>
         </form>
     </div>
   `;
@@ -152,11 +152,11 @@ export function forgotPasswordPopup() {
   modal.innerHTML = `
   <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true" aria-label="${t("dashboard.confirmation")}">
   <p class="text-cyan-200 mb-6">${t("login.forgot_password_desc")}</p>
-  <input type="email" id="forgot-email" placeholder="${t("login.email")}" class="bg-cyan-800 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow mb-4 w-full" required>
+  <input type="email" id="forgot-email" placeholder="${t("login.email")}" class="input-main mb-4 w-full" required>
   <div id="forgot-message" class="text-red-400"></div>
   <div class="flex gap-4">
-  <button id="confirm-yes" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold">${t("all.yes")}</button>
-  <button id="confirm-no" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded font-bold">${t("all.no")}</button>
+  <button id="confirm-yes" class="btn-success">${t("all.yes")}</button>
+  <button id="confirm-no" class="btn-danger">${t("all.no")}</button>
   </div>
   </div>
   `;

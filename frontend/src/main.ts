@@ -59,6 +59,8 @@ function render(route: string) {
   const app = document.getElementById("app");
   if (!app) return;
 
+  const allowedPrefixes = ["/resetPassword/", "/mailConfirm/"];
+
     const protectedRoutes = [
     "/dashboard",
     "/clicker",
@@ -89,7 +91,11 @@ function render(route: string) {
     return;
   }
 
-  const handler = routes[route] || (() => {navigateTo("/error"); return "";});
+  const isAllowed = allowedPrefixes.some(prefix => route.startsWith(prefix));
+  const handler = routes[route] || (isAllowed
+    ? () => ""
+    : () => {navigateTo("/error"); return "";}
+  );
   Promise.resolve(handler()).then(html => {
     app.innerHTML += html;
     attachEvents(route);

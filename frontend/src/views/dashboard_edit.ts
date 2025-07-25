@@ -3,30 +3,30 @@ import { t } from "../i18n";
 
 export function dashboardEditView(): string {
   return `
-    <div class="w-full min-h-screen px-8 md:px-32 bg-gradient-to-br from-[#232526] via-[#0f2027] to-[#2c5364] py-10">
-      <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-8 items-center ">${t("dashboard.edit_profile")}</h2>
+    <div class="dashboard-bg">
+      <h2 class="title-dashboard items-center ">${t("dashboard.edit_profile")}</h2>
       <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
         <div class="flex-[2] bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 flex flex-col">
           <form id="edit-profile-form" class="flex flex-col gap-6">
           <div class="mb-6">
-          <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.login")}</label>
-          <input name="login" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" required />
+          <label class="dashboard-label">${t("dashboard.login")}</label>
+          <input name="login" class="input-main w-full" required />
           </div>
           <div class="mb-6">
-          <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.email")}</label>
-          <input name="email" type="email" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" required />
+          <label class="dashboard-label">${t("dashboard.email")}</label>
+          <input name="email" type="email" class="input-main w-full" required />
           </div>
           <div class="mb-6">
-          <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.alias")}</label>
-          <input name="alias" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" />
+          <label class="dashboard-label">${t("dashboard.alias")}</label>
+          <input name="alias" class="input-main w-full" />
           </div>
           <input type="hidden" name="avatar">
           <div class="mb-6">
-          <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.avatar")}</label>
+          <label class="dashboard-label">${t("dashboard.avatar")}</label>
           <input type="file" id="avatar-upload" accept="image/*" class="mt-2" />
           <img id="avatar-preview" src="" alt="${t("dashboard.avatar_preview")}" class="mt-2 w-20 h-20 rounded-full border border-cyan-400" style="display:none;" />
           </div>
-          <button type="submit" class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition">${t("dashboard.save")}</button>
+          <button type="submit" class="btn-main">${t("dashboard.save")}</button>
           <div id="edit-profile-message" class="mt-4 text-cyan-200"></div>
           </form>
         </div>
@@ -35,27 +35,27 @@ export function dashboardEditView(): string {
             <div id="profile-info"></div>
           </div>
           <div class="mb-6">
-          <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.2fa")}</label>
+          <label class="dashboard-label">${t("dashboard.2fa")}</label>
           <div id="2fa-section" class="flex items-center gap-4">
           <span id="2fa-status" class="text-cyan-300">${t("dashboard.loading")}</span>
           <button id="2fa-toggle-btn" type="button" class="bg-cyan-600 hover:bg-cyan-400 text-white px-4 py-1 rounded-lg shadow transition">...</button>
           </div>
         </div>
-        <label class="block font-semibold mb-1 text-cyan-200">${t("dashboard.mdpModif")}</label>
+        <label class="dashboard-label">${t("dashboard.mdpModif")}</label>
         <form id="new-mdp" class="flex flex-col gap-2 p-0">
           <div class="mb-1">
-            <label class="block font-semibold mb-1 text-cyan-300">${t("dashboard.mdp")}</label>
-            <input name="mdp" type="password" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-1 py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" required />
+            <label class="label-form-blue">${t("dashboard.mdp")}</label>
+            <input name="mdp" type="password" class="input-small w-full" required />
           </div>
           <div class="mb-1">
-            <label class="block font-semibold mb-1 text-cyan-300">${t("dashboard.new_Mdp")}</label>
-            <input name="newMdp" type="password" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-1 py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" required />
+            <label class="label-form-blue">${t("dashboard.new_Mdp")}</label>
+            <input name="newMdp" type="password" class="input-small w-full" required />
           </div>
           <div class="mb-1">
-            <label class="block font-semibold mb-1 text-cyan-300">${t("dashboard.confirm_mdp")}</label>
-            <input name="newMdp2" type="password" class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-1 py-1 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow" />
+            <label class="label-form-blue">${t("dashboard.confirm_mdp")}</label>
+            <input name="newMdp2" type="password" class="input-small w-full" />
           </div>
-          <button type="submit" class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-2 py-1 rounded shadow-cyan-400/30 shadow transition">${t("dashboard.save")}</button>
+          <button type="submit" class="btn-main px-2 py-1">${t("dashboard.save")}</button>
           <div id="new-mdp" class="mt-1 text-cyan-200"></div>
         </form>
         </div>
@@ -191,7 +191,7 @@ fetch("/api/users/me", {
           if (user.avatar)
             info.innerHTML = `
             <div class="relative">
-              <img src="${user.avatar}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />
+              <img src="${user.avatar}" alt="Avatar" class="avatar-profile" />
               <button
                 id="avatar-delete"
                 type="button"
@@ -204,7 +204,7 @@ fetch("/api/users/me", {
             </div>
             `;
           else
-            info.innerHTML = `<img src="${"/uploads/default-avatar.png"}" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-cyan-400 shadow-lg mb-4 object-cover" />`;
+            info.innerHTML = `<img src="${"/uploads/default-avatar.png"}" alt="Avatar" class="avatar-profile" />`;
           const deleteAvatar = document.getElementById("avatar-delete");
           if (deleteAvatar)
           {

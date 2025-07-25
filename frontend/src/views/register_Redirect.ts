@@ -3,34 +3,34 @@ import { t } from "../i18n";
 
 export function registerRedirectView(): string {
   return `
-    <div class="w-full min-h-[50vh] px-8 md:px-32 flex items-center justify-center pt-8">
-      <div class="w-full max-w-xl mx-auto bg-cyan-900/60 border-2 border-cyan-400/30 rounded-2xl shadow-2xl p-10 backdrop-blur-md">
-        <h2 class="text-3xl font-extrabold text-cyan-300 mb-8 text-center uppercase tracking-widest">${t("register.title")}</h2>
+    <div class="register-container">
+      <div class="card-main w-full max-w-xl mx-auto">
+        <h2 class="title-dashboard text-center">${t("register.title")}</h2>
         <form id="register-form" class="flex flex-col gap-6">
           <input
             type="text"
             name="login"
             placeholder="${t("register.login")}"
             required
-            class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
+            class="input-main w-full"
           />
           <input
             type="email"
             name="email"
             placeholder="${t("register.email")}"
             required
-            class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
+            class="input-main w-full"
           />
           <input
             type="password"
             name="password"
             placeholder="${t("register.password")}"
             required
-            class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
+            class="input-main w-full"
           />
           <button
             type="submit"
-            class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition w-full"
+            class="btn-main w-full"
           >
             ${t("register.submit")}
           </button>

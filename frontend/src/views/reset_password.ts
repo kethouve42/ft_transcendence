@@ -3,19 +3,19 @@ import { t } from "../i18n";
 
 export function resetPasswordView(): string {
     return `
-        <div class="max-w-md mx-auto mt-12 bg-white/10 border border-cyan-400/20 rounded-2xl shadow-lg p-8 backdrop-blur-md">
-        <h2 class="text-2xl font-bold mb-6 text-cyan-300 tracking-widest uppercase">${t("reset_password.title")}</h2>
+        <div class="card-auth">
+        <h2 class="title-auth">${t("reset_password.title")}</h2>
         <form id="reset-password-form" class="flex flex-col gap-6">
             <input
             type="password"
             name="password"
             placeholder="${t("reset_password.password_placeholder")}"
             required
-            class="bg-cyan-900/40 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-cyan-400/20 shadow"
+            class="input-main"
             />
             <button
             type="submit"
-            class="bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition"
+            class="btn-main"
             >
             ${t("reset_password.submit")}
             </button>
