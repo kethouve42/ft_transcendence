@@ -19,7 +19,7 @@ export function attachProfileEvents(userId: string | number) {
 
   if (!content) return;
   console.log(`Loading profile for user ID: ${userId}`);
-  fetch("/api/users/${userId}", {
+  fetch(`/api/users/${userId}`, {
       headers: { "Accept-Language": localStorage.getItem("lang") || "fr"}
   })
     .then(res => res.json())
@@ -33,7 +33,7 @@ export function attachProfileEvents(userId: string | number) {
 
       content.innerHTML = `
         <div class="flex items-center gap-6 mb-8">
-          <span class="avatar-circle relative">
+          <span class="avatar-profile relative">
             <img src="${user.avatar || "/uploads/default-avatar.png"}" alt="avatar" class="avatar-medium" />
             ${isOnline ? `
               <span class="absolute bottom-1 right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center text-xs font-bold text-white shadow" title="${t("profile.online")}">●</span>
@@ -55,7 +55,7 @@ export function attachProfileEvents(userId: string | number) {
 
 function checkFriendStatus(profileId: number, currentUserId: string | null, content: HTMLElement, actionMsg: HTMLElement | null) {
   if (!currentUserId) return;
-  fetch("/api/friends/me/friends", {
+  fetch('/api/friends/me/friends', {
     headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${localStorage.getItem("token")}` }
   })
     .then(res => res.json())

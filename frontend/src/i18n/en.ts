@@ -140,6 +140,17 @@ export default {
     mdp: "Old password",
     new_Mdp: "New password",
     confirm_mdp: "Confirm password",
+    pong_stats: "Pong Statistics",
+    clicker_stats: "Clicker Statistics",
+    timerMatches: "Timer Matches",
+    chronoMatches: "score Matches",
+    no_clicker_match: "No Clicker match found.",
+    no_pong_match: "No Pong match found.",
+    no_clicker_stats: "No Clicker statistics found.",
+    no_pong_stats: "No Pong statistics found.",
+    last_matches_clicker: "Last 10 Clicker matches",
+    game_mode: "Game mode",
+
   },
   friends: {
     friends: "Friends",

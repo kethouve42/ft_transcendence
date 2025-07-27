@@ -16,18 +16,19 @@ export function dashboardView(): string {
         </div>
         <div class="card-section flex flex-col">
 
-          <h3 class="h3-dashboard">${t("dashboard.global_stats")}</h3>
+          <h3 class="h3-dashboard">${t("dashboard.pong_stats")}</h3>
           <div id="stats"></div>
 
         </div>
       </div>
+      </br>
       <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
         <div class="card-section max-h-[600px] overflow-y-auto">
-          <h3 class="h3-dashboard">${t("dashboard.last_matches")}</h3>
+          <h3 class="h3-dashboard">${t("dashboard.last_matches_clicker")}</h3>
           <ul id="match-clicker-list" class="space-y-3"></ul>
         </div>
         <div class="card-section flex flex-col">
-          <h3 class="h3-dashboard">${t("dashboard.global_stats")}</h3>
+          <h3 class="h3-dashboard">${t("dashboard.clicker_stats")}</h3>
           <div id="stats-clicker"></div>
         </div>
       </div>
@@ -162,7 +163,7 @@ export function attachDashboardViewEvents() {
           const list = document.getElementById("match-list");
           if (!list) return;
           if (!Array.isArray(matches) || matches.length === 0) {
-            list.innerHTML = `<li class="text-cyan-400 text-center">${t("dashboard.no_match")}</li>`;
+            list.innerHTML = `<li class="text-cyan-400 text-center">${t("dashboard.no_pong_match")}</li>`;
             return;
           }
           list.innerHTML = matches.slice(0, 10).map((match: any) => `
@@ -192,7 +193,7 @@ export function attachDashboardViewEvents() {
         .then((userStats: any) => {
           const statsDiv = document.getElementById("stats");
           if (!statsDiv || !userStats) {
-            if (statsDiv) statsDiv.innerHTML = `<p class="text-cyan-200 text-center">${t("dashboard.loading")}</p>`;
+            if (statsDiv) statsDiv.innerHTML = `<p class="text-cyan-200 text-center">${t("dashboard.no_pong_stats")}</p>`;
             return;
           }
           statsDiv.innerHTML = `
@@ -226,6 +227,93 @@ export function attachDashboardViewEvents() {
                   <div><b>${t("dashboard.losses")} :</b> ${userStats.vsPlayer?.losses ?? "?"}</div>
                   <div><b>${t("dashboard.winrate")} :</b> ${userStats.vsPlayer?.winRate ?? "?"}%</div>
                   <div class="col-span-2"><b>${t("dashboard.time_multi")} :</b> ${userStats.vsPlayer?.totalMultiTime ? Math.round(userStats.vsPlayer.totalMultiTime / 60) : "?"} min</div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      // 5. Récupère les matchs du clicker
+      fetch(`/api/clicker/user/me`, {
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then((matches: any[]) => {
+          const list = document.getElementById("match-clicker-list");
+          if (!list) return;
+          if (!Array.isArray(matches) || matches.length === 0) {
+            list.innerHTML = `<li class="text-cyan-400 text-center">${t("dashboard.no_clicker_match")}</li>`;
+            return;
+          }
+          list.innerHTML = matches.slice(0, 10).map((match: any) => {
+            if (match.game_mode == "timer") 
+              return`
+                <li class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-cyan-300">${new Date(match.date).toLocaleDateString()}</span>
+                    <span class="text-xs text-cyan-400">${match.target}s</span>
+                  </div>
+                  <div>
+                  
+                    <b>${t("dashboard.players")} :</b> ${renderUser(match.user1_id, userMap)} vs ${renderUser(match.user2_id, userMap)}
+                  </div>
+                  <div>
+                    <b>${t("dashboard.score")} :</b> user 1: ${match.user1_score} vs user 2: ${match.user2_score}
+                  </div>
+                  <div>
+                    <b>${t("dashboard.winner")} :</b> ${renderUser(match.winner_id, userMap)}
+                  </div>
+                  <div>
+                    <b>${t("dashboard.game_mode")} :</b> ${match.game_mode}
+                  </div>
+                </li>
+              `
+            else
+              return`
+              <li class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-cyan-300">${new Date(match.date).toLocaleDateString()}</span>
+                </div>
+                <div>
+                
+                  <b>${t("dashboard.players")} :</b> ${renderUser(match.user1_id, userMap)} vs ${renderUser(match.user2_id, userMap)}
+                </div>
+                <div>
+                  <b>${t("dashboard.score")} :</b> user 1: ${match.user1_score} / ${match.target} vs user 2: ${match.user2_score} / ${match.target}
+                </div>
+                <div>
+                  <b>${t("dashboard.winner")} :</b> ${renderUser(match.winner_id, userMap)}
+                </div>
+                <div>
+                  <b>${t("dashboard.game_mode")} :</b> ${match.game_mode}
+                </div>
+              </li>
+            `
+          }
+          ).join("");
+        });
+      // 6. Récupère les stats du clicker
+      fetch(`/api/clicker/user/me/stats`, {
+        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then((userStats: any) => {
+          const statsDiv = document.getElementById("stats-clicker");
+          if (!statsDiv || !userStats) {
+            if (statsDiv) statsDiv.innerHTML = `<p class="text-cyan-200 text-center">${t("dashboard.no_clicker_stats")}</p>`;
+            return;
+          }
+          console.log(userStats);
+          statsDiv.innerHTML = `
+            <div class="flex flex-col gap-6">
+              <div class="bg-cyan-800/60 rounded-lg p-4 shadow">
+                <h4 class="font-semibold text-cyan-300 mb-2">${t("dashboard.global")}</h4>
+                <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
+                  <div><b>${t("dashboard.matches")} :</b> ${userStats.totalMatches ?? "?"}</div>
+                  <div><b>${t("dashboard.wins")} :</b> ${userStats.wins ?? "?"}</div>
+                  <div><b>${t("dashboard.losses")} :</b> ${userStats.losses ?? "?"}</div>
+                  <div><b>${t("dashboard.winrate")} :</b> ${userStats.winRate ?? "?"}%</div>
+                  <div><b>${t("dashboard.timerMatches")} :</b> ${userStats.timerMatches ?? "?"}</div>
+                  <div><b>${t("dashboard.chronoMatches")} :</b> ${userStats.chronoMatches ?? "?"}</div>
                 </div>
               </div>
             </div>
