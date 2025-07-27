@@ -14,21 +14,23 @@ export function mailConfirmView(): string {
 }
 
 export async function mailConfirmEvents() {
-    const emailConfirm = document.getElementById("emailConfirm");
-    const msg = document.getElementById("emailConfirm-message");
-    if (!emailConfirm) return;
+    const msg = document.getElementById("reset-password-message");
+    const token = getRedirectUrl();
+    if (!token) {
+        msg!.textContent = t("emailConfirm.error_message");
+        return;
+    }
     try {
-        const response = await fetch("/api/reset_password", {
-            method: "POST",
+        const response = await fetch(`/api/users/verify-email?token=${encodeURIComponent(token)}`, {
+            method: "GET",
             headers: {
-                "Accept-Language": localStorage.getItem("lang") || "fr",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token: getRedirectUrl()}),
+                "Accept-Language": localStorage.getItem("lang") || "fr"
+            }
         });
 
+        const data = await response.json();
         if (!response.ok) {
-            throw new Error(await response.text());
+            throw new Error(data.error || t("emailConfirm.error_message"));
         }
 
         msg!.textContent = t("emailConfirm.success_message");

@@ -31,7 +31,7 @@ const routes: Record<string, RouteHandler> = {
   "/loginTournament" : loginTournamentView,
   "/reset-password" : resetPasswordView,
   "/registerRedirect": registerRedirectView,
-  "/mailConfirm": mailConfirmView,
+  "/verify-email": mailConfirmView,
 };
 
 function pingUser() {
@@ -58,7 +58,7 @@ function render(route: string) {
   const app = document.getElementById("app");
   if (!app) return;
 
-  const allowedPrefixes = ["/reset-password/", "/mailConfirm/"];
+  const allowedPrefixes = ["/reset-password/", "/verify-email/"];
 
     const protectedRoutes = [
     "/dashboard",
@@ -74,7 +74,7 @@ function render(route: string) {
   const protectedRoutes_lr = [
     "/login",
     "/reset-password",
-    "/mailConfirm",
+    "/verify-email",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");
@@ -115,7 +115,7 @@ function attachEvents(route: string) {
   if (route === "/loginTournament") attachLoginTournamentEvents()
   if (route === "/reset-password") resetPasswordEvents()
   if (route === "/registerRedirect") attachRegisterRedirectEvents();
-  if (route === "/mailConfirm") mailConfirmEvents();
+  if (route === "/verify-email") mailConfirmEvents();
 }
 
 export function attachLinkHandlers() {
