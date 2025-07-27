@@ -40,6 +40,7 @@ export default {
     error_email_required: "Email is required.",
     forgot_password_success: "An email has been sent.",
     email: "Email",
+    email_not_verified_bouton: "resend verification email",
   },
   register: {
     title: "Inscription",

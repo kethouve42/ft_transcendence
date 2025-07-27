@@ -213,8 +213,8 @@ export default async function userRoutes(app: FastifyInstance)
 			if (!user)
         		return reply.status(401).send({ error: i18next.t("email_or_password_incorrect") });
 
-			/*if (user.email_verified == 0)
-				return reply.status(401).send({ error: i18next.t("email_not_verified"), step: "email_not_verified" });*/
+			if (user.email_verified == 0)
+				return reply.status(401).send({ error: i18next.t("email_not_verified"), step: "email_not_verified" });
 
 			const validPassword = await bcrypt.compare(password, user.password);
 			if (!validPassword || (user.email !== identifier && user.login !== identifier))

@@ -50,7 +50,7 @@ export function loginView(): string {
           ${t("login.submit")}
         </button>
         <div id="email_not_verified" style="display:none;">
-          <a id="email_not_verified_bouton" class="link-main mt-4 inline-block" aria-label="${t("email_not_verified_bouton")}"> ${t("login.forgot_password_bouton")} </a>
+          <a id="email_not_verified_bouton" class="link-main mt-4 inline-block" aria-label="${t("email_not_verified_bouton")}"> ${t("login.email_not_verified_bouton")} </a>
         </div>
         <div id="login-message" class="text-red-400"></div>
       </form>
@@ -240,6 +240,8 @@ export function emailNotVerfiedPopup() {
         }
         msgForgot!.textContent = t("login.forgot_password_success");
         setTimeout(() => {
+          const emailNotVerfied = document.getElementById("email_not_verified");
+          if (emailNotVerfied) emailNotVerfied.style.display = "none";
           modal.remove();
         }, 1000);
       } catch (err: any) {
