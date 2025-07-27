@@ -28,7 +28,6 @@ body.high-contrast, .high-contrast * {
   background-image: none !important;
 }
 
-/* Tous les éléments avec une classe de fond ou de bordure */
 body.high-contrast [class*="bg-"],
 body.high-contrast [class*="hover:bg-"],
 body.high-contrast [class*="border-"],
@@ -43,7 +42,6 @@ body.high-contrast [class*="border-black"] {
   box-shadow: none !important;
 }
 
-/* Liens, boutons, inputs, etc. */
 .high-contrast a,
 .high-contrast button,
 .high-contrast input,
@@ -60,7 +58,6 @@ body.high-contrast [class*="border-black"] {
   box-shadow: none !important;
 }
 
-/* Boutons spécifiques */
 body.high-contrast button,
 body.high-contrast .btn,
 body.high-contrast .menu-btn {
@@ -73,14 +70,12 @@ body.high-contrast .menu-btn {
   transition: none !important;
 }
 
-/* Placeholder */
 .high-contrast input::placeholder,
 .high-contrast textarea::placeholder {
   color: #fff !important;
   opacity: 1 !important;
 }
 
-/* Scrollbars */
 body.high-contrast ::-webkit-scrollbar {
   background: #000 !important;
 }

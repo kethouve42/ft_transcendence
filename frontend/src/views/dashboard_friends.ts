@@ -54,6 +54,7 @@ export function attachDashboardFriendsEvents() {
           `).join("")}
         </ul>
       `;
+      attachLinkHandlers();
     });
 
   const form = document.getElementById("friends-search-form") as HTMLFormElement | null;

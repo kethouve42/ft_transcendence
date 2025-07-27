@@ -18,7 +18,6 @@ export function attachProfileEvents(userId: string | number) {
   const currentUserId = localStorage.getItem("userId");
 
   if (!content) return;
-  console.log(`Loading profile for user ID: ${userId}`);
   fetch(`/api/users/${userId}`, {
       headers: { "Accept-Language": localStorage.getItem("lang") || "fr"}
   })

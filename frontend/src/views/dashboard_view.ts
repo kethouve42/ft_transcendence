@@ -185,7 +185,6 @@ export function attachDashboardViewEvents() {
           `).join("");
         });
 
-      // 4. Récupère les stats de l'utilisateur connecté
       fetch(`/api/matchs/user/me/stats`, {
         headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })
@@ -232,7 +231,6 @@ export function attachDashboardViewEvents() {
             </div>
           `;
         });
-      // 5. Récupère les matchs du clicker
       fetch(`/api/clicker/user/me`, {
         headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })
@@ -291,7 +289,6 @@ export function attachDashboardViewEvents() {
           }
           ).join("");
         });
-      // 6. Récupère les stats du clicker
       fetch(`/api/clicker/user/me/stats`, {
         headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
       })
@@ -302,7 +299,6 @@ export function attachDashboardViewEvents() {
             if (statsDiv) statsDiv.innerHTML = `<p class="text-cyan-200 text-center">${t("dashboard.no_clicker_stats")}</p>`;
             return;
           }
-          console.log(userStats);
           statsDiv.innerHTML = `
             <div class="flex flex-col gap-6">
               <div class="bg-cyan-800/60 rounded-lg p-4 shadow">
@@ -321,7 +317,6 @@ export function attachDashboardViewEvents() {
         });
     })
     .catch((err) => {
-      // Gestion d'erreur globale
       const info = document.getElementById("profile-info");
       if (info) {
         info.innerHTML = `<div class="text-red-400">${t("dashboard.error_profile")} : ${err.message || err}</div>`;
@@ -337,7 +332,6 @@ export function attachDashboardViewEvents() {
     });
 }
 
-// Utilitaire pour afficher un utilisateur (alias ou login, ou IA)
 function renderUser(id: number | null, userMap: Record<number, { alias?: string; login: string }>): string {
   if (!id) return `<span class="italic text-cyan-400">${t("dashboard.ia")}</span>`;
   const user = userMap[id];

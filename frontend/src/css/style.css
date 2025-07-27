@@ -184,7 +184,6 @@
   background-color: orange;
 }
 
-/* Overlay semi-opaque */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -195,7 +194,6 @@
   z-index: 9999;
 }
 
-/* La “carte” blanche/bleue */
 .modal-card {
   background: #0e2233;
   padding: 2rem 3rem;
@@ -205,15 +203,12 @@
   max-width: 90%;
   width: 400px;
 }
-
-/* Titre */
 .modal-title {
   color: #00e6e6;
   font-size: 2rem;
   margin-bottom: 1rem;
 }
 
-/* Body du match */
 .modal-body {
   display: flex;
   align-items: center;
@@ -230,7 +225,6 @@
   color: #00e6e6;
 }
 
-/* Countdown */
 .modal-countdown {
   font-size: 2rem;
   color: #00e6e6;
@@ -246,7 +240,6 @@
   z-index: 2000;
 }
 
-/* 3. La “carte” du modal : taille max + scrolling interne */
 .score-modal-card {
   box-sizing: border-box;
   background: #111;
@@ -262,7 +255,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
-/* 4. Titre */
+
 .modal-title {
   margin: 0 0 1rem;
   text-align: center;
@@ -326,7 +319,6 @@
   z-index: 3000;
 }
 
-/* La carte du résultat */
 .result-modal-card {
   box-sizing: border-box;
   background: #111;

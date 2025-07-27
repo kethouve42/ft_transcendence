@@ -1,7 +1,6 @@
 import { t } from "../i18n";
 
 export function homeView(): string {
-  // On utilise localStorage pour garder le compteur même après refresh
   const count = Number(localStorage.getItem("homeCount") || 0);
   return `
     <div class="center-screen">

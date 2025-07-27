@@ -16,7 +16,6 @@ import { resetPasswordView, resetPasswordEvents } from "./views/reset_password"
 import { mailConfirmView, mailConfirmEvents } from "./views/mail_confirm";
 import { t } from "./i18n";
 
-// Ajoute ici toutes les routes de ton app
 type RouteHandler = (params?: any) => string | Promise<string>;
 
 const routes: Record<string, RouteHandler> = {

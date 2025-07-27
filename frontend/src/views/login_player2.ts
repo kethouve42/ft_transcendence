@@ -64,7 +64,6 @@ export function attachLoginPlayer2Events() {
     e.preventDefault();
     msg!.textContent = "";
 
-    // Si le champ 2FA est visible, on tente la connexion 2FA
     if (field2fa && field2fa.style.display !== "none") {
       const code = (form.code2fa as HTMLInputElement).value;
       const identifier = identifierFor2FA || localStorage.getItem("2fa_identifier_player2");
@@ -94,8 +93,6 @@ export function attachLoginPlayer2Events() {
       }
       return;
     }
-
-    // Sinon, tentative de connexion classique
     const login = (form.login as HTMLInputElement).value;
     const password = (form.password as HTMLInputElement).value;
 
@@ -118,14 +115,12 @@ export function attachLoginPlayer2Events() {
         return;
       }
       
-      // On bloque si c’est le même utilisateur que player 1
       const user1Id = localStorage.getItem("userId")
       if (data.UserId && data.UserId.toString() === user1Id) {
         msg!.textContent = `${t("tournament.login_page.err_2same")}`
         return
       }
 
-      // Connexion classique
       localStorage.setItem("token_player2", data.token);
       if (data.UserId)
         localStorage.setItem("userId_player2", data.UserId.toString())

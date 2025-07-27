@@ -95,7 +95,6 @@ fetch("/api/users/me", {
     status.textContent = is2FA ? t("dashboard.2fa_enabled") : t("dashboard.2fa_disabled");
     btn.textContent = is2FA ? t("dashboard.2fa_disable") : t("dashboard.2fa_enable");
 
-    // Ajout sécurisé du listener (une seule fois)
     if (!btn.dataset.listener) {
       btn.onclick = async () => {
         btn.disabled = true;

@@ -75,7 +75,6 @@ export function attachLoginEvents() {
     e.preventDefault();
     msg!.textContent = "";
 
-    // Si le champ 2FA est visible, on tente la connexion 2FA
     if (field2fa && field2fa.style.display !== "none") {
       const code = (form.code2fa as HTMLInputElement).value;
       const identifier = identifierFor2FA || localStorage.getItem("2fa_identifier");
@@ -106,7 +105,6 @@ export function attachLoginEvents() {
       return;
     }
 
-    // Sinon, tentative de connexion classique
     const login = (form.login as HTMLInputElement).value;
     const password = (form.password as HTMLInputElement).value;
     const stayConnected = (form.stayConnected as HTMLInputElement).checked;
@@ -129,7 +127,6 @@ export function attachLoginEvents() {
         msg!.textContent = data.error || t("login.error");
         return;
       }
-      // Connexion classique
       localStorage.setItem("token", data.token);
       if (data.UserId)
         localStorage.setItem("userId", data.UserId.toString())
