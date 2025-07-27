@@ -36,9 +36,9 @@ export default {
     register: "Crear una cuenta",
     stayConnected: "Mantener la sesión iniciada",
     forgot_password: "¿Olvidaste tu contraseña?",
-    forgot_password_desc: "Introduce tu correo electrónico para recibir un enlace de restablecimiento de contraseña.",
+    forgot_password_desc: "Introduce tu correo electrónico para recibir un enlace.",
     error_email_required: "El correo electrónico es obligatorio.",
-    forgot_password_success: "Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.",
+    forgot_password_success: "Se ha enviado un correo electrónico.",
     email: "Correo electrónico",
   },
   register: {
