@@ -5,7 +5,7 @@ export function dashboardEditView(): string {
   return `
     <div class="dashboard-bg">
       <h2 class="title-dashboard text-center ">${t("dashboard.edit_profile")}</h2>
-      <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
+      <div class="w-full max-w-[1800px] mx-auto flex flex-row gap-10">
         <div class="flex-[2] bg-cyan-900/30 rounded-2xl shadow-lg border border-cyan-400/20 p-4 flex flex-col">
           <form id="edit-profile-form" class="flex flex-col gap-6">
           <div class="mb-6">

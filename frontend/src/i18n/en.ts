@@ -214,11 +214,14 @@ export default {
     intro: "This application complies with the European General Data Protection Regulation (GDPR). We are committed to protecting your personal information and providing you with tools to manage your data.",
     collected: "What data is collected?",
     collected_list: [
-      "Login credentials (login, email, encrypted password)",
-      "Alias and avatar",
-      "Game statistics (scores, matches, wins, losses, play time...)",
-      "Match history and social interactions (friends, invitations...)",
-      "Local settings (language, preferences, key configuration... stored in your browser)"
+      "Login credentials (login, email, password encrypted with bcrypt)",
+      "User profile (alias, uploaded avatar)",
+      "Pong game data (scores, wins, losses, match duration, opponent type AI/player)",
+      "Clicker game data (total score, purchased upgrades: cooler, generator, coils)",
+      "Social relationships (friends list, match history between players)",
+      "2FA security (temporary codes, JWT tokens for authentication)",
+      "Password reset (temporary tokens, email verification)",
+      "Local preferences (language, game key configuration, game settings stored in your browser)"
     ],
     usage: "How is your data used?",
     usage_list: [
@@ -229,20 +232,25 @@ export default {
     ],
     rights: "What are your rights?",
     rights_list: [
-      "Access your personal data",
-      "Modify or correct your information",
-      "Anonymize your data (replace your info with anonymous values)",
-      "Export your data (download as JSON)",
-      "Permanently delete your account and all your data"
+      "Access your personal data via your profile",
+      "Modify your information (alias, avatar, email, password)",
+      "Configure 2FA security according to your preferences",
+      "View complete history of your matches and statistics",
+      "Manage your friends list and social relationships",
+      "Anonymize your data (replacement with generic values)",
+      "Export your personal data in JSON format",
+      "Permanently delete your account (all related data will be erased)"
     ],
-    rights_info: "You can exercise these rights at any time from your dashboard, in the \"Privacy & GDPR\" section.",
+    rights_info: "You can exercise these rights at any time from your user dashboard.",
     storage: "Where is your data stored?",
     storage_list: [
-      "Account and game data are stored on our secure servers (the PC where you see the site).",
-      "Local preferences (language, configuration) are stored only in your browser (localStorage)."
+      "Secure local SQLite database (accounts, games, statistics, relationships)",
+      "Avatar files uploaded in a protected server folder",
+      "Activity logs analyzed via ELK Stack (Elasticsearch, Logstash, Kibana) for monitoring",
+      "User preferences (language, keys) stored locally in your browser"
     ],
     contact: "Contact",
-    contact_info: "For any questions or requests regarding your personal data, ask to your left or right, we are here",
+    contact_info: "For any questions regarding your personal data or this privacy policy, contact the server administrator. (that's me)",
     back_home: "Back to home"
   },
   click: {

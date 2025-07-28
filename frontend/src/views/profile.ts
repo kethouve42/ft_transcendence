@@ -3,7 +3,7 @@ import { escapeHTML } from "../main"
 
 export function profileView(userId: string | number): string {
   return `
-    <div class="w-full min-h-screen px-8 md:px-32">
+    <div class="w-full min-h-screen px-32">
       <div class="card-profile">
         <div id="profile-content">${t("profile.loading")}</div>
         <div id="profile-action-msg" class="mt-4 text-cyan-200"></div>

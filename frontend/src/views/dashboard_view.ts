@@ -7,7 +7,7 @@ export function dashboardView(): string {
       <div class="w-full flex flex-col items-center mb-10">
         <div class="w-full max-w-[1800px] card-main px-10 py-6 flex flex-col items-center"" id="profile-info"></div>
       </div>
-      <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
+      <div class="w-full max-w-[1800px] mx-auto flex flex-row gap-10">
         <div class="card-section max-h-[600px] overflow-y-auto">
 
           <h3 class="h3-dashboard">${t("dashboard.last_matches")}</h3>
@@ -22,7 +22,7 @@ export function dashboardView(): string {
         </div>
       </div>
       </br>
-      <div class="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row gap-10">
+      <div class="w-full max-w-[1800px] mx-auto flex flex-row gap-10">
         <div class="card-section max-h-[600px] overflow-y-auto">
           <h3 class="h3-dashboard">${t("dashboard.last_matches_clicker")}</h3>
           <ul id="match-clicker-list" class="space-y-3"></ul>
@@ -35,7 +35,7 @@ export function dashboardView(): string {
 
       <div class="gdpr-section">
         <h3 class="text-xl font-bold text-cyan-200 mb-4">${t("dashboard.gdpr_title") || "Vie privée & GDPR"}</h3>
-        <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex flex-row gap-4">
           <button id="gdpr-anonymize" class=" grpd-main">${t("dashboard.gdpr_anonymize") || "Anonymiser mes données"}</button>
           <button id="gdpr-export" class=" grpd-main">${t("dashboard.gdpr_export") || "Exporter mes données"}</button>
           <button id="gdpr-delete" class=" grpd-main">${t("dashboard.gdpr_delete") || "Supprimer mon compte"}</button>

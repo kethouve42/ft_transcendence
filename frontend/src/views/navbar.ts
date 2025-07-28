@@ -1,6 +1,7 @@
 import { navigateTo, escapeHTML } from "../main";
 import { t, getLang, setLang, LANG_NAMES } from "../i18n";
 import { clearTournamentData } from "./game/loginTournament";
+import { cleanupVersusMode } from "./clicker/clicker";
 
 export function navbarView(): string {
   const isLogged = !!localStorage.getItem("token");
@@ -18,7 +19,7 @@ export function navbarView(): string {
   }
 
   return `
-    <nav class="w-full px-6 md:px-32 py-4 bg-cyan-950/80 flex items-center justify-between shadow-lg z-50">
+    <nav class="w-full px-32 py-4 bg-cyan-950/80 flex items-center justify-between shadow-lg z-50">
       <div class="flex items-center gap-10">
         <a href="/" class="${linkClass("/", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.home")}</a>
         <a href="/pong" class="${linkClass("/pong", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">pong</a>
@@ -88,12 +89,16 @@ export function attachNavbarEvents() {
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
+      // Nettoie le mode versus du clicker s'il est en cours
+      cleanupVersusMode();
+      clearTournamentData();
+      
       localStorage.removeItem("token");
       localStorage.removeItem("userLogin");
       localStorage.removeItem("userAlias");
       localStorage.removeItem("userAvatar");
       localStorage.removeItem("userId");
-      clearTournamentData()
+      
       navigateTo("/login");
     });
   }

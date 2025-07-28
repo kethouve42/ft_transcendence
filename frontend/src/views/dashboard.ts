@@ -15,7 +15,7 @@ function getSections() {
 export function dashboardMainView(): string {
   const sections = getSections();
   return `
-    <div class="w-full min-h-screen px-8 md:px-32">
+    <div class="w-full min-h-screen px-32">
       <div class="flex gap-4 mb-6" id="dashboard-menu">
         ${sections.map((s) => `<button id="dashboard-menu-${s.key}" class="dashboard-menu-btn btn-main px-4 py-2" data-section="${s.key}" >${s.label}</button>`).join("")}
       </div>

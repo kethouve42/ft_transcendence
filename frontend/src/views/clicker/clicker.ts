@@ -22,6 +22,17 @@ function clearAllVersusIntervals()
     versusGeneratorTimer = null;
 }
 
+export function cleanupVersusMode()
+{
+  clearAllVersusIntervals();
+  localStorage.removeItem("versusMode");
+  localStorage.removeItem("versusTarget");
+  localStorage.removeItem("token_player2");
+  localStorage.removeItem("userId_player2");
+  const timerDiv = document.getElementById("versus-timer");
+  if (timerDiv) timerDiv.remove();
+}
+
 // Visuel pour des arcs electriques aleatoires
 function spawnElectricArc(canvasId: string)
 {

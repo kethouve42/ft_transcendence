@@ -213,11 +213,14 @@ export default {
     intro: "Esta aplicación cumple con el Reglamento General de Protección de Datos (RGPD) europeo. Nos comprometemos a proteger su información personal y a ofrecerle herramientas para gestionar sus datos.",
     collected: "¿Qué datos se recopilan?",
     collected_list: [
-      "Credenciales de inicio de sesión (login, email, contraseña cifrada)",
-      "Alias y avatar",
-      "Estadísticas de juego (puntuaciones, partidas, victorias, derrotas, tiempo de juego...)",
-      "Historial de partidas e interacciones sociales (amigos, invitaciones...)",
-      "Configuraciones locales (idioma, preferencias, configuración de teclas... almacenadas en su navegador)"
+      "Credenciales de inicio de sesión (login, email, contraseña cifrada con bcrypt)",
+      "Perfil de usuario (alias, avatar subido)",
+      "Datos del juego Pong (puntuaciones, victorias, derrotas, duración de partidas, tipo de oponente IA/jugador)",
+      "Datos del juego Clicker (puntuación total, mejoras compradas: enfriador, generador, bobinas)",
+      "Relaciones sociales (lista de amigos, historial de partidas entre jugadores)",
+      "Seguridad 2FA (códigos temporales, tokens JWT para autenticación)",
+      "Restablecimiento de contraseña (tokens temporales, verificación por email)",
+      "Preferencias locales (idioma, configuración de teclas de juego, configuraciones de juego almacenadas en su navegador)"
     ],
     usage: "¿Cómo se usan sus datos?",
     usage_list: [
@@ -228,20 +231,25 @@ export default {
     ],
     rights: "¿Cuáles son sus derechos?",
     rights_list: [
-      "Acceder a sus datos personales",
-      "Modificar o corregir su información",
-      "Anonimizar sus datos (reemplazo de su información por valores anónimos)",
-      "Exportar sus datos (descarga en formato JSON)",
-      "Eliminar permanentemente su cuenta y todos sus datos"
+      "Acceder a sus datos personales a través de su perfil",
+      "Modificar su información (alias, avatar, email, contraseña)",
+      "Configurar la seguridad 2FA según sus preferencias",
+      "Consultar el historial completo de sus partidas y estadísticas",
+      "Gestionar su lista de amigos y relaciones sociales",
+      "Anonimizar sus datos (reemplazo por valores genéricos)",
+      "Exportar sus datos personales en formato JSON",
+      "Eliminar permanentemente su cuenta (todos los datos relacionados serán borrados)"
     ],
-    rights_info: "Puede ejercer estos derechos en cualquier momento desde su panel, en la sección \"Privacidad y GDPR\".",
+    rights_info: "Puede ejercer estos derechos en cualquier momento desde su panel de usuario.",
     storage: "¿Dónde se almacenan sus datos?",
     storage_list: [
-      "Los datos de la cuenta y del juego se almacenan en nuestros servidores seguros (el PC donde ves el sitio).",
-      "Las preferencias locales (idioma, configuración) se almacenan solo en su navegador (localStorage)."
+      "Base de datos SQLite local segura (cuentas, juegos, estadísticas, relaciones)",
+      "Archivos de avatar subidos en una carpeta protegida del servidor",
+      "Logs de actividad analizados vía ELK Stack (Elasticsearch, Logstash, Kibana) para monitoreo",
+      "Preferencias de usuario (idioma, teclas) almacenadas localmente en su navegador"
     ],
     contact: "Contacto",
-    contact_info: "Para cualquier pregunta o solicitud sobre sus datos personales, pregunte a su izquierda o derecha, estamos aquí",
+    contact_info: "Para cualquier pregunta sobre sus datos personales o esta política de privacidad, contacte al administrador del servidor. (soy yo)",
     back_home: "Volver al inicio"
   },
   click: {
