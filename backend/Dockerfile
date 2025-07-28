@@ -5,7 +5,6 @@ WORKDIR /app
 
 # Copier et installer les dépendances
 COPY package*.json ./
-COPY .env ./
 RUN npm install
 
 
@@ -23,7 +22,6 @@ WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY .env .
 COPY data ./data
 COPY src/i18n ./dist/i18n
 
