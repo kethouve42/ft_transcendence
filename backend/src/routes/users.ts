@@ -17,24 +17,24 @@ type AuthenticatedRequest = FastifyRequest & { user: AuthUser };
 
 //-----------BREVO POUR VRAI MAIL (PENSER A MODIF DB.TS (VOIR COMMENTAIRE))-------------//
 // Crée un transporteur SMTP de test (Brevo)
-/*const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     host: 'smtp-relay.brevo.com',
     port: 587,
     auth: {
         user: process.env.BREVO_USER,
         pass: process.env.BREVO_PASS
     }
-});*/
+});
 
 // Crée un transporteur SMTP de test (Ethereal) A REMPLACER PAR BREVO POUR VERSION FINAL
-const transporter = nodemailer.createTransport({
+/*const transporter = nodemailer.createTransport({
     host: 'smtp.ethereal.email',
     port: 587,
     auth: {
         user: process.env.ETHEREAL_USER,
         pass: process.env.ETHEREAL_PASS
     }
-});
+});*/
 
 export default async function userRoutes(app: FastifyInstance)
 {
@@ -106,7 +106,10 @@ export default async function userRoutes(app: FastifyInstance)
 
 			const verifyUrl = `https://localhost:8443/verify-email?token=${verifyToken}`;
 			await transporter.sendMail({
-			  from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+			  //---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
+			  //from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+			  //-----------VRAI MAIL------------//
+			  from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
 			  to: email,
 			  subject: i18next.t("verify_email_subject"),
 			  text: i18next.t("verify_email_text", { url: verifyUrl })
@@ -150,7 +153,10 @@ export default async function userRoutes(app: FastifyInstance)
 
 				const verifyUrl = `https://localhost:8443/verify-email?token=${verifyToken}`;
 				await transporter.sendMail({
-				  from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+				  //---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
+				  //from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+				  //-----------VRAI MAIL------------//
+				  from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
 				  to: email,
 				  subject: i18next.t("verify_new_email_subject"),
 				  text: i18next.t("verify_new_email_text", { url: verifyUrl })
@@ -231,10 +237,10 @@ export default async function userRoutes(app: FastifyInstance)
 				
 				// Envoie le mail
 				await transporter.sendMail({
-					//-----------VRAI MAIL------------//
-					//from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
 					//---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
-					from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+					//from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+					//-----------VRAI MAIL------------//
+					from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
 					to: user.email,
 					subject: i18next.t("2fa_subject"),
 					text: i18next.t("2fa_text", { code })
@@ -299,7 +305,10 @@ export default async function userRoutes(app: FastifyInstance)
 		const verifyUrl = `https://localhost:8443/verify-email?token=${verifyToken}`;
 		await transporter.sendMail(
 		{
-			from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+			//---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
+			//from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+			//-----------VRAI MAIL------------//
+			from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
 			to: email,
 			subject: i18next.t("verify_email_subject"),
 			text: i18next.t("verify_email_text", { url: verifyUrl })
@@ -601,7 +610,10 @@ export default async function userRoutes(app: FastifyInstance)
 			// Vérifie si l'utilisateur existe
 			const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email) as { id: number, email: string } | undefined;
 			if (!user)
+			{
+				console.log("User not found");
 				return reply.status(200).send({ error: i18next.t("user_unknown") });
+			}
 
 			// Génère un token sécurisé
 			const resetToken = crypto.randomBytes(32).toString('hex');
@@ -613,7 +625,11 @@ export default async function userRoutes(app: FastifyInstance)
 			// Envoie l'email avec le lien de réinitialisation
 			const resetUrl = `https://localhost:8443/reset-password?token=${resetToken}`;
 			await transporter.sendMail({
-				from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+
+				//---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
+				//from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+				//-----------VRAI MAIL------------//
+				from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
 				to: user.email,
 				subject: i18next.t("reset_email_subject"),
 				text: i18next.t("reset_email_text", { url: resetUrl })

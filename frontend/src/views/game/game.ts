@@ -187,7 +187,8 @@ function renderPanelSettings() {
 }
 
 // Affiche le panneau de configuration des touches pour les joueurs
-function renderPanelKeys() {
+function renderPanelKeys(fromSettings = false) {
+  console.log("fromSettings: ",fromSettings);
   return `
       <div id="panel-keyconfig" class="settings-panel">
       <h1>${t("local.title")}</h1>
@@ -219,9 +220,9 @@ function renderPanelKeys() {
         </div>
       </div>
       <div class="settings-actions">
-        <button id="btn-start-local" class="menu-btn">${t("local.start")}</button>
+        ${!fromSettings ? `<button id="btn-start-local" class="menu-btn">${t("local.start")}</button>` : ""}
         <button id="btn-cancel-keyconfig" class="menu-btn">${t("local.cancel")}</button>
-        <button id="btn-giveup-keyconfig" class="menu-btn">${t("local.giveup")}</button>
+        ${!fromSettings ? `<button id="btn-giveup-keyconfig" class="menu-btn">${t("local.giveup")}</button>` : ""}
       </div>
     </div>
   `
@@ -314,7 +315,7 @@ function renderUI() {
       html += renderPanelAI()
       break
     case "keyConfig": 
-      html += renderPanelKeys()
+      html += renderPanelKeys(previousPanel === "settings")
       break
     case "rules":
       html += renderPanelRules()
@@ -337,6 +338,7 @@ function renderUI() {
 
 // Change le panneau affiché à l'écran
 export function showOnly(panel: Panel) {
+  console.log("previousPanel:", currentPanel, "->", panel)
   previousPanel = currentPanel
   currentPanel = panel
   renderUI()
@@ -442,7 +444,6 @@ function attachKeyConfigEvents(root: HTMLElement) {
   root.querySelector('#btn-cancel-keyconfig')?.addEventListener("click", () => {
     showOnly(previousPanel || "menu")
   })
-  root.querySelector('#btn-keyconfig')?.addEventListener("click", () => showOnly("keyConfig"))
   root.querySelector('#btn-giveup-keyconfig')?.addEventListener("click", () => {
     if (localStorage.getItem("tournement_phase")) {
       for (let i = 2; i <= 8; i++) {
