@@ -310,4 +310,10 @@ export default {
     success_message: "Votre adresse e-mail a été confirmée avec succès. Vous allez être redirigé vers la page de connexion.",
     error_message: "Erreur lors de la confirmation de l'adresse e-mail. Veuillez réessayer.",
   },
+  ariaLabel: {
+    LanguageSelector: "Sélecteur de langue",
+    plusTaille: "Augmenter la taille du texte",
+    moinsTaille: "Diminuer la taille du texte",
+    supprimer_avatar: "Supprimer l'avatar",
+  },
 };

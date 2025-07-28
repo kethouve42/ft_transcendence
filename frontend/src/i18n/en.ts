@@ -312,4 +312,10 @@ export default {
     success_message: "Your email has been successfully confirmed. You will be redirected to the login page.",
     error_message: "An error occurred while confirming your email.",
   },
+   ariaLabel: {
+    LanguageSelector: "Language selector",
+    plusTaille: "Increase text size",
+    moinsTaille: "Diminish text size",
+    supprimer_avatar: "Delete avatar",
+  },
 };

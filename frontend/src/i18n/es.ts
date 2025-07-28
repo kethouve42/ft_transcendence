@@ -311,4 +311,10 @@ export default {
     success_message: "¡Correo electrónico confirmado con éxito! Serás redirigido a la página de inicio de sesión.",
     error_message: "Error al confirmar el correo electrónico. Por favor, inténtalo de nuevo.",
   },
+  ariaLabel: {
+    LanguageSelector: "Selector de idioma",
+    plusTaille: "Incrementar tamaño de texto",
+    moinsTaille: "Disminuir tamaño de texto",
+    supprimer_avatar: "Eliminar avatar",
+  },
 };

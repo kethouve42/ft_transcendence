@@ -198,7 +198,7 @@ fetch("/api/users/me", {
               <button
                 id="avatar-delete"
                 type="button"
-                aria-label="Supprimer l’avatar"
+                aria-label=${t("ariaLabel.supprimer_avatar")}
                 class="absolute top-1 right-1 text-4xl leading-none text-red-600 bg-transparent border-none shadow-none p-0 m-0 select-none outline-none focus:outline-none hover:bg-transparent active:bg-transparent appearance-none"
                 style="all: unset; position: absolute; top: 0.25rem; right: 0.25rem; color: #dc2626; font-size: 2.2rem; line-height: 0; cursor: pointer; user-select: none;"
               >

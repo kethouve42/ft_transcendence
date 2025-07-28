@@ -30,7 +30,7 @@ export function loginPlayer2View(): string {
           />
         </div>
         <div class="flex justify-between items-center">
-          <a id="forgot-password" class="link-main mt-4 inline-block" aria-label="${t("login.forgot_password")}"> ${t("login.forgot_password")} </a>
+          <a id="forgot-password" class="link-main mt-4 inline-block"> ${t("login.forgot_password")} </a>
         </div>
         <button
           type="submit"
@@ -145,7 +145,7 @@ export function forgotPasswordPopup() {
   modal.id = "confirm-modal";
   modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
   modal.innerHTML = `
-  <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true" aria-label="${t("dashboard.confirmation")}">
+  <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true" >
   <p class="text-cyan-200 mb-6">${t("login.forgot_password_desc")}</p>
   <input type="email" id="forgot-email" placeholder="${t("login.email")}" class="input-main mb-4 w-full" required>
   <div id="forgot-message" class="text-red-400"></div>
