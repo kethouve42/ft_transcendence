@@ -259,7 +259,7 @@ export function clickerView(): string {
     return `
       ${topRightButtons}
       <div class="w-full flex flex-row justify-center">
-        <div id="versus-timer" class="bg-gray-800 text-white px-6 py-2 rounded shadow-lg text-xl my-4">
+        <div id="versus-timer" class="bg-gray-800 text-white px-6 py-2 rounded shadow-lg text-xl my-4" style="">
           ${t("click.time")} 60s
         </div>
       </div>
@@ -913,6 +913,12 @@ export function clickerEvent(): void {
     {
       timeLeft = Number(localStorage.getItem("versusTarget"));
       if (timerDiv) timerDiv.textContent = `${t("click.time")} ${timeLeft}s`;
+    }
+    // Sinon on fait disparaitre le timer
+    else
+    {
+      const timerContainer = document.getElementById("versus-timer");
+      if (timerContainer) timerContainer.style.display = "none";
     }
 
     // Decrementer le timer (si timer mode)
