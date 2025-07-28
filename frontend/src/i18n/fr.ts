@@ -246,6 +246,7 @@ export default {
   click: {
     hot: "chaleur",
     cl: "Clique !",
+    cl_versus: "fonctionnel",
     pt: "Points",
     buy_re: "Acheter refroidisseur",
     buy_ge: "Acheter generateur",

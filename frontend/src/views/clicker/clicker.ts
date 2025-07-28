@@ -5,6 +5,7 @@ let versusTimer: ReturnType<typeof setInterval> | null = null;
 let versusCoolingTimer: ReturnType<typeof setInterval> | null = null;
 let versusGeneratorTimer: ReturnType<typeof setInterval> | null = null;
 let soloGeneratorTimer: ReturnType<typeof setInterval> | null = null;
+let soloCoolingTimer: ReturnType<typeof setInterval> | null = null;
 let soloKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 let versusKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
@@ -21,7 +22,7 @@ function clearAllVersusIntervals()
     versusGeneratorTimer = null;
 }
 
-// Visuel pas ouf pour des arcs electriques aleatoires
+// Visuel pour des arcs electriques aleatoires
 function spawnElectricArc(canvasId: string)
 {
   const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -287,7 +288,7 @@ export function clickerView(): string {
                 id="click-btn-1"
                 class="bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition"
               >
-                ${t("click.cl")}
+                ${t("click.cl_versus")}
               </button>
               <span class="text-lg text-cyan-300 font-bold mt-4">${t("click.pt")}</span>
               <span id="point-count-1" class="text-3xl font-extrabold mt-2 min-w-[4ch] text-center">0</span>
@@ -336,9 +337,9 @@ export function clickerView(): string {
             <div class="flex flex-col items-center ml-8">
               <button
                 id="click-btn-2"
-                class="bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition"
+                class="bg-cyan-600 hover:bg-cyan-400 text-white px-6 py-2 rounded-full shadow-lg transition" 
               >
-                ${t("click.cl")}
+                ${t("click.cl_versus")}
               </button>
               <span class="text-lg text-cyan-300 font-bold mt-4">${t("click.pt")}</span>
               <span id="point-count-2" class="text-3xl font-extrabold mt-2 min-w-[4ch] text-center">0</span>
@@ -505,7 +506,8 @@ export function clickerEvent(): void {
     }
 
     // Gestion de la chaleur
-    setInterval(() => {
+    if (soloCoolingTimer) clearInterval(soloCoolingTimer);
+    soloCoolingTimer = setInterval(() => {
 
       // Refroidissement du réacteur
       if (Number(localStorage.getItem("heat")) > 0) 
@@ -1046,9 +1048,9 @@ export function clickerEvent(): void {
         // Calculer le coût du cooler en fonction de son niveau
         let cooler_cost;
         if (Number(localStorage.getItem(`vs_${n}cooler`)) == 0)
-          cooler_cost = 50;
+          cooler_cost = 25;
         else
-          cooler_cost = Math.round(50 * Math.pow(1.15, Number(localStorage.getItem(`vs_${n}cooler`))));
+          cooler_cost = Math.round(25 * Math.pow(1.15, Number(localStorage.getItem(`vs_${n}cooler`))));
 
         if (Number(localStorage.getItem(`vs_${n}score`)) >= cooler_cost)
         {
@@ -1072,9 +1074,9 @@ export function clickerEvent(): void {
         // Calculer le coût du generator en fonction de son niveau
         let generator_cost;
         if (Number(localStorage.getItem(`vs_${n}generator`)) == 0)
-          generator_cost = 150;
+          generator_cost = 75;
         else
-          generator_cost = Math.round(150 * Math.pow(1.25, Number(localStorage.getItem(`vs_${n}generator`))));
+          generator_cost = Math.round(75 * Math.pow(1.25, Number(localStorage.getItem(`vs_${n}generator`))));
 
         if (Number(localStorage.getItem(`vs_${n}score`)) >= generator_cost)
         {
@@ -1098,9 +1100,9 @@ export function clickerEvent(): void {
         // Calculer le coût du coil en fonction de son niveau
         let coil_cost;
         if (Number(localStorage.getItem(`vs_${n}coil`)) == 0)
-          coil_cost = 75;
+          coil_cost = 50;
         else
-          coil_cost = Math.round(75 * Math.pow(1.15, Number(localStorage.getItem(`vs_${n}coil`))));
+          coil_cost = Math.round(50 * Math.pow(1.15, Number(localStorage.getItem(`vs_${n}coil`))));
 
         if (Number(localStorage.getItem(`vs_${n}score`)) > coil_cost)
         {

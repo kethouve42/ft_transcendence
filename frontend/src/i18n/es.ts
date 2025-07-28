@@ -247,6 +247,7 @@ export default {
   click: {
     hot: "Calor",
     cl: "Haga clic.",
+    cl_versus: "funcional",
     pt: "Puntos",
     buy_re: "Comprar nevera",
     buy_ge: "Comprar generador",

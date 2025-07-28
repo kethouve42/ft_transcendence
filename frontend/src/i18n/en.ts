@@ -248,6 +248,7 @@ export default {
   click: {
     hot: "Heat",
     cl: "Click !",
+    cl_versus: "functional",
     pt: "Points",
     buy_re: "Buy cooler",
     buy_ge: "Buy generator",
