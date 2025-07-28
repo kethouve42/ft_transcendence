@@ -64,6 +64,7 @@ function render(route: string) {
     "/dashboard",
     "/clicker",
     "/pong",
+    "/loginUser2",
   ];
   const token = localStorage.getItem("token");
   if (protectedRoutes.includes(route) && !token) {
@@ -73,8 +74,6 @@ function render(route: string) {
 
   const protectedRoutes_lr = [
     "/login",
-    "/reset-password",
-    "/verify-email",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");

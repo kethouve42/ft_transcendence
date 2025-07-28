@@ -24,7 +24,7 @@ function clearAllVersusIntervals()
 // Visuel pas ouf pour des arcs electriques aleatoires
 function spawnElectricArc(canvasId: string)
 {
-  /*const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+  const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -63,7 +63,7 @@ function spawnElectricArc(canvasId: string)
   // Animation de disparition
   setTimeout(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }, 250);*/
+  }, 250);
 }
 
 //Config des touche avant versus
