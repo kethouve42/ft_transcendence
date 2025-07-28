@@ -36,10 +36,11 @@ export default {
     register: "Create an account",
     stayConnected: "Stay signed in",
     forgot_password: "Forgot your password?",
-    forgot_password_desc: "Enter your email address to receive a link to reset your password.",
+    forgot_password_desc: "Enter your email address to receive a link.",
     error_email_required: "Email is required.",
-    forgot_password_success: "An email has been sent to reset your password.",
+    forgot_password_success: "An email has been sent.",
     email: "Email",
+    email_not_verified_bouton: "resend verification email",
   },
   register: {
     title: "Inscription",
@@ -310,5 +311,11 @@ export default {
   emailConfirm: {
     success_message: "Your email has been successfully confirmed. You will be redirected to the login page.",
     error_message: "An error occurred while confirming your email.",
+  },
+   ariaLabel: {
+    LanguageSelector: "Language selector",
+    plusTaille: "Increase text size",
+    moinsTaille: "Diminish text size",
+    supprimer_avatar: "Delete avatar",
   },
 };

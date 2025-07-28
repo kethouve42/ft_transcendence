@@ -21,13 +21,13 @@ export function navbarView(): string {
     <nav class="w-full px-6 md:px-32 py-4 bg-cyan-950/80 flex items-center justify-between shadow-lg z-50">
       <div class="flex items-center gap-10">
         <a href="/" class="${linkClass("/", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">${t("nav.home")}</a>
-        <a href="/pong" class="${linkClass("/game", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">pong</a>
+        <a href="/pong" class="${linkClass("/pong", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">pong</a>
         <a href="/clicker" class="${linkClass("/clicker", "text-lg font-extrabold tracking-widest text-cyan-300 hover:text-cyan-400 transition")}">clicker</a>
       </div>
       <div class="flex items-center gap-6">
         <select
           id="lang-switcher"
-          aria-label="Language selector"
+          aria-label=${t("ariaLabel.LanguageSelector")}
           class="bg-cyan-900 border border-cyan-400 text-cyan-200 rounded mb-[0em] px-2 py-1 h-9 self-center focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
         >
           ${Object.entries(LANG_NAMES).map(([k, v]) =>
@@ -48,13 +48,12 @@ export function navbarView(): string {
             id="accessibility-menu"
             class="dropdown-menu hidden"
             role="menu"
-            aria-label="Accessibilité"
           >
             <button type="button" onclick="toggleContrast()" class="text-left px-4 py-2 hover:bg-cyan-800 w-full">${t("nav.Contraste")}</button>
             <div class="flex gap-2 px-4 py-2 items-center">
               <span class="text-cyan-200">${t("nav.tailleTexte")}</span>
-              <button type="button" onclick="changeFontSize(2)" aria-label="Augmenter la taille du texte" class="btn-access">A+</button>
-              <button type="button" onclick="changeFontSize(-2)" aria-label="Diminuer la taille du texte" class="btn-access">A-</button>
+              <button type="button" onclick="changeFontSize(2)" aria-label=${t("ariaLabel.plusTaille")} class="btn-access">A+</button>
+              <button type="button" onclick="changeFontSize(-2)" aria-label=${t("ariaLabel.moinsTaille")} class="btn-access">A-</button>
             </div>
           </div>
         </div>

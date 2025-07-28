@@ -36,10 +36,11 @@ export default {
     register: "Créer un compte",
     stayConnected: "Rester connecté",
     forgot_password: "Mot de passe oublié ?",
-    forgot_password_desc: "Entrez votre email pour recevoir un lien de réinitialisation.",
+    forgot_password_desc: "Entrez votre email pour recevoir un lien.",
     error_email_required: "Email requis.",
-    forgot_password_success: "Un email de réinitialisation a été envoyé.",
+    forgot_password_success: "Un email a été envoyé.",
     email: "Email",
+    email_not_verified_bouton: "renvoyer l'email de vérification",
   },
   register: {
     title: "Inscription",
@@ -140,7 +141,7 @@ export default {
     confirm_mdp: "Confirmer le mot de passe",
     pong_stats: "Statistiques Pong",
     clicker_stats: "Statistiques Clicker",
-    timerMatches: "Matchs chronométrés",
+    timerMatches: "Matchs timer",
     chronoMatches: "Matchs à score",
     no_clicker_match: "Aucun match Clicker trouvé.",
     no_pong_match: "Aucun match Pong trouvé.",
@@ -308,5 +309,11 @@ export default {
   emailConfirm: {
     success_message: "Votre adresse e-mail a été confirmée avec succès. Vous allez être redirigé vers la page de connexion.",
     error_message: "Erreur lors de la confirmation de l'adresse e-mail. Veuillez réessayer.",
+  },
+  ariaLabel: {
+    LanguageSelector: "Sélecteur de langue",
+    plusTaille: "Augmenter la taille du texte",
+    moinsTaille: "Diminuer la taille du texte",
+    supprimer_avatar: "Supprimer l'avatar",
   },
 };

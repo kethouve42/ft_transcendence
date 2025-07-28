@@ -6,11 +6,6 @@ const db = new Database('/app/data/db.sqlite');
 // Active les foreign keys
 db.pragma('foreign_keys = ON');
 
-/*A rajouter dans users pour les vrai mail*/
-//email_verified INTEGER DEFAULT 0,
-//email_verify_token TEXT,
-//email_verify_expires INTEGER
-
 // Crée les tables
 db.exec(`
 

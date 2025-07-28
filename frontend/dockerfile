@@ -1,17 +1,30 @@
-# Étape 1 : build du frontend
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+RUN apk add --no-cache openssl \
+  && mkdir -p /app/certs \
+  && openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+     -keyout /app/certs/key.pem \
+     -out /app/certs/cert.pem \
+     -subj "/C=FR/ST=Paris/L=Paris/O=42/CN=localhost"
+
 RUN npm run build
 
-# Étape 2 : image Nginx pour servir le build
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 COPY --from=build /app/dist ./
 COPY public ./public
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY certs /etc/nginx/certs
+
+RUN apk add --no-cache openssl \
+  && mkdir -p /etc/nginx/certs \
+  && openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+     -keyout /etc/nginx/certs/key.pem \
+     -out /etc/nginx/certs/cert.pem \
+     -subj "/C=FR/ST=Paris/L=Paris/O=42/CN=localhost"
+
 EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]

@@ -208,13 +208,13 @@ export default async function userRoutes(app: FastifyInstance)
 
 		try
 		{
-			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; alias: string; avatar: string };
+			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; alias: string; avatar: string; email_verified: number };
 
 			if (!user)
         		return reply.status(401).send({ error: i18next.t("email_or_password_incorrect") });
-			//----------------DECOMMENTER POUR LES VRAI MAIL (vérifie si le mail a été validé)--------------------------//
-			/*if (user.email_verified == 0)
-				return reply.status(401).send({ error: i18next.t("email_not_verified") });*/
+
+			if (user.email_verified == 0)
+				return reply.status(401).send({ error: i18next.t("email_not_verified"), step: "email_not_verified" });
 
 			const validPassword = await bcrypt.compare(password, user.password);
 			if (!validPassword || (user.email !== identifier && user.login !== identifier))

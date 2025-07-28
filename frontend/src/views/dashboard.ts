@@ -4,13 +4,16 @@ import { dashboardFriendsView, attachDashboardFriendsEvents } from "./dashboard_
 import { attachLinkHandlers } from "../main";
 import { t } from "../i18n";
 
-const sections = [
-  { key: "view", label: t("dashboard.view") },
-  { key: "edit", label: t("dashboard.edit") },
-  { key: "friends", label: t("dashboard.friends") },
-];
+function getSections() {
+  return [
+    { key: "view", label: t("dashboard.view") },
+    { key: "edit", label: t("dashboard.edit") },
+    { key: "friends", label: t("dashboard.friends") },
+  ];
+}
 
 export function dashboardMainView(): string {
+  const sections = getSections();
   return `
     <div class="w-full min-h-screen px-8 md:px-32">
       <div class="flex gap-4 mb-6" id="dashboard-menu">

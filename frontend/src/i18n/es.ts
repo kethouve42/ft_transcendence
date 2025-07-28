@@ -36,10 +36,11 @@ export default {
     register: "Crear una cuenta",
     stayConnected: "Mantener la sesión iniciada",
     forgot_password: "¿Olvidaste tu contraseña?",
-    forgot_password_desc: "Introduce tu correo electrónico para recibir un enlace de restablecimiento de contraseña.",
+    forgot_password_desc: "Introduce tu correo electrónico para recibir un enlace.",
     error_email_required: "El correo electrónico es obligatorio.",
-    forgot_password_success: "Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.",
+    forgot_password_success: "Se ha enviado un correo electrónico.",
     email: "Correo electrónico",
+    email_not_verified_bouton: "reenviar correo electrónico de verificación",
   },
   register: {
     title: "Registro",
@@ -309,5 +310,11 @@ export default {
   emailConfirm: {
     success_message: "¡Correo electrónico confirmado con éxito! Serás redirigido a la página de inicio de sesión.",
     error_message: "Error al confirmar el correo electrónico. Por favor, inténtalo de nuevo.",
+  },
+  ariaLabel: {
+    LanguageSelector: "Selector de idioma",
+    plusTaille: "Incrementar tamaño de texto",
+    moinsTaille: "Disminuir tamaño de texto",
+    supprimer_avatar: "Eliminar avatar",
   },
 };

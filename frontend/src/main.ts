@@ -31,7 +31,7 @@ const routes: Record<string, RouteHandler> = {
   "/loginTournament" : loginTournamentView,
   "/reset-password" : resetPasswordView,
   "/registerRedirect": registerRedirectView,
-  "/mailConfirm": mailConfirmView,
+  "/verify-email": mailConfirmView,
 };
 
 function pingUser() {
@@ -58,12 +58,13 @@ function render(route: string) {
   const app = document.getElementById("app");
   if (!app) return;
 
-  const allowedPrefixes = ["/reset-password/", "/mailConfirm/"];
+  const allowedPrefixes = ["/reset-password/", "/verify-email/"];
 
     const protectedRoutes = [
     "/dashboard",
     "/clicker",
-    "/game",
+    "/pong",
+    "/loginUser2",
   ];
   const token = localStorage.getItem("token");
   if (protectedRoutes.includes(route) && !token) {
@@ -73,8 +74,6 @@ function render(route: string) {
 
   const protectedRoutes_lr = [
     "/login",
-    "/reset-password",
-    "/mailConfirm",
   ];
   if (protectedRoutes_lr.includes(route) && token) {
     navigateTo("/dashboard");
@@ -115,7 +114,7 @@ function attachEvents(route: string) {
   if (route === "/loginTournament") attachLoginTournamentEvents()
   if (route === "/reset-password") resetPasswordEvents()
   if (route === "/registerRedirect") attachRegisterRedirectEvents();
-  if (route === "/mailConfirm") mailConfirmEvents();
+  if (route === "/verify-email") mailConfirmEvents();
 }
 
 export function attachLinkHandlers() {
@@ -181,7 +180,7 @@ export function showPopup(message: string, onConfirm: () => void) {
   modal.id = "confirm-modal";
   modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
   modal.innerHTML = `
-    <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true" aria-label="${t("dashboard.confirmation")}">
+    <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true">
       <p class="text-cyan-200 mb-6">${message}</p>
       <div class="flex gap-4">
         <button id="confirm-yes" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold">${t("all.yes")}</button>
