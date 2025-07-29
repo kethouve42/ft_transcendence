@@ -1,7 +1,7 @@
 import { navigateTo, escapeHTML } from "../main";
 import { t, getLang, setLang, LANG_NAMES } from "../i18n";
 import { clearTournamentData } from "./game/loginTournament";
-import { cleanupVersusMode } from "./clicker/clicker";
+import { cleanupSoloMode, cleanupVersusMode } from "./clicker/clicker";
 
 export function navbarView(): string {
   const isLogged = !!localStorage.getItem("token");
@@ -68,6 +68,7 @@ export function attachNavbarEvents() {
     logoutBtn.addEventListener("click", () => {
       // Nettoie le mode versus du clicker s'il est en cours
       cleanupVersusMode();
+	  cleanupSoloMode();
       clearTournamentData();
       
       localStorage.removeItem("token");

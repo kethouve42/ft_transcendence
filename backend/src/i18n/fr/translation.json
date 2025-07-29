@@ -37,5 +37,6 @@
   "2fa_enabled": "2FA activé avec succès",
   "2fa_disabled": "2FA désactivé avec succès",
   "email_verified": "Email vérifié !",
-  "player2_token_invalid": "Token du joueur 2 invalide"
+  "player2_token_invalid": "Token du joueur 2 invalide",
+  "devmode_cannot_be_changed": "Le devmode ne peut-être changé"
 }

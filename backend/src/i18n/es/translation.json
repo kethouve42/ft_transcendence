@@ -37,5 +37,6 @@
   "email_verified": "¡Correo electrónico verificado!",
   "Token_password_required": "Se requieren token y nueva contraseña",
   "email_not_verified": "Dirección de correo electrónico no verificada",
-  "player2_token_invalid": "Token del jugador 2 inválido"
+  "player2_token_invalid": "Token del jugador 2 inválido",
+  "devmode_cannot_be_changed": "devmode no se puede cambiar"
 }
