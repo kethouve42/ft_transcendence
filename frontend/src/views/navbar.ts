@@ -35,29 +35,6 @@ export function navbarView(): string {
             `<option value="${k}" ${getLang() === k ? "selected" : ""}>${v}</option>`
           ).join("")}
         </select>
-        <div class="relative" id="accessibility-dropdown">
-          <button
-            id="accessibility-btn"
-            aria-haspopup="true"
-            aria-expanded="false"
-            class="bg-cyan-900 border border-cyan-400 text-cyan-200 rounded px-2 py-1 h-9 self-center focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
-            type="button"
-          >
-            ♿ ${t("nav.Accessibilite")}
-          </button>
-          <div
-            id="accessibility-menu"
-            class="dropdown-menu hidden"
-            role="menu"
-          >
-            <button type="button" onclick="toggleContrast()" class="text-left px-4 py-2 hover:bg-cyan-800 w-full">${t("nav.Contraste")}</button>
-            <div class="flex gap-2 px-4 py-2 items-center">
-              <span class="text-cyan-200">${t("nav.tailleTexte")}</span>
-              <button type="button" onclick="changeFontSize(2)" aria-label=${t("ariaLabel.plusTaille")} class="btn-access">A+</button>
-              <button type="button" onclick="changeFontSize(-2)" aria-label=${t("ariaLabel.moinsTaille")} class="btn-access">A-</button>
-            </div>
-          </div>
-        </div>
         ${
           isLogged
             ? `
@@ -105,23 +82,5 @@ export function attachNavbarEvents() {
   const langSel = document.getElementById("lang-switcher") as HTMLSelectElement | null;
   if (langSel) {
     langSel.onchange = () => setLang(langSel.value as any);
-  }
-  const accBtn = document.getElementById("accessibility-btn");
-  const accMenu = document.getElementById("accessibility-menu");
-  const accDropdown = document.getElementById("accessibility-dropdown");
-
-  if (accBtn && accMenu && accDropdown) {
-    accBtn.onclick = (e) => {
-      e.stopPropagation();
-      const expanded = accBtn.getAttribute("aria-expanded") === "true";
-      accBtn.setAttribute("aria-expanded", (!expanded).toString());
-      accMenu.classList.toggle("hidden", expanded);
-    };
-    document.addEventListener("click", (e) => {
-      if (!accDropdown.contains(e.target as Node)) {
-        accMenu.classList.add("hidden");
-        accBtn.setAttribute("aria-expanded", "false");
-      }
-    });
   }
 }

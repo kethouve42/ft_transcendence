@@ -156,7 +156,7 @@ fetch("/api/users/me", {
             msgMdp!.className = "mt-2 text-green-500";
             setTimeout(() => {
               navigateTo("/dashboard");
-            }, 1000);
+            }, 100);
           } else {
             const data = await res.json();
             msgMdp!.textContent = data.error || t("dashboard.error_update");
@@ -291,7 +291,7 @@ fetch("/api/users/me", {
             localStorage.setItem("userAvatar", avatar);
             setTimeout(() => {
               navigateTo("/dashboard");
-            }, 1000);
+            }, 100);
           } else {
             const data = await res.json();
             msg!.textContent = data.error || t("dashboard.error_update");

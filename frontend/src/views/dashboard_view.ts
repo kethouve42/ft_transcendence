@@ -70,7 +70,7 @@ export function attachDashboardViewEvents() {
           if (res.ok) {
             localStorage.clear();
             msg!.textContent = t("dashboard.gdpr_anonymized");
-            setTimeout(() => navigateTo("/"), 1000);
+            setTimeout(() => navigateTo("/"), 500);
           } else {
             msg!.textContent = t("dashboard.gdpr_error_anonymize");
           }
@@ -113,7 +113,7 @@ export function attachDashboardViewEvents() {
                 if (res.ok) {
                   localStorage.clear();
                   msg!.textContent = t("dashboard.gdpr_deleted");
-                  setTimeout(() => navigateTo("/"), 1500);
+                  setTimeout(() => navigateTo("/"), 500);
                 } else {
                   msg!.textContent = t("dashboard.gdpr_error_delete");
                 }

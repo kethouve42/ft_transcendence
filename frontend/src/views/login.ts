@@ -60,6 +60,7 @@ export function loginView(): string {
 }
 
 export function attachLoginEvents() {
+  let isProcessing = false;
   const forgotPassword = document.getElementById("forgot-password");
   if (forgotPassword)
   {
@@ -101,7 +102,7 @@ export function attachLoginEvents() {
         });
         const data = await res.json();
         if (!res.ok || !data.token) {
-          msg!.textContent = data.error || t("login.error_2fa");
+          msg!.textContent = data.error;
           return;
         }
         localStorage.setItem("token", data.token);
@@ -111,54 +112,62 @@ export function attachLoginEvents() {
         localStorage.removeItem("2fa_identifier");
         navigateTo("/dashboard");
       } catch (err: any) {
-        msg!.textContent = t("login.error_2fa_connexion") + " " + err.message;
+        msg!.textContent = err.message;
       }
       return;
     }
-
-    const login = (form.login as HTMLInputElement).value;
-    const password = (form.password as HTMLInputElement).value;
-    const stayConnected = (form.stayConnected as HTMLInputElement).checked;
-
-    try {
-      const res = await fetch("/api/users/auth", {
-        method: "POST",
-        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: login, password, stayConnected }),
-      });
-      const data = await res.json();
-      if (data.step === "2fa_required") {
-        if (field2fa) field2fa.style.display = "";
-        identifierFor2FA = data.identifier;
-        localStorage.setItem("2fa_identifier", data.identifier);
-        msg!.textContent = t("login.need2fa");
-        return;
+    if (isProcessing == true)
+    {
+      msg!.textContent = t("all.wait");
+    }
+    else
+    {
+      const login = (form.login as HTMLInputElement).value;
+      const password = (form.password as HTMLInputElement).value;
+      const stayConnected = (form.stayConnected as HTMLInputElement).checked;
+      isProcessing = true;
+      try {
+        const res = await fetch("/api/users/auth", {
+          method: "POST",
+          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: login, password, stayConnected }),
+        });
+        const data = await res.json();
+        if (data.step === "2fa_required") {
+          if (field2fa) field2fa.style.display = "";
+          identifierFor2FA = data.identifier;
+          localStorage.setItem("2fa_identifier", data.identifier);
+          msg!.textContent = t("login.need2fa");
+          return;
+        }
+        if (data.step === "email_not_verified")
+        {
+          if (emailNotVerfied) emailNotVerfied.style.display = "";
+          return;
+        }
+        if (!res.ok || !data.token) {
+          msg!.textContent = data.error;
+          return;
+        }
+        localStorage.setItem("token", data.token);
+        if (data.UserId)
+          localStorage.setItem("userId", data.UserId.toString())
+        localStorage.setItem("userLogin", data.login || "");
+        localStorage.setItem("userAlias", data.alias || "");
+        localStorage.setItem("userAvatar", data.avatar || "");
+        localStorage.removeItem("2fa_identifier");
+        navigateTo("/dashboard");
+      } catch (err: any) {
+        msg!.textContent = err.message;
+      } finally {
+        isProcessing = false;
       }
-      if (data.step === "email_not_verified")
-      {
-        if (emailNotVerfied) emailNotVerfied.style.display = "";
-        return;
-      }
-      if (!res.ok || !data.token) {
-        msg!.textContent = data.error || t("login.error");
-        return;
-      }
-      localStorage.setItem("token", data.token);
-      if (data.UserId)
-        localStorage.setItem("userId", data.UserId.toString())
-      localStorage.setItem("userLogin", data.login || "");
-      localStorage.setItem("userAlias", data.alias || "");
-      localStorage.setItem("userAvatar", data.avatar || "");
-      localStorage.removeItem("2fa_identifier");
-      navigateTo("/dashboard");
-    } catch (err: any) {
-      msg!.textContent = t("login.error_connexion") + " " + err.message;
     }
   };
 }
 
 export function forgotPasswordPopup() {
-
+  let isProcessing = false;
   const modal = document.createElement("div");
   modal.id = "confirm-modal";
   modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
@@ -176,26 +185,36 @@ export function forgotPasswordPopup() {
     modal.onclick = (e) => {
       if (e.target === modal) modal.remove();
     };
-
-    document.body.appendChild(modal);
+  document.body.appendChild(modal);
   const msgForgot = document.getElementById("forgot-message");
     document.getElementById("confirm-yes")?.addEventListener("click", async () => {
-      const emailInput = document.getElementById("forgot-email") as HTMLInputElement;
-      try {
-        const res = await fetch("/api/users/forgot-password", {
-          method: "POST",
-          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
-          body: JSON.stringify({ email: emailInput.value }),
-        })
-        if (!res.ok) {
-          throw new Error(t("login.error_email_required"));
+      if (isProcessing = true)
+      {
+        msgForgot!.textContent = t("all.wait");
+      }
+      else
+      {
+        const emailInput = document.getElementById("forgot-email") as HTMLInputElement;
+        isProcessing = true;
+        try {
+          const res = await fetch("/api/users/forgot-password", {
+            method: "POST",
+            headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
+            body: JSON.stringify({ email: emailInput.value }),
+          })
+          const errorData = await res.json();
+          if (!res.ok) {
+            throw new Error(errorData.error);
+          }
+          msgForgot!.textContent = t("login.forgot_password_success");
+          setTimeout(() => {
+            modal.remove();
+          }, 100);
+        } catch (err: any) {
+          msgForgot!.textContent = err.message;
+        } finally {
+          isProcessing = false;
         }
-        msgForgot!.textContent = t("login.forgot_password_success");
-        setTimeout(() => {
-          modal.remove();
-        }, 1000);
-      } catch (err: any) {
-        msgForgot!.textContent = err.message;
       }
     });
     document.getElementById("confirm-no")?.addEventListener("click", () => {
@@ -206,7 +225,7 @@ export function forgotPasswordPopup() {
 }
 
 export function emailNotVerfiedPopup() {
-
+  let isProcessing = false;
   const modal = document.createElement("div");
   modal.id = "confirm-modal";
   modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
@@ -228,24 +247,35 @@ export function emailNotVerfiedPopup() {
     document.body.appendChild(modal);
   const msgForgot = document.getElementById("forgot-message");
     document.getElementById("confirm-yes")?.addEventListener("click", async () => {
-      const emailInput = document.getElementById("forgot-email") as HTMLInputElement;
-      try {
-        const res = await fetch("/api/users/resend-verification", {
-          method: "POST",
-          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
-          body: JSON.stringify({ email: emailInput.value }),
-        })
-        if (!res.ok) {
-          throw new Error(t("login.error_email_required"));
+      if (isProcessing == true)
+      {
+        msgForgot!.textContent = t("all.wait");
+      }
+      else
+      {
+        const emailInput = document.getElementById("forgot-email") as HTMLInputElement;
+        isProcessing = true;
+        try {
+          const res = await fetch("/api/users/resend-verification", {
+            method: "POST",
+            headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
+            body: JSON.stringify({ email: emailInput.value }),
+          })
+          const errorData = await res.json();
+          if (!res.ok) {
+            throw new Error(errorData.error);
+          }
+          msgForgot!.textContent = t("login.forgot_password_success");
+          setTimeout(() => {
+            const emailNotVerfied = document.getElementById("email_not_verified");
+            if (emailNotVerfied) emailNotVerfied.style.display = "none";
+            modal.remove();
+          }, 100);
+        } catch (err: any) {
+          msgForgot!.textContent = err.message;
+        } finally {
+          isProcessing = false;
         }
-        msgForgot!.textContent = t("login.forgot_password_success");
-        setTimeout(() => {
-          const emailNotVerfied = document.getElementById("email_not_verified");
-          if (emailNotVerfied) emailNotVerfied.style.display = "none";
-          modal.remove();
-        }, 1000);
-      } catch (err: any) {
-        msgForgot!.textContent = err.message;
       }
     });
     document.getElementById("confirm-no")?.addEventListener("click", () => {

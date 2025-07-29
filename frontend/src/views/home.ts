@@ -1,36 +1,12 @@
 import { t } from "../i18n";
 
-export function homeView(): string {
-  const count = Number(localStorage.getItem("homeCount") || 0);
+export function renderHome() {
   return `
     <div class="center-screen">
-      <h1 class="text-4xl font-bold text-cyan-300 mb-6">
-        ${t("welcome")}
-      </h1>
-      <div class="card p-8">
-        <button
-          id="kill-btn"
-          class="btn-main"
-        >
-          ${t("home.kill")}
-        </button>
-        <div class="mt-4 text-lg">
-          ${t("home.killed")}: <span id="kill-count" class="font-bold">${count}</span>
-        </div>
-      </div>
+      <h1 class="text-6xl font-extrabold text-cyan-400 mb-4">404</h1>
+      <p class="text-xl text-cyan-200 mb-8">${t("home.home")}</p>
     </div>
   `;
 }
 
-export function attachHomeEvents() {
-  const btn = document.getElementById("kill-btn");
-  const countSpan = document.getElementById("kill-count");
-  if (!btn || !countSpan) return;
-
-  btn.addEventListener("click", () => {
-    let count = Number(localStorage.getItem("homeCount") || 0);
-    count++;
-    localStorage.setItem("homeCount", String(count));
-    countSpan.textContent = String(count);
-  });
-}
+export function attachHomeEvents() {}

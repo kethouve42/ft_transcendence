@@ -42,31 +42,38 @@ export function registerView(): string {
 }
 
 export function attachRegisterEvents() {
+  let isProcessing = false;
   const form = document.getElementById("register-form") as HTMLFormElement | null;
   const msg = document.getElementById("register-message");
   if (!form) return;
-
-  form.onsubmit = async (e) => {
+  if (!msg) return;
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (msg) msg.textContent = "";
     const login = (form.login as HTMLInputElement).value;
     const email = (form.email as HTMLInputElement).value;
     const password = (form.password as HTMLInputElement).value;
-
-    try {
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
-        body: JSON.stringify({ login, email, password }),
-      });
-      if (!res.ok) throw new Error(t("register.error_api") + res.status);
-      if (msg) msg.textContent = t("register.success");
-      form.reset();
-      setTimeout(() => {
+    if (isProcessing == true)
+      msg.textContent = t("all.wait");
+    else
+    {
+      isProcessing = true;
+      try {
+        const res = await fetch("/api/users", {
+          method: "POST",
+          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
+          body: JSON.stringify({ login, email, password }),
+        });
+        const errorData = await res.json();
+        if (!res.ok) throw new Error(errorData.error);
+        msg.textContent = t("register.success");
+        form.reset();
         navigateTo("/login");
-      }, 1000);
-    } catch (err: any) {
-      if (msg) msg.textContent = t("register.error_add") + err.message;
-    }
-  };
+      } catch (err: any) {
+        msg.textContent = err.message;
+      } finally {
+        isProcessing = false;
+      }
+    };
+  });
 }

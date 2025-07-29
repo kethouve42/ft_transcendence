@@ -2,6 +2,7 @@ export default {
   all: {
     yes: "Sí",
     no: "No",
+    wait: "Enviando...",
   },
   nav: {
     home: "Inicio",

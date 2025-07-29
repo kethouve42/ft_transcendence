@@ -2,7 +2,6 @@ import "./css/index.css";
 import { loginView, attachLoginEvents } from "./views/login";
 import { dashboardMainView, attachDashboardMainEvents } from "./views/dashboard";
 import { registerView, attachRegisterEvents } from "./views/register";
-import { homeView, attachHomeEvents } from "./views/home";
 import { profileView, attachProfileEvents } from "./views/profile";
 import { navbarView, attachNavbarEvents } from "./views/navbar";
 import { renderError, attachErrorEvents } from "./views/error";
@@ -14,12 +13,13 @@ import { loginTournamentView, attachLoginTournamentEvents } from "./views/game/l
 import { registerRedirectView, attachRegisterRedirectEvents } from "./views/register_Redirect";
 import { resetPasswordView, resetPasswordEvents } from "./views/reset_password"
 import { mailConfirmView, mailConfirmEvents } from "./views/mail_confirm";
+import { renderHome, attachHomeEvents } from "./views/home";
 import { t } from "./i18n";
 
 type RouteHandler = (params?: any) => string | Promise<string>;
 
 const routes: Record<string, RouteHandler> = {
-  "/": homeView,
+  "/": renderHome,
   "/login": loginView,
   "/dashboard": dashboardMainView,
   "/register": registerView,
@@ -47,7 +47,7 @@ function pingUser() {
       localStorage.removeItem("userLogin");
       localStorage.removeItem("userAlias");
       localStorage.removeItem("userAvatar");
-      navigateTo("/login");
+      navigateTo("/");
     }
   })
   .catch(() => {});
@@ -142,26 +142,6 @@ export function navigateTo(route: string) {
 window.onpopstate = () => render(location.pathname);
 render(location.pathname);
 
-if (!localStorage.getItem("size"))
-  localStorage.setItem("size", "16");
-const root = document.documentElement;
-let next = Number(localStorage.getItem("size"));
-root.style.setProperty('--base-font-size', next + 'px');
-
-
-export function changeFontSize(delta: number) {
-  const root = document.documentElement;
-  let next = Number(localStorage.getItem("size"));
-  next = next + delta;
-  if (next < 12) next = 12;
-  if (next > 28) next = 28;
-  localStorage.setItem("size", next.toString());
-  root.style.setProperty('--base-font-size', next + 'px');
-}
-
-function toggleContrast() {
-  document.body.classList.toggle('high-contrast');
-}
 
 export function escapeHTML(str: string) {
   if (!str)
@@ -205,6 +185,4 @@ export function showPopup(message: string, onConfirm: () => void) {
     document.getElementById("confirm-yes")?.focus();
 }
 
-(window as any).toggleContrast = toggleContrast;
-(window as any).changeFontSize = changeFontSize;
 (window as any).navigateTo = navigateTo;

@@ -2,6 +2,7 @@ export default {
   all: {
     yes: "Oui",
     no: "Non",
+    wait: "Envoi en cours...",
   },
   nav: {
     home: "Accueil",
@@ -29,7 +30,7 @@ export default {
     code2fa: "Code 2FA",
     need2fa: "Veuillez entrer le code 2FA reçu.",
     error: "Identifiants incorrects",
-    error_internal: "Erreur interne : identifiant manquant.",
+    error_internal: "Erreur: identifiant manquant.",//////////////////
     error_2fa: "Code 2FA incorrect",
     error_2fa_connexion: "Erreur lors de la connexion 2FA :",
     error_connexion: "Erreur lors de la connexion :",
