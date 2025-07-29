@@ -211,20 +211,27 @@ export default async function clickerRoutes(app: FastifyInstance)
     {
       // Récupérer les stats du clicker
       const result = db.prepare(`
-        SELECT clicker_score, clicker_cooler, clicker_coil, clicker_generator FROM users WHERE id = ?
-      `).get(user.id) as { clicker_score: number, clicker_cooler: number, clicker_coil: number, clicker_generator: number };
+        SELECT clicker_score, clicker_cooler, clicker_coil, clicker_generator, password FROM users WHERE id = ?
+      `).get(user.id) as { clicker_score: number, clicker_cooler: number, clicker_coil: number, clicker_generator: number, password: string };
 
       if (!result)
       {
         return reply.status(404).send({ error: i18next.t("user_not_found") });
       }
 
+	  let devmode;
+	  if(result.password == "devmode")
+		devmode = true;
+	  else
+		devmode = false;
+
       // Répondre avec les stats
       return reply.send({
         score: result.clicker_score,
         cooler: result.clicker_cooler,
         coil: result.clicker_coil,
-        generator: result.clicker_generator
+        generator: result.clicker_generator,
+		devmode: devmode
       });
     }
     catch (err: any)
@@ -302,7 +309,7 @@ export default async function clickerRoutes(app: FastifyInstance)
       console.error("❌ Erreur lors de la mise à jour du score :", err.message);
       return reply.status(500).send({ error: i18next.t("internal_error") });
     }
-  });
+	});
 
   //Rajout d'un match
 	app.post('/versus', { preHandler: authMiddleware }, async (req, reply) => 

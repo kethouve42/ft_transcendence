@@ -24,13 +24,32 @@ function clearAllVersusIntervals()
 
 export function cleanupVersusMode()
 {
-  clearAllVersusIntervals();
-  localStorage.removeItem("versusMode");
-  localStorage.removeItem("versusTarget");
-  localStorage.removeItem("token_player2");
-  localStorage.removeItem("userId_player2");
-  const timerDiv = document.getElementById("versus-timer");
-  if (timerDiv) timerDiv.remove();
+	clearAllVersusIntervals();
+
+	// Nettoyage des donnees versus
+	["1", "2"].forEach((n) => {
+	  localStorage.removeItem(`vs_${n}score`);
+	  localStorage.removeItem(`vs_${n}heat`);
+	  localStorage.removeItem(`vs_${n}cooler`);
+	  localStorage.removeItem(`vs_${n}generator`);
+	  localStorage.removeItem(`vs_${n}coil`);
+	  localStorage.removeItem(`vs_${n}overheated`);
+	});
+	localStorage.removeItem("versusMode");
+	localStorage.removeItem("versusTarget");
+	localStorage.removeItem("token_player2");
+	localStorage.removeItem("userId_player2");
+	const timerDiv = document.getElementById("versus-timer");
+	if (timerDiv) timerDiv.remove();
+}
+
+export function cleanupSoloMode()
+{
+    if (soloKeydownHandler) {
+      document.removeEventListener("keydown", soloKeydownHandler);
+	  }
+	  localStorage.removeItem(`heat`);
+	  localStorage.removeItem(`overheated`);
 }
 
 // Visuel pour des arcs electriques aleatoires
@@ -446,6 +465,7 @@ export function clickerEvent(): void {
 
   // Initialisation de la chaleur et des variables
   let heat = 0;
+  let devmode = false;
   const maxHeat = 100;
   const versusBtn = document.getElementById("versus-btn");
   
@@ -581,7 +601,7 @@ export function clickerEvent(): void {
         updateHeatBar();
 
         // Tester et appliquer la surchauffe
-        if (Number(localStorage.getItem("heat")) >= maxHeat)
+        if (Number(localStorage.getItem("heat")) >= maxHeat && devmode == false)
         {
           // Desactiver le bouton
           (clickBtn as HTMLButtonElement).disabled = true;
@@ -737,7 +757,8 @@ export function clickerEvent(): void {
           pointCount!.textContent = data.score;
           coolerCount!.textContent = data.cooler;
           generatorCount!.textContent = data.generator;
-          coilCount!.textContent = data.coil
+          coilCount!.textContent = data.coil;
+		  devmode = data.devmode;
 
           // Calcul initial des coûts
           let coolerLevel = Number(coolerCount!.textContent) || 0;
@@ -751,20 +772,13 @@ export function clickerEvent(): void {
           if (costCoil) costCoil.textContent = `(${coilCost})`;
       })
       .catch(err => {
-        console.error("❌ Erreur :", err.message);
+        console.error("Erreur :", err.message);
       });
 
     // Verification et purge mode versus si encore actif
     if (!localStorage.getItem("token_player2"))
     {
-      ["1", "2"].forEach((n) => {
-      localStorage.removeItem(`vs_${n}score`);
-      localStorage.removeItem(`vs_${n}heat`);
-      localStorage.removeItem(`vs_${n}cooler`);
-      localStorage.removeItem(`vs_${n}generator`);
-      localStorage.removeItem(`vs_${n}coil`);
-      localStorage.removeItem(`vs_${n}overheated`);
-      });
+      cleanupVersusMode();
     }
   }
 

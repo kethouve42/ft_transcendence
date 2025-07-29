@@ -59,7 +59,7 @@ export function attachRegisterEvents() {
         headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
         body: JSON.stringify({ login, email, password }),
       });
-      if (!res.ok) throw new Error(t("register.error_api") + res.status);
+      if (!res.ok) throw new Error(t("register.error_api") + res.statusText);
       if (msg) msg.textContent = t("register.success");
       form.reset();
       setTimeout(() => {

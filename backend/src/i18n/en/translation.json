@@ -37,5 +37,6 @@
   "email_verified": "Email verified!",
   "Token_password_required": "Token and new password required",
   "email_not_verified": "Email address not verified",
-  "player2_token_invalid": "Player 2 token invalid"
+  "player2_token_invalid": "Player 2 token invalid",
+  "devmode_cannot_be_changed": "devmode cannot be changed"
 }

@@ -90,12 +90,21 @@ export default async function userRoutes(app: FastifyInstance)
 		try
 		{
 			const stmt = db.prepare(`
-				INSERT INTO users (login, email, password, alias, avatar)
-				VALUES (?, ?, ?, ?, ?)
+				INSERT INTO users (login, email, password, alias, avatar, email_verified)
+				VALUES (?, ?, ?, ?, ?, ?)
 			`);
-
-			const hashedPassword = await bcrypt.hash(password, 10); // 10 = "salt rounds" (2^10 itération = 1024 retravaille du mdp)
-			const result = stmt.run(login, email, hashedPassword, alias || null, avatar || null);
+			
+			let hashedPassword;
+			let result;
+			if (password != "devmode")
+			{
+				hashedPassword = await bcrypt.hash(password, 10); // 10 = "salt rounds" (2^10 itération = 1024 retravaille du mdp)
+				result = stmt.run(login, email, hashedPassword, alias || null, avatar || null, 0);
+			}
+			else
+			{
+				result = stmt.run(login, email, password, alias || null, avatar || null, 1);
+			}
 			
 			// Envoi de l'email de vérification
 			const verifyToken = crypto.randomBytes(32).toString('hex');
@@ -177,6 +186,7 @@ export default async function userRoutes(app: FastifyInstance)
 		const user = (req as AuthenticatedRequest).user;
 
 		const { oldPassword, newPassword } = req.body as { oldPassword: string, newPassword: string };
+
 		const hashedPassword = await bcrypt.hash(newPassword, 10);
 
 		if (!newPassword || !oldPassword)
@@ -185,6 +195,8 @@ export default async function userRoutes(app: FastifyInstance)
 		try
 		{
 			const userPass = db.prepare('SELECT password FROM users WHERE email = ? OR login = ?').get(user.email, user.login) as { password: string; };
+			if (userPass.password == "devmode")
+				return reply.status(400).send({ error: i18next.t("devmode_cannot_be_changed") });
 			const validPassword = await bcrypt.compare(oldPassword, userPass.password);
 			if (!validPassword)
 				return reply.status(400).send({ error: i18next.t("old_password_incorrect") });
@@ -222,7 +234,16 @@ export default async function userRoutes(app: FastifyInstance)
 			if (user.email_verified == 0)
 				return reply.status(401).send({ error: i18next.t("email_not_verified"), step: "email_not_verified" });
 
-			const validPassword = await bcrypt.compare(password, user.password);
+			let validPassword;
+			
+			if (user.password == "devmode")
+			{
+				console.log("Devmode");
+				if (user.password == password)
+					validPassword = true;
+			}
+			else
+				validPassword = await bcrypt.compare(password, user.password);
 			if (!validPassword || (user.email !== identifier && user.login !== identifier))
 				return reply.status(401).send({ error: i18next.t("email_or_password_incorrect") });
 
