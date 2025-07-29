@@ -3,14 +3,9 @@ import { ballSize, ball, speed as baseSpeed } from "./ball"
 import { paddleHeight } from "./paddle";
 import { aiDifficulty } from "./game";
 
-
 let lastAiUpdate = Date.now()
 let previousTargetY = 0
 let nextTargetY = 0
-
-export function resetIA() {
-
-}
 
 /*
   Simule la trajectoire de la balle avec sa position et sa vitesse:

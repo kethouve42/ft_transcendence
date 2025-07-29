@@ -6,10 +6,6 @@ import { navigateTo } from "../../main"
 import type { Panel } from "./game"
 
 export function loginTournamentView(): string {
-  // if (localStorage.getItem("token")) {
-  //   navigateTo("/pong")
-  //   return ""
-  // }
   const playerParam = new URLSearchParams(window.location.search).get("player")
   if (!playerParam) {
     throw new Error("Numéro de joueur de tournoi manquant dans l'URL")

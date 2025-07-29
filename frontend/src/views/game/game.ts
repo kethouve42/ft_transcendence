@@ -145,7 +145,8 @@ function renderPanelSettings() {
           <input
             type="number"
             id="input-timer-mod"
-            min="10" max="300"
+            min="10" 
+            max="300"
             value="${timerMod}"
             class="ml-2 w-20 p-1 bg-gray-800 rounded"
           />
@@ -506,7 +507,13 @@ function attachSettingsEvents(root: HTMLElement) {
     root.querySelector('#display-ball-speed')!.textContent = ballSpeed.toString()
   })
   root.querySelector('#input-timer-mod')?.addEventListener("input", e => {
-    timerMod = +(e.target as HTMLInputElement).value
+    let val = +(e.target as HTMLInputElement).value
+    if (val < 1)
+      val = 1
+    if (val > 300)
+      val = 300
+    timerMod = val;
+    (e.target as HTMLInputElement).value = val.toString()
     root.querySelector('#display-timer-mod')!.textContent = timerMod.toString()
   })
   root.querySelector('#input-score-mod')?.addEventListener("input", e => {
