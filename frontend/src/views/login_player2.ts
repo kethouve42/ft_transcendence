@@ -114,7 +114,7 @@ export function attachLoginPlayer2Events() {
     {
       const login = (form.login as HTMLInputElement).value;
       const password = (form.password as HTMLInputElement).value;
-      const stayConnected = (form.stayConnected as HTMLInputElement).checked;
+      const stayConnected = false;
       isProcessing = true;
       try {
         const res = await fetch("/api/users/auth", {
@@ -140,12 +140,8 @@ export function attachLoginPlayer2Events() {
           msg!.textContent = data.error || t("login.error");
           return;
         }
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("token_player2", data.token);
         if (data.UserId)
-          localStorage.setItem("userId", data.UserId.toString())
-        localStorage.setItem("userLogin", data.login || "");
-        localStorage.setItem("userAlias", data.alias || "");
-        localStorage.setItem("userAvatar", data.avatar || "");
         localStorage.removeItem("2fa_identifier");
         navigateTo(getRedirectUrl());
       } catch (err: any) {

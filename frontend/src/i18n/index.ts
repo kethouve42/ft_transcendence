@@ -1,7 +1,7 @@
 import fr from "./fr";
 import en from "./en";
 import es from "./es";
-import { navigateTo } from "../main";
+import { navigateTo, updateNavbar } from "../main";
 
 const LANGS = { fr, en, es };
 const LANG_NAMES = { fr: "Français", en: "English", es: "Español" };
@@ -14,6 +14,7 @@ export function getLang(): LangKey {
 
 export function setLang(lang: LangKey) {
   localStorage.setItem("lang", lang);
+  updateNavbar();
   navigateTo(window.location.pathname + window.location.search);
 }
 

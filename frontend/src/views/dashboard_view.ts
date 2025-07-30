@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { navigateTo, escapeHTML, showPopup } from "../main";
+import { navigateTo, escapeHTML } from "../main";
 
 export function dashboardView(): string {
   return `
@@ -337,4 +337,35 @@ function renderUser(id: number | null, userMap: Record<number, { alias?: string;
   const user = userMap[id];
   if (!user) return `<span>${id}</span>`;
   return `<span class="text-cyan-300 hover:underline cursor-pointer" onclick="navigateTo('/profile/${id}')">${escapeHTML(user.alias || user.login)}</span>`;
+}
+
+function showPopup(message: string, onConfirm: () => void) {
+
+  const modal = document.createElement("div");
+  modal.id = "confirm-modal";
+  modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999]";
+  modal.innerHTML = `
+    <div class="bg-cyan-900 rounded-2xl shadow-2xl border-2 border-cyan-400 p-8 flex flex-col items-center max-w-md w-full" role="dialog" aria-modal="true">
+      <p class="text-cyan-200 mb-6">${message}</p>
+      <div class="flex gap-4">
+        <button id="confirm-yes" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold">${t("all.yes")}</button>
+        <button id="confirm-no" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded font-bold">${t("all.no")}</button>
+      </div>
+    </div>
+  `;
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+
+    document.body.appendChild(modal);
+
+    document.getElementById("confirm-yes")?.addEventListener("click", () => {
+      modal.remove();
+      onConfirm();
+    });
+    document.getElementById("confirm-no")?.addEventListener("click", () => {
+      modal.remove();
+    });
+
+    document.getElementById("confirm-yes")?.focus();
 }
