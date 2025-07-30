@@ -45,13 +45,17 @@ export default async function matchsRoutes(app: FastifyInstance)
 			}
 		}
 
-		// Vérifie que les joueurs sont différents en PVP
 		if (user2 && user1.id === user2.id)
 			return reply.status(400).send({ error: i18next.t("match_self") });
-
-		// Vérifie que le gagnant est l'un des deux
-		if (winner_id !== user1.id && (!user2 || winner_id !== user2.id) && winner_id !== null)
-			return reply.status(400).send({ error: i18next.t("match_winner_invalid") });
+		
+		if (winner_id !== user1.id && winner_id !== null)
+		{
+			if (user2 && winner_id !== user2.id)
+			{
+				console.log("Erreur: ", winner_id);
+				return reply.status(400).send({ error: i18next.t("match_winner_invalid") });
+			}
+		}
 
 		try
 		{

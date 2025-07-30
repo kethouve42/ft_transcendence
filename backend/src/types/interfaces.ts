@@ -32,3 +32,15 @@ export interface Friend {
     alias: string;
     avatar: string;
 }
+
+export interface Clicker
+{
+	id: number;
+	date: string;
+	game_mode: string,
+	target: number;
+	user1_id: number;
+	user2_id: number;
+	winner_id: number | null;
+	score: number,
+}

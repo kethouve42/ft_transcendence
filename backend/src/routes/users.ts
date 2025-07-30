@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import { FastifyRequest } from "fastify";
 import nodemailer from 'nodemailer';
-import { AuthUser, Match, Friend } from '../types/interfaces';
+import { AuthUser, Match, Friend, Clicker } from '../types/interfaces';
 import crypto from "crypto";
 import i18next from '../i18n/i18n';
 import { langMiddleware } from '../middlewares/lang';
@@ -100,29 +100,28 @@ export default async function userRoutes(app: FastifyInstance)
 			{
 				hashedPassword = await bcrypt.hash(password, 10); // 10 = "salt rounds" (2^10 itération = 1024 retravaille du mdp)
 				result = stmt.run(login, email, hashedPassword, alias || null, avatar || null, 0);
+				// Envoi de l'email de vérification
+				const verifyToken = crypto.randomBytes(32).toString('hex');
+				const expires = Date.now() + 1000 * 60 * 30; // 30 min
+	
+				db.prepare('UPDATE users SET email_verify_token = ?, email_verify_expires = ? WHERE id = ?')
+				  .run(verifyToken, expires, result.lastInsertRowid);
+	
+				const verifyUrl = `https://localhost:8443/verify-email?token=${verifyToken}`;
+				await transporter.sendMail({
+				  //---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
+				  //from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
+				  //-----------VRAI MAIL------------//
+				  from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
+				  to: email,
+				  subject: i18next.t("verify_email_subject"),
+				  text: i18next.t("verify_email_text", { url: verifyUrl })
+				});
 			}
 			else
 			{
 				result = stmt.run(login, email, password, alias || null, avatar || null, 1);
 			}
-			
-			// Envoi de l'email de vérification
-			const verifyToken = crypto.randomBytes(32).toString('hex');
-			const expires = Date.now() + 1000 * 60 * 30; // 30 min
-
-			db.prepare('UPDATE users SET email_verify_token = ?, email_verify_expires = ? WHERE id = ?')
-			  .run(verifyToken, expires, result.lastInsertRowid);
-
-			const verifyUrl = `https://localhost:8443/verify-email?token=${verifyToken}`;
-			await transporter.sendMail({
-			  //---------FAUX MAIL AVEC ETHEREAL (TEST)-----------------//
-			  //from: '"ft_transcendence" <no-reply@ft_transcendence.local>',
-			  //-----------VRAI MAIL------------//
-			  from: '"ft_transcendence" <SainteDataBase@outlook.fr>',
-			  to: email,
-			  subject: i18next.t("verify_email_subject"),
-			  text: i18next.t("verify_email_text", { url: verifyUrl })
-			});
 
 			return { success: true, id: result.lastInsertRowid };
 		}
@@ -427,6 +426,9 @@ export default async function userRoutes(app: FastifyInstance)
 		const user = (req as AuthenticatedRequest).user;
 
 		try {
+			const devmode = db.prepare('SELECT password FROM users WHERE id = ?').get(user.id) as {password: string};
+			if (devmode.password === "devmode")
+				return reply.status(400).send( "Devmode cannot activate 2fa" );
 			const result = db.prepare(`UPDATE users SET tfa_enabled = 1 WHERE id = ?`).run(user.id);
 
 			if (result.changes === 0)
@@ -490,6 +492,21 @@ export default async function userRoutes(app: FastifyInstance)
 		{
 			if (part.type === 'file')
 			{
+				const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+				if (!allowedMimeTypes.includes(part.mimetype)) {
+					return reply.status(400).send({ error: i18next.t("invalid_file_type") });
+				}
+
+				const maxFileSize = 10 * 1024 * 1024;
+				let fileSize = 0;
+				part.file.on('data', (chunk) => {
+					fileSize += chunk.length;
+					if (fileSize > maxFileSize) {
+						part.file.destroy();
+						return reply.status(400).send({ error: i18next.t("file_too_large") });
+					}
+				});
+
 				const fileExt = path.extname(part.filename);
 				const fileName = `avatar_${user.id}_${Date.now()}${fileExt}`;
 				const uploadDir = path.resolve(process.cwd(), 'uploads/avatars');
@@ -576,10 +593,14 @@ export default async function userRoutes(app: FastifyInstance)
 		// Récupère les amis
 		const friends = db.prepare('SELECT * FROM friends WHERE user_id = ? OR friend_id = ?').all(user.id, user.id) as Friend[];
 
+		// Récupère les matchs du clicker
+		const clickers = db.prepare('SELECT * FROM clicker_matchs WHERE user1_id = ? OR user2_id = ?').all(user.id, user.id) as Clicker[];
+
 		return {
 			user: userData,
 			matchs,
-			friends
+			friends,
+			clickers
 		};
 	});
 
@@ -629,13 +650,17 @@ export default async function userRoutes(app: FastifyInstance)
 		try
 		{
 			// Vérifie si l'utilisateur existe
-			const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email) as { id: number, email: string } | undefined;
+			const user = db.prepare('SELECT id, email, email_verified FROM users WHERE email = ?').get(email) as { id: number, email: string, email_verified: number } | undefined;
 			if (!user)
 			{
 				console.log("User not found");
 				return reply.status(200).send({ error: i18next.t("user_unknown") });
 			}
-
+			if (user.email_verified == 0)
+				return reply.status(401).send({ error: i18next.t("email_not_verified"), step: "email_not_verified" });
+			const devmode = db.prepare('SELECT password FROM users WHERE id = ?').get(user.id) as { password: string}
+			if (devmode.password === "devmode")
+				return reply.status(400).send( "Your account is on devmode");
 			// Génère un token sécurisé
 			const resetToken = crypto.randomBytes(32).toString('hex');
 			const expires = Date.now() + 1000 * 60 * 15; // 15 minutes
