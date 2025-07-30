@@ -296,6 +296,120 @@ function renderGame() {
   `
 }
 
+function restoreOriginalUser() {
+  const oriToken = localStorage.getItem("tournament_original_token")
+  const oriUser = localStorage.getItem("tournament_original_userId")
+
+  if (oriToken && oriUser) {
+    localStorage.setItem("token", oriToken)
+    localStorage.setItem("userId", oriUser)
+    localStorage.removeItem("tournament_original_token")
+    localStorage.removeItem("tournament_original_userId")
+  }
+}
+
+// Prépare et lance un nouveau match (local, IA ou tournoi)
+export function startMatch() {
+  const map = maps[selectedMapIndex]
+  if (map.randomObstacle)
+    currentObstacles = generateRandomObstacles(map.randomObstacle)
+  else if (map.obstacle)
+    currentObstacles = map.obstacle.slice()
+  else
+    currentObstacles = []
+  
+  let pseudo1 = ""
+  let pseudo2 = ""  
+  const phaseStr = localStorage.getItem("tournament_phase")
+  if (phaseStr) {
+    mode = "tournoi"
+    const phase = Number(phaseStr)
+    const playerCount = Number(localStorage.getItem("tournament_player_count") || "4")
+
+    if (phase === 1 && !localStorage.getItem("tournament_original_token")) {
+      localStorage.setItem("tournament_original_token", localStorage.getItem("token")!)
+      localStorage.setItem("tournament_original_userId", localStorage.getItem("userId")!)
+    }
+
+    const match = getTournamentMatchPlayers(phase, playerCount)
+    if (match) {
+      localStorage.setItem("token", match.token1)
+      localStorage.setItem("userId", match.userId1)
+      localStorage.setItem("token_player2", match.token2)
+      localStorage.setItem("userId_player2", match.userId2)
+      pseudo1 = match.login1
+      pseudo2 = match.login2
+    }
+  }
+  else
+    mode = (currentPanel === "ai") ? "ai" : "local"
+  showOnly("game")
+  canvas = document.getElementById("pong") as HTMLCanvasElement
+  ctx = canvas.getContext("2d")!
+  initPaddle(canvas)
+  resetGame()
+  const timerGame = Math.max(10, timerMod)
+  startTimer(timerGame)
+  //-------------------------------------REMPLACEMENT CALCULÉ SUR LES FPS-----------------------------------------------//
+  lastFrameTime = performance.now();
+  //--------------------------------------------------------------------------------------------------------------------//
+  gameLoop();
+}
+
+// Termine la partie, enregistre le match et affiche le résultat
+async function endGame() {
+  // Détermine le gagnant du match
+  let winner: "left" | "right" | null = null
+  if (score.left === scoreMod)
+    winner = "left"
+  else if (score.right === scoreMod)
+    winner = "right"
+  else if (score.left > score.right)
+    winner = "left"
+  else if (score.right > score.left)
+    winner = "right"
+
+  const token1 = localStorage.getItem("token")
+  const token2 = localStorage.getItem("token_player2")
+  const user1_id = Number(localStorage.getItem("userId"))
+  const user2_id = Number(localStorage.getItem("userId_player2"))
+  const winnerID = winner === "left" ? user1_id : winner === "right" ? user2_id : null
+  const scoreStr = `${score.left}-${score.right}`
+
+  const payload: Record<string, any> = {
+    date: new Date().toISOString(),
+    duration: timerMod,
+    winner_id: winnerID,
+    score: scoreStr,
+  }
+  if (mode !== "ai" && token2)
+    payload.player2_token = token2
+
+  try {
+    await fetch("/api/matchs/", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token1
+      },
+      body: JSON.stringify(payload)
+    })
+  }
+  catch (err) {
+    console.error("Erreur lors de l'enregistrement du match:", err)
+  }
+  document.body.insertAdjacentHTML("beforeend", renderPanelResult())
+  attachResultEvents()
+  resetGame()
+  showOnly("menu")
+  localStorage.removeItem("token_player2")
+
+  if (localStorage.getItem("tournament_phase")) {
+    handleTournamentProgress(winner!, showOnly)
+    return
+  }
+}
+
 /*
 Gestion de l'affichage des  différents écrans.
 La fonction se base sur les booléens pour savoir si l'élément doit être visible ou doit être caché.
@@ -563,6 +677,19 @@ function attachRulesEvents(root: HTMLElement) {
   root.querySelector('#btn-close-rules')?.addEventListener("click", () => showOnly("menu"))
 }
 
+function restoreTournament() {
+  window.addEventListener("beforeunload", () => {
+    if (localStorage.getItem("tournament_phase")) {
+      restoreOriginalUser()
+    }
+  })
+  window.addEventListener("pagehide", () => {
+    if (localStorage.getItem("tournament_phase")) {
+      restoreOriginalUser()
+    }
+  })
+}
+
 // Gère tous les événements des boutons et des menus du jeu
 export function gameEvent() {
   const root = document.getElementById('app')!
@@ -572,6 +699,7 @@ export function gameEvent() {
   attachAIEvents(root)
   attachRulesEvents(root)
   attachTournamentCountEvents(root)
+  restoreTournament()
   if (currentPanel === "tournament")
     attachTournamentEvents(root)
 
@@ -594,59 +722,6 @@ function resetGame(): void {
   nextTargetY = rightPaddle.y
 }
 
-// Termine la partie, enregistre le match et affiche le résultat
-async function endGame() {
-  // Détermine le gagnant du match
-  let winner: "left" | "right" | null = null
-  if (score.left === scoreMod)
-    winner = "left"
-  else if (score.right === scoreMod)
-    winner = "right"
-  else if (score.left > score.right)
-    winner = "left"
-  else if (score.right > score.left)
-    winner = "right"
-
-  const token1 = localStorage.getItem("token")
-  const token2 = localStorage.getItem("token_player2")
-  const user1_id = Number(localStorage.getItem("userId"))
-  const user2_id = Number(localStorage.getItem("userId_player2"))
-  const winnerID = winner === "left" ? user1_id : winner === "right" ? user2_id : null
-  const scoreStr = `${score.left}-${score.right}`
-
-  const payload: Record<string, any> = {
-    date: new Date().toISOString(),
-    duration: timerMod,
-    winner_id: winnerID,
-    score: scoreStr,
-  }
-  if (mode !== "ai" && token2)
-    payload.player2_token = token2
-
-  try {
-    await fetch("/api/matchs/", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token1
-      },
-      body: JSON.stringify(payload)
-    })
-  }
-  catch (err) {
-    console.error("Erreur lors de l'enregistrement du match:", err)
-  }
-  document.body.insertAdjacentHTML("beforeend", renderPanelResult())
-  attachResultEvents()
-  resetGame()
-  showOnly("menu")
-  localStorage.removeItem("token_player2")
-
-  if (localStorage.getItem("tournament_phase")) {
-    handleTournamentProgress(winner!, showOnly)
-    return
-  }
-}
 //----------------------------------INIT DES VARIABLE FPS----------------------------------------//
 
 const TARGET_FPS = 60;
@@ -804,54 +879,6 @@ function gameLoop(now = performance.now()) {
   requestAnimationFrame(gameLoop);
 }
 //--------------------------------------------------------------------------------------------------------------------------//
-
-// Prépare et lance un nouveau match (local, IA ou tournoi)
-export function startMatch() {
-  const map = maps[selectedMapIndex]
-  if (map.randomObstacle)
-    currentObstacles = generateRandomObstacles(map.randomObstacle)
-  else if (map.obstacle)
-    currentObstacles = map.obstacle.slice()
-  else
-    currentObstacles = []
-  
-  let pseudo1 = ""
-  let pseudo2 = ""  
-  const phaseStr = localStorage.getItem("tournament_phase")
-  if (phaseStr) {
-    mode = "tournoi"
-    const phase = Number(phaseStr)
-    const playerCount = Number(localStorage.getItem("tournament_player_count") || "4")
-
-    if (phase === 1 && !localStorage.getItem("tournament_original_token")) {
-      localStorage.setItem("tournament_original_token", localStorage.getItem("token")!)
-      localStorage.setItem("tournament_original_userId", localStorage.getItem("userId")!)
-    }
-
-    const match = getTournamentMatchPlayers(phase, playerCount)
-    if (match) {
-      localStorage.setItem("token", match.token1)
-      localStorage.setItem("userId", match.userId1)
-      localStorage.setItem("token_player2", match.token2)
-      localStorage.setItem("userId_player2", match.userId2)
-      pseudo1 = match.login1
-      pseudo2 = match.login2
-    }
-  }
-  else
-    mode = (currentPanel === "ai") ? "ai" : "local"
-  showOnly("game")
-  canvas = document.getElementById("pong") as HTMLCanvasElement
-  ctx = canvas.getContext("2d")!
-  initPaddle(canvas)
-  resetGame()
-  const timerGame = Math.max(10, timerMod)
-  startTimer(timerGame)
-  //-------------------------------------REMPLACEMENT CALCULÉ SUR LES FPS-----------------------------------------------//
-  lastFrameTime = performance.now();
-  //--------------------------------------------------------------------------------------------------------------------//
-  gameLoop();
-}
 
 // window.addEventListener("load", () => {
 //   if (localStorage.getItem("returnToTournament")) {
