@@ -844,8 +844,7 @@ export function startMatch() {
   canvas = document.getElementById("pong") as HTMLCanvasElement
   ctx = canvas.getContext("2d")!
   initPaddle(canvas)
-  resetBall(canvas)
-  resetTimer()
+  resetGame()
   const timerGame = Math.max(10, timerMod)
   startTimer(timerGame)
   //-------------------------------------REMPLACEMENT CALCULÉ SUR LES FPS-----------------------------------------------//
