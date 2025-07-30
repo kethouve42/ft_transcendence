@@ -19,8 +19,8 @@ export default {
   },
   welcome: "La paroisse de la Sainte DATABASE",
   home: {
-    kill: "Clique ici pour tuer un randome",
-    killed: "Nombre de randome tués"
+    start_journey: "Commencer l'aventure",
+    join_server: "Rejoindre le site",
   },
   login: {
     title: "Connexion",
@@ -150,7 +150,8 @@ export default {
     no_pong_stats: "Aucune statistique Pong trouvée.",
     last_matches_clicker: "10 derniers matchs Clicker",
     game_mode: "Mode de jeu",
-
+    login_required: "Le nom d'utilisateur est obligatoire",
+    email_required: "L'adresse email est obligatoire",
   },
   friends: {
     friends: "Amis",

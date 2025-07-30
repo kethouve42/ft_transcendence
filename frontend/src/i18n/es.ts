@@ -19,8 +19,8 @@ export default {
   },
   welcome: "La parroquia de la Santa DATABASE",
   home: {
-    kill: "Haz clic aquí para matar a un random",
-    killed: "Número de randoms matados"
+    start_journey: "Comenzar la aventura",
+    join_server: "Unirse al sitio",
   },
   login: {
     title: "Conexión",
@@ -152,6 +152,8 @@ export default {
     no_pong_stats: "No se encontraron estadísticas Pong.",
     last_matches_clicker: "Últimos 10 partidos Clicker",
     game_mode: "Modo de juego",
+    login_required: "El nombre de usuario es obligatorio",
+    email_required: "La dirección de correo electrónico es obligatoria",
   },
   friends: {
     friends: "Amigos",

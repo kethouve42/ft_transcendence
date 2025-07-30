@@ -379,6 +379,17 @@
   gap: 1rem;
 }
 
+.lore-chapter {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: all 1s ease-out;
+}
+
+.animate-fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .btn-main {
   @apply bg-cyan-600 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-lg shadow-cyan-400/30 shadow transition;
 }

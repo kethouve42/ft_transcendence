@@ -19,8 +19,8 @@ export default {
   },
   welcome: "The Holy DATABASE Parish",
   home: {
-    kill: "Click here to kill a random",
-    killed: "Number of randoms killed"
+    start_journey: "Start the journey",
+    join_server: "join the site",
   },
   login: {
     title: "Login",
@@ -152,7 +152,8 @@ export default {
     no_pong_stats: "No Pong statistics found.",
     last_matches_clicker: "Last 10 Clicker matches",
     game_mode: "Game mode",
-
+    login_required: "Username is required",
+    email_required: "Email address is required",
   },
   friends: {
     friends: "Friends",

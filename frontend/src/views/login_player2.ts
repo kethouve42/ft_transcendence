@@ -92,8 +92,7 @@ export function attachLoginPlayer2Events() {
         });
         const data = await res.json();
         if (!res.ok || !data.token) {
-          msg!.textContent = data.error || t("login.error_2fa");
-          return;
+          throw new Error(data.error);
         }
         localStorage.setItem("token_player2", data.token);
         localStorage.removeItem("2fa_identifier_player2");
@@ -137,8 +136,7 @@ export function attachLoginPlayer2Events() {
           return;
         }
         if (!res.ok || !data.token) {
-          msg!.textContent = data.error || t("login.error");
-          return;
+          throw new Error(data.error);
         }
         localStorage.setItem("token_player2", data.token);
         if (data.UserId)

@@ -102,8 +102,7 @@ export function attachLoginEvents() {
         });
         const data = await res.json();
         if (!res.ok || !data.token) {
-          msg!.textContent = data.error;
-          return;
+          throw new Error(data.error);
         }
         localStorage.setItem("token", data.token);
         localStorage.setItem("userLogin", data.login || "");
@@ -147,8 +146,7 @@ export function attachLoginEvents() {
             return;
         }
         if (!res.ok || !data.token) {
-          msg!.textContent = data.error;
-          return;
+          throw new Error(data.error);
         }
         localStorage.setItem("token", data.token);
         if (data.UserId)

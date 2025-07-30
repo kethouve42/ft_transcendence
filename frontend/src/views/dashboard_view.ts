@@ -1,342 +1,356 @@
 import { t } from "../i18n";
-import { navigateTo, escapeHTML } from "../main";
+import { escapeHTML, navigateTo} from "../main"
 
 export function dashboardView(): string {
-  return `
+    return `
     <div class="dashboard-bg">
-      <div class="w-full flex flex-col items-center mb-10">
-        <div class="w-full max-w-[1800px] card-main px-10 py-6 flex flex-col items-center"" id="profile-info"></div>
-      </div>
-      <div class="w-full max-w-[1800px] mx-auto flex flex-row gap-10">
-        <div class="card-section max-h-[600px] overflow-y-auto">
-
-          <h3 class="h3-dashboard">${t("dashboard.last_matches")}</h3>
-          <ul id="match-list" class="space-y-3"></ul>
-          
+        <div class="w-full flex flex-col items-center mb-10">
+            <div id="infoUser" class="w-full max-w-[1800px] card-main px-10 py-6 flex flex-col items-center""></div>
         </div>
-        <div class="card-section flex flex-col">
-
-          <h3 class="h3-dashboard">${t("dashboard.pong_stats")}</h3>
-          <div id="stats"></div>
-
+        <div class="w-full max-w-[1800px] mx-auto flex flex-row gap-10 mb-10">
+            <div class="card-section max-h-96 overflow-y-auto">
+                <h2>${t("dashboard.last_matches")}</h2>
+                <div id="matchUserpong" class="space-y-3"></div>
+            </div>
+            <div class="card-section max-h-96 overflow-y-auto">
+                <h2>${t("dashboard.last_matches_clicker")}</h2>
+                <div id="matchUserclicker" class="space-y-3"></div>
+            </div>
         </div>
-      </div>
-      </br>
-      <div class="w-full max-w-[1800px] mx-auto flex flex-row gap-10">
-        <div class="card-section max-h-[600px] overflow-y-auto">
-          <h3 class="h3-dashboard">${t("dashboard.last_matches_clicker")}</h3>
-          <ul id="match-clicker-list" class="space-y-3"></ul>
+        <div class="w-full max-w-[1800px] mx-auto flex flex-row gap-10 mb-10">
+            <div class="card-section flex flex-col">
+                <h2>${t("dashboard.pong_stats")}</h2>
+                <div id="statUserpong"></div>
+            </div>
+            <div class="card-section flex flex-col">
+                <h2>${t("dashboard.clicker_stats")}</h2>
+                <div id="statUserclicker"></div>
+            </div>
         </div>
-        <div class="card-section flex flex-col">
-          <h3 class="h3-dashboard">${t("dashboard.clicker_stats")}</h3>
-          <div id="stats-clicker"></div>
+        <div id="msg"></div>
+        <div class="gdpr-section">
+            <h3 class="text-xl font-bold text-cyan-200 mb-4">${t("dashboard.gdpr_title") || "Vie privée & GDPR"}</h3>
+            <div class="flex flex-row gap-4">
+            <button id="gdpr-anonymize" class=" grpd-main">${t("dashboard.gdpr_anonymize") || "Anonymiser mes données"}</button>
+            <button id="gdpr-export" class=" grpd-main">${t("dashboard.gdpr_export") || "Exporter mes données"}</button>
+            <button id="gdpr-delete" class=" grpd-main">${t("dashboard.gdpr_delete") || "Supprimer mon compte"}</button>
+            <a href="/privacy" class="text-cyan-400 underline self-center">${t("dashboard.gdpr_policy") || "Politique de confidentialité"}</a>
+            </div>
+            <div id="gdpr-message" class="mt-4 text-center"></div>
         </div>
-      </div>
-
-      <div class="gdpr-section">
-        <h3 class="text-xl font-bold text-cyan-200 mb-4">${t("dashboard.gdpr_title") || "Vie privée & GDPR"}</h3>
-        <div class="flex flex-row gap-4">
-          <button id="gdpr-anonymize" class=" grpd-main">${t("dashboard.gdpr_anonymize") || "Anonymiser mes données"}</button>
-          <button id="gdpr-export" class=" grpd-main">${t("dashboard.gdpr_export") || "Exporter mes données"}</button>
-          <button id="gdpr-delete" class=" grpd-main">${t("dashboard.gdpr_delete") || "Supprimer mon compte"}</button>
-          <a href="/privacy" class="text-cyan-400 underline self-center">${t("dashboard.gdpr_policy") || "Politique de confidentialité"}</a>
-        </div>
-        <div id="gdpr-message" class="mt-4 text-center"></div>
-      </div>
-      <a href="/" class="link-main mt-8 inline-block">${t("dashboard.back_home")}</a>
+        <a href="/" class="link-main mt-8 inline-block">${t("dashboard.back_home")}</a>
     </div>
-  `;
+    `;
 }
 
-export function attachDashboardViewEvents() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    navigateTo("/login");
-    return;
-  }
-
-  setTimeout(() => {
+export function attachDashboardViewEvents (): void {
+    const msg = document.getElementById("msg")
+    if (!msg) return
     const token = localStorage.getItem("token");
-    const msg = document.getElementById("gdpr-message");
-
-    const anonymBtn = document.getElementById("gdpr-anonymize");
-    if (anonymBtn) {
-      anonymBtn.addEventListener("click", () => {
-        showPopup(t(t("dashboard.gdpr_confirm_anonymize")), async () => {
-          const res = await fetch("/api/users/me/anonymize", {
-            method: "POST",
-            headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-          });
-          if (res.ok) {
-            localStorage.clear();
-            msg!.textContent = t("dashboard.gdpr_anonymized");
-            setTimeout(() => navigateTo("/"), 500);
-          } else {
-            msg!.textContent = t("dashboard.gdpr_error_anonymize");
-          }
-        });
-      });
-    }
-
-    const exportBtn = document.getElementById("gdpr-export");
-    if (exportBtn) {
-      exportBtn.addEventListener("click", async () => {
-        const res = await fetch("/api/users/me/export", {
-          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = t("dashboard.gdpr_export_filename");
-          a.click();
-          msg!.textContent = t("dashboard.gdpr_exported");
-        } else {
-          msg!.textContent = t("dashboard.gdpr_error_export");
+    if (!token) return
+    async function loadData()
+    {
+        let user, matchpong, matchclicker, statspong, statsclicker, users;
+        try {
+            const [userReponse, matchReponsepong, matchReponseclicker, statsReponsepong, statsReponseclicker, usersReponse] = await Promise.all([
+                fetch("/api/users/profil", {method: "GET",headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }}),
+                fetch("/api/matchs/user/me", {method: "GET",headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }}),
+                fetch("/api/clicker/user/me", {method: "GET",headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }}),
+                fetch("/api/matchs/user/me/stats", {method: "GET",headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }}),
+                fetch("/api/clicker/user/me/stats", {method: "GET",headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }}),
+                fetch("/api/users/", {method: "GET",headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }}),
+            ]);
+            if (!userReponse.ok) {
+                const error = await userReponse.json();
+                throw new Error(error.message);
+            } else if (!matchReponsepong.ok) {
+                const error = await matchReponsepong.json();
+                throw new Error(error.message);
+            } else if (!matchReponseclicker.ok) {
+                const error = await matchReponseclicker.json();
+                throw new Error(error.message);
+            } else if (!statsReponsepong.ok) {
+                const error = await statsReponsepong.json();
+                throw new Error(error.message);
+            } else if (!statsReponseclicker.ok) {
+                const error = await statsReponseclicker.json();
+                throw new Error(error.message);
+            } else if (!usersReponse.ok) {
+                const error = await usersReponse.json();
+                throw new Error(error.message);
+            }
+            user = await userReponse.json();
+            matchpong = await matchReponsepong.json();
+            matchclicker = await matchReponseclicker.json();
+            statspong = await statsReponsepong.json();
+            statsclicker = await statsReponseclicker.json();
+            users = await usersReponse.json();
+        } catch (err: any) {
+            msg!.textContent = (err);
         }
-      });
-    }
 
-    const deleteBtn = document.getElementById("gdpr-delete");
-    if (deleteBtn) {
-      deleteBtn.addEventListener("click", () => {
-        showPopup(t("dashboard.gdpr_confirm_delete"), () => {
-          showPopup(t("dashboard.gdpr_confirm_delete2"), () => {
-            showPopup(t("dashboard.gdpr_confirm_delete3"), () => {
-              showPopup(t("dashboard.gdpr_confirm_delete4"), async () => {
-                const res = await fetch("/api/users/me", {
-                  method: "DELETE",
-                  headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-                });
-                if (res.ok) {
-                  localStorage.clear();
-                  msg!.textContent = t("dashboard.gdpr_deleted");
-                  setTimeout(() => navigateTo("/"), 500);
-                } else {
-                  msg!.textContent = t("dashboard.gdpr_error_delete");
-                }
-              });
-            });
-          });
-        });
-      });
-    }
-  }, 0);
-  
-  fetch("/api/users/profil", {
-    headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-  })
-    .then(res => res.json())
-    .then(user => {
-      const info = document.getElementById("profile-info");
-      if (info) {
-        info.innerHTML = `
-          <img src="${user.avatar || "/uploads/default-avatar.png"}" alt="Avatar" class="avatar-profile" />
-          <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-2">${escapeHTML(user.login)}</h2>
-          <div class="flex gap-6 text-cyan-100 text-lg">
-            <span><b>${t("dashboard.alias")} :</b> ${escapeHTML(user.alias) || `<span class="italic text-cyan-400">${t("dashboard.none")}</span>`}</span>
-            <span><b>${t("dashboard.email")} :</b> ${escapeHTML(user.email)}</span>
-          </div>
-        `;
-      }
-
-      return fetch("/api/users", {
-        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then(users => {
-          const userMap: Record<number, { alias?: string; login: string }> = {};
-          users.forEach((u: any) => {
-            userMap[u.id] = { alias: u.alias, login: u.login };
-          });
-          return { user, userMap };
-        });
-    })
-    .then(({ user, userMap }) => {
-      fetch(`/api/matchs/user/me`, {
-        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then((matches: any[]) => {
-          const list = document.getElementById("match-list");
-          if (!list) return;
-          if (!Array.isArray(matches) || matches.length === 0) {
-            list.innerHTML = `<li class="text-cyan-400 text-center">${t("dashboard.no_pong_match")}</li>`;
-            return;
-          }
-          list.innerHTML = matches.slice(0, 10).map((match: any) => `
-            <li class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
-              <div class="flex justify-between items-center mb-1">
-                <span class="font-bold text-cyan-300">${new Date(match.date).toLocaleDateString()}</span>
-                <span class="text-xs text-cyan-400">${match.duration}s</span>
-              </div>
-              <div>
-                <b>${t("dashboard.players")} :</b> ${renderUser(match.user1_id, userMap)} vs ${renderUser(match.user2_id, userMap)}
-              </div>
-              <div>
-                <b>${t("dashboard.score")} :</b> ${match.score}
-              </div>
-              <div>
-                <b>${t("dashboard.winner")} :</b> ${renderUser(match.winner_id, userMap)}
-              </div>
-            </li>
-          `).join("");
-        });
-
-      fetch(`/api/matchs/user/me/stats`, {
-        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then((userStats: any) => {
-          const statsDiv = document.getElementById("stats");
-          if (!statsDiv || !userStats) {
-            if (statsDiv) statsDiv.innerHTML = `<p class="text-cyan-200 text-center">${t("dashboard.no_pong_stats")}</p>`;
-            return;
-          }
-          statsDiv.innerHTML = `
-            <div class="flex flex-col gap-6">
-              <div class="bg-cyan-800/60 rounded-lg p-4 shadow">
-                <h4 class="font-semibold text-cyan-300 mb-2">${t("dashboard.global")}</h4>
-                <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
-                  <div><b>${t("dashboard.matches")} :</b> ${userStats.global?.totalMatches ?? "?"}</div>
-                  <div><b>${t("dashboard.wins")} :</b> ${userStats.global?.wins ?? "?"}</div>
-                  <div><b>${t("dashboard.losses")} :</b> ${userStats.global?.losses ?? "?"}</div>
-                  <div><b>${t("dashboard.winrate")} :</b> ${userStats.global?.winRate ?? "?"}%</div>
-                  <div><b>${t("dashboard.avg_duration")} :</b> ${userStats.global?.averageDuration ?? "?"} sec</div>
-                  <div><b>${t("dashboard.total_time")} :</b> ${userStats.global?.totalGameTime ? Math.round(userStats.global.totalGameTime / 60) : "?"} min</div>
-                </div>
-              </div>
-              <div class="bg-cyan-800/60 rounded-lg p-4 shadow">
-                <h4 class="font-semibold text-cyan-300 mb-2">${t("dashboard.vs_ai")}</h4>
-                <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
-                  <div><b>${t("dashboard.matches")} :</b> ${userStats.vsAI?.matches ?? "?"}</div>
-                  <div><b>${t("dashboard.wins")} :</b> ${userStats.vsAI?.wins ?? "?"}</div>
-                  <div><b>${t("dashboard.losses")} :</b> ${userStats.vsAI?.losses ?? "?"}</div>
-                  <div><b>${t("dashboard.winrate")} :</b> ${userStats.vsAI?.winRate ?? "?"}%</div>
-                  <div class="col-span-2"><b>${t("dashboard.time_vs_ai")} :</b> ${userStats.vsAI?.totalIaTime ? Math.round(userStats.vsAI.totalIaTime / 60) : "?"} min</div>
-                </div>
-              </div>
-              <div class="bg-cyan-800/60 rounded-lg p-4 shadow">
-                <h4 class="font-semibold text-cyan-300 mb-2">${t("dashboard.vs_players")}</h4>
-                <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
-                  <div><b>${t("dashboard.matches")} :</b> ${userStats.vsPlayer?.matches ?? "?"}</div>
-                  <div><b>${t("dashboard.wins")} :</b> ${userStats.vsPlayer?.wins ?? "?"}</div>
-                  <div><b>${t("dashboard.losses")} :</b> ${userStats.vsPlayer?.losses ?? "?"}</div>
-                  <div><b>${t("dashboard.winrate")} :</b> ${userStats.vsPlayer?.winRate ?? "?"}%</div>
-                  <div class="col-span-2"><b>${t("dashboard.time_multi")} :</b> ${userStats.vsPlayer?.totalMultiTime ? Math.round(userStats.vsPlayer.totalMultiTime / 60) : "?"} min</div>
-                </div>
-              </div>
+        const infoUser = document.getElementById("infoUser")
+        if (infoUser)
+        {
+            infoUser.innerHTML = `
+            <img src="${user.avatar || "/uploads/default-avatar.png"}" alt="Avatar" class="avatar-profile" />
+            <h2 class="text-3xl font-extrabold text-cyan-300 tracking-widest uppercase mb-2">${escapeHTML(user.login)}</h2>
+            <div class="flex gap-6 text-cyan-100 text-lg">
+                <b>${t("dashboard.alias")} : ${escapeHTML(user.alias) || t("dashboard.none")}</b>
+                <b>${t("dashboard.email")} : ${escapeHTML(user.email)}</b>
             </div>
-          `;
-        });
-      fetch(`/api/clicker/user/me`, {
-        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then((matches: any[]) => {
-          const list = document.getElementById("match-clicker-list");
-          if (!list) return;
-          if (!Array.isArray(matches) || matches.length === 0) {
-            list.innerHTML = `<li class="text-cyan-400 text-center">${t("dashboard.no_clicker_match")}</li>`;
-            return;
-          }
-          list.innerHTML = matches.slice(0, 10).map((match: any) => {
-            if (match.game_mode == "timer") 
-              return`
-                <li class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
-                  <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-cyan-300">${new Date(match.date).toLocaleDateString()}</span>
-                    <span class="text-xs text-cyan-400">${match.target}s</span>
-                  </div>
-                  <div>
-                  
-                    <b>${t("dashboard.players")} :</b> ${renderUser(match.user1_id, userMap)} vs ${renderUser(match.user2_id, userMap)}
-                  </div>
-                  <div>
-                    <b>${t("dashboard.score")} :</b> user 1: ${match.user1_score} vs user 2: ${match.user2_score}
-                  </div>
-                  <div>
-                    <b>${t("dashboard.winner")} :</b> ${renderUser(match.winner_id, userMap)}
-                  </div>
-                  <div>
-                    <b>${t("dashboard.game_mode")} :</b> ${match.game_mode}
-                  </div>
-                </li>
-              `
+            `;
+        }
+        const matchUserpong = document.getElementById("matchUserpong")
+        if (matchUserpong)
+        {
+            if (matchpong.length === 0)
+            {
+                matchUserpong.innerHTML = `
+                    <b>${t("dashboard.no_pong_match")}}</b>
+                `;
+            }
             else
-              return`
-              <li class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
-                <div class="flex justify-between items-center mb-1">
-                  <span class="font-bold text-cyan-300">${new Date(match.date).toLocaleDateString()}</span>
+            {
+                for (let i = 0; i < matchpong.length && i < 11; i++)
+                {
+                    matchUserpong.innerHTML += `
+                        <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <b>${new Date(matchpong[i]?.date).toLocaleDateString()}</b>
+                                    <b>${matchpong[i]?.duration} s</b>
+                                </div>
+                                <div>
+                                    <b>${t("dashboard.players")} :</b> ${renderPlayer(matchpong[i]?.user1_id, users)} vs ${renderPlayer(matchpong[i]?.user2_id, users)}
+                                </div>
+                                <div>
+                                    <b>${t("dashboard.score")}: ${matchpong[i]?.score}</b>
+                                </div>
+                                <div>
+                                    <b>${t("dashboard.winner")}: ${renderPlayer(matchpong[i]?.winner_id, users)}</b>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        const matchUserclicker = document.getElementById("matchUserclicker")
+        if (matchUserclicker)
+        {
+            if (matchclicker.length === 0)
+            {
+                matchUserclicker.innerHTML = `
+                    <b>${t("dashboard.no_clicker_match")}}</b>
+                `;
+            }
+            else
+            {
+                for (let i = 0; i < matchclicker.length && i < 11; i++)
+                {
+                    if (matchclicker[i]?.game_mode == "timer") 
+                    matchUserclicker.innerHTML += `
+                        <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                            <div class="flex justify-between items-center mb-1">
+                                <b>${new Date(matchclicker[i]?.date).toLocaleDateString()}</b>
+                                <b>${matchclicker[i]?.target} s</b>
+                            </div>
+                            <div>
+                            
+                                <b>${t("dashboard.players")} :</b> ${renderPlayer(matchclicker[i]?.user1_id, users)} vs ${renderPlayer(matchclicker[i]?.user2_id, users)}</b>
+                            </div>
+                            <div>
+                                <b>${t("dashboard.score")} : ${t("dashboard.players")} 1: ${matchclicker[i]?.user1_score} vs ${t("dashboard.players")} 2: ${matchclicker[i]?.user2_score}</b>
+                            </div>
+                            <div>
+                                <b>${t("dashboard.winner")} : ${renderPlayer(matchclicker[i]?.winner_id, users)}</b>
+                            </div>
+                            <div>
+                                <b>${t("dashboard.game_mode")} : ${matchclicker[i]?.game_mode}</b>
+                            </div>
+                        </div>
+                    `
+                    else
+                    matchUserclicker.innerHTML += `
+                    <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                        <div class="flex justify-between items-center mb-1">
+                            <b>${new Date(matchclicker[i]?.date).toLocaleDateString()}</b>
+                        </div>
+                        <div>
+                            <b>${t("dashboard.players")} : ${renderPlayer(matchclicker[i]?.user1_id, users)} vs ${renderPlayer(matchclicker[i]?.user2_id, users)} </b>
+                        </div>
+                        <div>
+                            <b>${t("dashboard.score")} : ${t("dashboard.players")} 1: ${matchclicker[i]?.user1_score} / ${matchclicker[i]?.target} vs ${t("dashboard.players")} 2: ${matchclicker[i]?.user2_score} / ${matchclicker[i]?.target} </b> 
+                        </div>
+                        <div>
+                            <b>${t("dashboard.winner")} : ${renderPlayer(matchclicker[i]?.winner_id, users)}</b>
+                        </div>
+                        <div>
+                            <b>${t("dashboard.game_mode")} : ${matchclicker[i]?.game_mode}</b>
+                        </div>
+                    </div>
+                    `;
+                }
+            }
+        }
+
+        const statUserpong = document.getElementById("statUserpong")
+        if (statUserpong)
+        {
+            statUserpong.innerHTML = `
+            <div>
+                <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                    <h4>${t("dashboard.global")}</h4>
+                    <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
+                        <b>${t("dashboard.matches")} : ${statspong.global.totalMatches ?? "?"}</b>
+                        <b>${t("dashboard.wins")} : ${statspong.global.wins ?? "?"}</b>
+                        <b>${t("dashboard.losses")} : ${statspong.global.losses ?? "?"}</b>
+                        <b>${t("dashboard.winrate")} : ${statspong.global.winRate ?? "?"}%</b>
+                        <b>${t("dashboard.avg_duration")} : ${statspong.global.averageDuration ?? "?"}</b>
+                        <b>${t("dashboard.total_time")} : ${statspong.global.totalGameTime ?? "?"}</b>
+                    </div>
                 </div>
-                <div>
-                
-                  <b>${t("dashboard.players")} :</b> ${renderUser(match.user1_id, userMap)} vs ${renderUser(match.user2_id, userMap)}
+                <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                    <h4>${t("dashboard.vs_ai")}</h4>
+                    <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
+                        <b>${t("dashboard.matches")} : ${statspong.vsAI.totalMatches ?? "?"}</b>
+                        <b>${t("dashboard.wins")} : ${statspong.vsAI.wins ?? "?"}</b>
+                        <b>${t("dashboard.losses")} : ${statspong.vsAI.losses ?? "?"}</b>
+                        <b>${t("dashboard.winrate")} : ${statspong.vsAI.winRate ?? "?"}%</b>
+                        <b>${t("dashboard.avg_duration")} : ${statspong.vsAI.averageDuration ?? "?"}</b>
+                        <b>${t("dashboard.total_time")} : ${statspong.vsAI.totalGameTime ?? "?"}</b>
+                    </div>
                 </div>
-                <div>
-                  <b>${t("dashboard.score")} :</b> user 1: ${match.user1_score} / ${match.target} vs user 2: ${match.user2_score} / ${match.target}
+                <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                    <h4>${t("dashboard.vs_players")}</h4>
+                    <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
+                        <b>${t("dashboard.matches")} : ${statspong.vsPlayer.totalMatches ?? "?"}</b>
+                        <b>${t("dashboard.wins")} : ${statspong.vsPlayer.wins ?? "?"}</b>
+                        <b>${t("dashboard.losses")} : ${statspong.vsPlayer.losses ?? "?"}</b>
+                        <b>${t("dashboard.winrate")} : ${statspong.vsPlayer.winRate ?? "?"}%</b>
+                        <b>${t("dashboard.avg_duration")} : ${statspong.vsPlayer.averageDuration ?? "?"}</b>
+                        <b>${t("dashboard.total_time")} : ${statspong.vsPlayer.totalGameTime ?? "?"}</b>
+                    </div>
                 </div>
-                <div>
-                  <b>${t("dashboard.winner")} :</b> ${renderUser(match.winner_id, userMap)}
-                </div>
-                <div>
-                  <b>${t("dashboard.game_mode")} :</b> ${match.game_mode}
-                </div>
-              </li>
-            `
-          }
-          ).join("");
-        });
-      fetch(`/api/clicker/user/me/stats`, {
-        headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then((userStats: any) => {
-          const statsDiv = document.getElementById("stats-clicker");
-          if (!statsDiv || !userStats) {
-            if (statsDiv) statsDiv.innerHTML = `<p class="text-cyan-200 text-center">${t("dashboard.no_clicker_stats")}</p>`;
-            return;
-          }
-          statsDiv.innerHTML = `
-            <div class="flex flex-col gap-6">
-              <div class="bg-cyan-800/60 rounded-lg p-4 shadow">
-                <h4 class="font-semibold text-cyan-300 mb-2">${t("dashboard.global")}</h4>
-                <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
-                  <div><b>${t("dashboard.matches")} :</b> ${userStats.totalMatches ?? "?"}</div>
-                  <div><b>${t("dashboard.wins")} :</b> ${userStats.wins ?? "?"}</div>
-                  <div><b>${t("dashboard.losses")} :</b> ${userStats.losses ?? "?"}</div>
-                  <div><b>${t("dashboard.winrate")} :</b> ${userStats.winRate ?? "?"}%</div>
-                  <div><b>${t("dashboard.timerMatches")} :</b> ${userStats.timerMatches ?? "?"}</div>
-                  <div><b>${t("dashboard.chronoMatches")} :</b> ${userStats.chronoMatches ?? "?"}</div>
-                </div>
-              </div>
             </div>
-          `;
+            `;
+        }
+
+        const statUserclicker = document.getElementById("statUserclicker")
+        if (statUserclicker)
+        {
+            statUserclicker.innerHTML = `
+            <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
+                <div>
+                    <h4>${t("dashboard.global")}</h4>
+                    <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
+                        <div>
+                            <b>${t("dashboard.matches")} : ${statsclicker.totalMatches ?? "?"}</b>
+                        </div>
+                        <div>
+                            <b>${t("dashboard.wins")} : ${statsclicker.wins ?? "?"}</b>
+                        </div>
+                        <div >
+                            <b>${t("dashboard.winrate")} : ${statsclicker.winRate ?? "?"}</b>
+                        </div>
+                        <div>
+                            <b>${t("dashboard.losses")} : ${statsclicker.losses ?? "?"}</b>
+                        </div>
+                        <div >
+                            <b>${t("dashboard.timerMatches")} : ${statsclicker.timerMatches ?? "?"}</b>
+                        </div >
+                        <div>
+                            <b>${t("dashboard.chronoMatches")} : ${statsclicker.chronoMatches ?? "?"}</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+    }
+    setTimeout(() => {
+        const token = localStorage.getItem("token");
+        const msg = document.getElementById("gdpr-message");
+
+        const anonymBtn = document.getElementById("gdpr-anonymize");
+        if (anonymBtn) {
+        anonymBtn.addEventListener("click", () => {
+            showPopup(t(t("dashboard.gdpr_confirm_anonymize")), async () => {
+            const res = await fetch("/api/users/me/anonymize", {
+                method: "POST",
+                headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                localStorage.clear();
+                msg!.textContent = t("dashboard.gdpr_anonymized");
+                setTimeout(() => navigateTo("/"), 500);
+            } else {
+                msg!.textContent = t("dashboard.gdpr_error_anonymize");
+            }
+            });
         });
-    })
-    .catch((err) => {
-      const info = document.getElementById("profile-info");
-      if (info) {
-        info.innerHTML = `<div class="text-red-400">${t("dashboard.error_profile")} : ${err.message || err}</div>`;
-      }
-      const list = document.getElementById("match-list");
-      if (list) {
-        list.innerHTML = `<li class="text-red-400 text-center">${t("dashboard.error_matches")}</li>`;
-      }
-      const statsDiv = document.getElementById("stats");
-      if (statsDiv) {
-        statsDiv.innerHTML = `<div class="text-red-400 text-center">${t("dashboard.error_stats")}</div>`;
-      }
-    });
+        }
+
+        const exportBtn = document.getElementById("gdpr-export");
+        if (exportBtn) {
+        exportBtn.addEventListener("click", async () => {
+            const res = await fetch("/api/users/me/export", {
+            headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+            const data = await res.json();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = t("dashboard.gdpr_export_filename");
+            a.click();
+            msg!.textContent = t("dashboard.gdpr_exported");
+            } else {
+            msg!.textContent = t("dashboard.gdpr_error_export");
+            }
+        });
+        }
+
+        const deleteBtn = document.getElementById("gdpr-delete");
+        if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => {
+            showPopup(t("dashboard.gdpr_confirm_delete"), () => {
+            showPopup(t("dashboard.gdpr_confirm_delete2"), () => {
+                showPopup(t("dashboard.gdpr_confirm_delete3"), () => {
+                showPopup(t("dashboard.gdpr_confirm_delete4"), async () => {
+                    const res = await fetch("/api/users/me", {
+                    method: "DELETE",
+                    headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                    localStorage.clear();
+                    msg!.textContent = t("dashboard.gdpr_deleted");
+                    setTimeout(() => navigateTo("/"), 500);
+                    } else {
+                    msg!.textContent = t("dashboard.gdpr_error_delete");
+                    }
+                });
+                });
+            });
+            });
+        });
+        }
+    }, 0);
+    loadData();
 }
 
-function renderUser(id: number | null, userMap: Record<number, { alias?: string; login: string }>): string {
-  if (!id) return `<span class="italic text-cyan-400">${t("dashboard.ia")}</span>`;
-  const user = userMap[id];
-  if (!user) return `<span>${id}</span>`;
-  return `<span class="text-cyan-300 hover:underline cursor-pointer" onclick="navigateTo('/profile/${id}')">${escapeHTML(user.alias || user.login)}</span>`;
+function renderPlayer(userId: number | null, allUsers: any[]) {
+    if (!userId) {
+        return "IA";
+    }
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) {
+        return `<span class="text-gray-400">${userId}</span>`;
+    }
+    return `<span onclick="navigateTo('/profile/${userId}')" class="text-cyan-300">${escapeHTML(user.login)}</span>`;
 }
 
 function showPopup(message: string, onConfirm: () => void) {

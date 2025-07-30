@@ -159,12 +159,10 @@ fetch("/api/users/me", {
             }, 100);
           } else {
             const data = await res.json();
-            msgMdp!.textContent = data.error || t("dashboard.error_update");
-            msgMdp!.className = "mt-2 text-red-400";
+            throw new Error(data.error);
           }
-        } catch {
-          msgMdp!.textContent = t("dashboard.network_error");
-          msgMdp!.className = "mt-2 text-red-400";
+        } catch (err: any){
+          msgMdp!.textContent = err.message;
         }
       }
       else
@@ -176,7 +174,7 @@ fetch("/api/users/me", {
   }
 
 
-    
+    const msg = document.getElementById("edit-profile-message");
     fetch("/api/users/profil", {
       headers: { "Accept-Language": localStorage.getItem("lang") || "fr", Authorization: `Bearer ${token}` }
     })
@@ -221,8 +219,8 @@ fetch("/api/users/me", {
                 localStorage.removeItem("userAvatar");
                 navigateTo("/dashboard");
               } else {
-                const text = await res.text();
-                alert(t("dashboard.error_avatar_upload") + text);
+                const data = await res.json();
+                msg!.textContent = data.message;
                 return;
               }
             });
@@ -245,10 +243,15 @@ fetch("/api/users/me", {
     if (form) {
       form.onsubmit = async (e) => {
         e.preventDefault();
-        const login = (form.login as HTMLInputElement).value;
-        const alias = (form.alias as HTMLInputElement).value;
-        const email = (form.email as HTMLInputElement).value;
+        const login = (form.login as HTMLInputElement).value.trim();
+        const alias = (form.alias as HTMLInputElement).value.trim();
+        const email = (form.email as HTMLInputElement).value.trim();
         let avatar = (form.avatar as HTMLInputElement).value;
+
+        if (!login)
+          return msg!.textContent = t("dashboard.login_required");
+        if (!email)
+          return msg!.textContent = t("dashboard.email_required");
 
         const file = avatarInput.files?.[0];
         if (file) {
@@ -272,7 +275,6 @@ fetch("/api/users/me", {
           }
         }
 
-        const msg = document.getElementById("edit-profile-message");
         try {
           const res = await fetch("/api/users/me", {
             method: "PUT",
@@ -281,25 +283,23 @@ fetch("/api/users/me", {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({ login, alias, email, avatar })
+            body: JSON.stringify({ login, alias: alias || null, email, avatar })
           });
           if (res.ok) {
             msg!.textContent = t("dashboard.profile_updated");
             msg!.className = "mt-2 text-green-500";
             localStorage.setItem("userLogin", login);
-            localStorage.setItem("userAlias", alias);
-            localStorage.setItem("userAvatar", avatar);
+            localStorage.setItem("userAlias", alias || "");
+            localStorage.setItem("userAvatar", avatar || "");
             setTimeout(() => {
               navigateTo("/dashboard");
             }, 100);
           } else {
             const data = await res.json();
-            msg!.textContent = data.error || t("dashboard.error_update");
-            msg!.className = "mt-2 text-red-400";
+            throw new Error(data.error);
           }
-        } catch {
-          msg!.textContent = t("dashboard.network_error");
-          msg!.className = "mt-2 text-red-400";
+        } catch (err: any){
+          msg!.textContent = err.message;
         }
       };
     }

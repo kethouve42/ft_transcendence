@@ -71,7 +71,6 @@ function renderRoute(url: string)
   let eventsFunction;
   const urlsplit = url.split("/")[1];
   const urlsplit2 = urlsplit.split("?")[0];
-  console.log ("1", urlsplit, urlsplit2);
   if (urlsplit === "profile")
   {
     contentFunction = () => profileView(escapeHTML(url.split("/")[2]));
@@ -84,7 +83,6 @@ function renderRoute(url: string)
   }
   else if (routeDynamiquesurl.includes(urlsplit2))
   {
-    console.log (urlsplit, urlsplit2);
     contentFunction = route["/"+urlsplit2].view;
     eventsFunction = route["/"+urlsplit2].events;
   }
