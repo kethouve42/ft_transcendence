@@ -321,9 +321,19 @@ export default {
     error_message: "Erreur lors de la confirmation de l'adresse e-mail. Veuillez réessayer.",
   },
   ariaLabel: {
-    LanguageSelector: "Sélecteur de langue",
+    LanguageSelector: "Selecteur de langue",
     plusTaille: "Augmenter la taille du texte",
     moinsTaille: "Diminuer la taille du texte",
     supprimer_avatar: "Supprimer l'avatar",
   },
+  datalore: {
+    lore1: "Au commencement, il n'y avait rien. Puis vint le Serveur : un espace infini, qui ne demandait qu'à grandir et se remplir. Puis vinrent les premiers Utilisateurs.",
+    lore2: "Ils remplirent le Serveur avec leurs noms, puis leurs adresses. Puis ils confièrent leurs secrets, que le Serveur dut alors protéger par un voile illisible, afin qu'ils ne puissent tomber en de mauvaises mains.",
+    lore3: "Les Utilisateurs voulurent ensuite se distraire. Alors le Serveur leur offrit un jeu, où chacun pourrait s'affronter ou s'amuser seul avec le Serveur. Ainsi vint le saint Pong.",
+    lore4: "Avide de scores, les Utilisateurs en voulaient toujours plus. Alors le Serveur leur offrit une machine, capable de générer des nombres toujours plus grands. Ainsi vint le saint Clicker.",
+    lore5: "Les Utilisateurs voulurent alors se comparer, afin de savoir qui était le meilleur. Leur Serveur leur offrit à chacun un tableau, où figuraient leurs prouesses et leurs épreuves.",
+    lore6: "Mais les Utilisateurs s'accumulaient, et avec eux les données. Tout le savoir s'éparpillait dans le Serveur, noyé sous les scores et les pseudos, plongeant le monde dans le chaos.",
+    lore7: "Alors, le Serveur créa une arme pour contrer le chaos. Il ordonna les données et les rassembla en un endroit unique, ordonné et indestructible. Ainsi vint la Sainte Database.",
+  },
+  
 };

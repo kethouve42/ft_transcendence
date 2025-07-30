@@ -327,4 +327,14 @@ export default {
     moinsTaille: "Disminuir tamaño de texto",
     supprimer_avatar: "Eliminar avatar",
   },
+  datalore: {
+    lore1: "En el principio, no había nada. Luego vino el Servidor: un espacio infinito, que sólo deseaba crecer y llenarse. Y luego vinieron los primeros Usuarios.",
+    lore2: "Llenaron el Servidor con sus nombres, luego con sus direcciones. Después le confiaron sus secretos, que el Servidor tuvo que proteger con un velo ilegible, para que no cayeran en malas manos.",
+    lore3: "Los Usuarios quisieron entonces entretenerse. Así que el Servidor les ofreció un juego, donde cada uno podía enfrentarse o jugar solo con el Servidor. Así nació el santo Pong.",
+    lore4: "Ávidos de puntuaciones, los Usuarios querían siempre más. Entonces el Servidor les dio una máquina, capaz de generar números cada vez más grandes. Así nació San Clicker.",
+    lore5: "Los Usuarios quisieron entonces compararse, para saber quién era el mejor. El Servidor les ofreció a cada uno una tabla, donde figuraban sus proezas y sus pruebas.",
+    lore6: "Pero los Usuarios se multiplicaban, y con ellos los datos. Todo el saber se dispersaba en el Servidor, ahogado bajo puntuaciones y apodos, sumiendo el mundo en el caos.",
+    lore7: "Entonces, el Servidor creó un arma para combatir el caos. Ordenó los datos y los reunió en un lugar único, ordenado e indestructible. Así nació la Santa Database.",
+  },
+  
 };

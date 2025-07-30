@@ -328,4 +328,14 @@ export default {
     moinsTaille: "Diminish text size",
     supprimer_avatar: "Delete avatar",
   },
+  datalore: {
+    lore1: "In the beginning, there was nothing. Then came the Server: an infinite space, longing to grow and be filled. And then came the first Users.",
+    lore2: "They filled the Server with their names, then with their addresses. Then they entrusted it with their secrets, which the Server had to protect with an unreadable veil, so they might not fall into the wrong hands.",
+    lore3: "The Users then sought entertainment. So the Server gave them a game, where each could face one another or play alone with the Server. Thus came the holy Pong.",
+    lore4: "Hungry for scores, the Users always wanted more. So the Server gave them a machine, able to generate ever greater numbers. Thus came Saint Clicker.",
+    lore5: "The Users then wished to compare themselves, to know who was the greatest. The Server gave each of them a board, where their feats and trials were written.",
+    lore6: "But the Users multiplied, and with them the data. All knowledge scattered across the Server, drowned under scores and nicknames, plunging the world into chaos.",
+    lore7: "Then, the Server forged a weapon to fight back the chaos. It ordered the data and gathered it into a single place — ordered and indestructible. Thus came the Holy Database.",
+  },
+  
 };
