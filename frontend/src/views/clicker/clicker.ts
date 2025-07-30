@@ -583,7 +583,7 @@ export function clickerEvent(): void {
           pointCount!.textContent = data.newScore;
         })
         .catch(err => {
-          //console.error("❌ Erreur :", err.message);
+          //console.error("Erreur :", err.message);
         });
         }
       }
@@ -624,7 +624,7 @@ export function clickerEvent(): void {
             pointCount.textContent = data.newScore;
           })
           .catch(err => {
-            console.error("❌ Erreur :", err.message);
+            console.error("Erreur :", err.message);
           });
           return;
         }
@@ -646,7 +646,7 @@ export function clickerEvent(): void {
           spawnElectricArc("particle-canvas");
         })
         .catch(err => {
-          console.error("❌ Erreur :", err.message);
+          console.error("Erreur :", err.message);
         });
       });
     }
@@ -676,7 +676,7 @@ export function clickerEvent(): void {
           }
         })
         .catch(err => {
-          console.error("❌ Erreur :", err.message);
+          console.error("Erreur :", err.message);
         });
       });
     }
@@ -706,7 +706,7 @@ export function clickerEvent(): void {
           }
         })
         .catch(err => {
-          console.error("❌ Erreur :", err.message);
+          console.error("Erreur :", err.message);
         });
       });
     }
@@ -736,7 +736,7 @@ export function clickerEvent(): void {
           }
         })
         .catch(err => {
-          console.error("❌ Erreur :", err.message);
+          console.error("Erreur :", err.message);
         });
       });
     }
@@ -888,7 +888,7 @@ export function clickerEvent(): void {
         return res.json();
       })
       .catch(err => {
-        console.error("❌ Erreur :", err.message);
+        console.error("Erreur :", err.message);
       });
 
       // Nettoyage des donnees versus

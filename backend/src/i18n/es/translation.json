@@ -18,7 +18,7 @@
   "2fa_text": "Tu código 2FA es: {{code}}",
   "2fa_sent": "Se ha enviado un código 2FA a tu correo electrónico.",
   "fields_required": "Faltan campos obligatorios",
-  "email_or_password_incorrect": "Correo electrónico o contraseña incorrectos",
+  "email_or_password_incorrect": "Identificador o contraseña incorrectos",
   "user_unknown": "Usuario desconocido",
   "2fa_expired_or_invalid": "El código 2FA ha expirado o es inválido",
   "2fa_incorrect": "Código 2FA incorrecto",

@@ -31,3 +31,5 @@ export function privacyView(): string {
     </div>
   `;
 }
+
+export function attachPrivacyEvents() {}

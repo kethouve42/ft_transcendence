@@ -71,25 +71,6 @@ CREATE TABLE IF NOT EXISTS clicker_matchs (
 
 `);
 
-console.log("✅ Toutes les tables ont été créées ou existaient déjà.");
-
-// Prépare une insertion d'exemple
-const insert = db.prepare(`
-  INSERT INTO users (login, password, alias, email)
-  VALUES (?, ?, ?, ?)
-`);
-
-try {
-  const result = insert.run('antoine42', 'hashed_password123', 'Kagnous', 'antoine@42.fr');
-  console.log(`Utilisateur inséré avec ID ${result.lastInsertRowid}`);
-} catch (err: any) {
-  if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-    console.warn('⚠️ Conflit de clé unique : login ou email déjà utilisé.');
-  } else {
-    console.error('❌ Erreur d’insertion :', err.message);
-  }
-}
-
 // Affiche tous les utilisateurs
 const users = db.prepare(`SELECT * FROM users`).all();
 console.log("Table USERS :");

@@ -114,7 +114,7 @@ export function attachLoginPlayer2Events() {
     {
       const login = (form.login as HTMLInputElement).value;
       const password = (form.password as HTMLInputElement).value;
-      const stayConnected = (form.stayConnected as HTMLInputElement).checked;
+      const stayConnected = false;
       isProcessing = true;
       try {
         const res = await fetch("/api/users/auth", {
@@ -133,18 +133,15 @@ export function attachLoginPlayer2Events() {
         if (data.step === "email_not_verified")
         {
           if (emailNotVerfied) emailNotVerfied.style.display = "";
+          msg!.textContent = data.error;
           return;
         }
         if (!res.ok || !data.token) {
           msg!.textContent = data.error || t("login.error");
           return;
         }
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("token_player2", data.token);
         if (data.UserId)
-          localStorage.setItem("userId", data.UserId.toString())
-        localStorage.setItem("userLogin", data.login || "");
-        localStorage.setItem("userAlias", data.alias || "");
-        localStorage.setItem("userAvatar", data.avatar || "");
         localStorage.removeItem("2fa_identifier");
         navigateTo(getRedirectUrl());
       } catch (err: any) {
@@ -183,7 +180,7 @@ export function forgotPasswordPopup() {
   document.body.appendChild(modal);
   const msgForgot = document.getElementById("forgot-message");
     document.getElementById("confirm-yes")?.addEventListener("click", async () => {
-      if (isProcessing = true)
+      if (isProcessing == true)
       {
         msgForgot!.textContent = t("all.wait");
       }

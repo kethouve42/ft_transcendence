@@ -18,7 +18,7 @@
   "2fa_text": "Your 2FA code is: {{code}}",
   "2fa_sent": "A 2FA code has been sent to your email address.",
   "fields_required": "Required fields missing",
-  "email_or_password_incorrect": "Email or password incorrect",
+  "email_or_password_incorrect": "Email, username or password incorrect",
   "user_unknown": "Unknown user",
   "2fa_expired_or_invalid": "2FA code expired or invalid",
   "2fa_incorrect": "2FA code incorrect",
