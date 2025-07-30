@@ -40,7 +40,7 @@
   max-width: 600px;
   margin: 2rem auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  font-weight: "bold";
+  font-weight: bold;
   color: #e5e5e5;
 }
 
@@ -118,7 +118,7 @@
   max-width: 600px;
   margin: 2rem auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  font-weight: "bold";
+  font-weight: bold;
   color: #e5e5e5;
   text-align: left;
 }
@@ -138,7 +138,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  font-weight: "bold";
+  font-weight: bold;
 }
 
 .rules-list > li {
@@ -185,7 +185,7 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  font-weight: "bold";
+  font-weight: bold;
 }
 
 .modal-card {
@@ -195,13 +195,13 @@
   box-shadow: 0 0 20px #000;
   text-align: center;
   width: 400px;
-  font-weight: "bold";
+  font-weight: bold;
 }
 .modal-title {
   color: #00e6e6;
   font-size: 2rem;
   margin-bottom: 1rem;
-  font-weight: "bold";
+  font-weight: bold;
 }
 
 .modal-body {
@@ -263,7 +263,7 @@
   flex: 1;
   overflow-y: auto;
   display: block;
-  font-weight: "bold";
+  font-weight: bold;
 }
 
 .score-table thead {
@@ -327,7 +327,7 @@
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0,0,0,0.5);
-  font-weight: "bold";
+  font-weight: bold;
 }
 
 .result-modal-card .modal-title {
