@@ -3,7 +3,6 @@ import { ballSize, speed as baseSpeed, ball, drawBall, resetBall } from './ball.
 import { score, drawScore } from './score.js'
 import { timer, drawTimer, startTimer, resetTimer } from './timer.js'
 import { updatePowerUps, drawPowerUp } from "./power_up.js"
-import { navbarView, attachNavbarEvents } from '../navbar.js'
 import { renderPanelResult, attachResultEvents, handleTournamentLogin, handleTournamentProgress, getTournamentMatchPlayers } from './loginTournament.js'
 import { aiStep } from './ai_logic.js'
 import { drawObstacles, generateRandomObstacles, maps, Obstacle} from './map.js'
@@ -304,7 +303,7 @@ Pour chacun des menus, on inverse le flag correspondant.
 */
 function renderUI() {
   const root = document.getElementById('app')!
-  let html = navbarView()
+  let html = ""
   switch (currentPanel) {
     case "menu":
       html += gameViews()
@@ -333,7 +332,6 @@ function renderUI() {
   }
   root.innerHTML = html
   gameEvent()
-  attachNavbarEvents()
   attachLinkHandlers();
 }
 
@@ -508,8 +506,8 @@ function attachSettingsEvents(root: HTMLElement) {
   })
   root.querySelector('#input-timer-mod')?.addEventListener("input", e => {
     let val = +(e.target as HTMLInputElement).value
-    if (val < 1)
-      val = 1
+    if (val < 10)
+      val = 10
     if (val > 300)
       val = 300
     timerMod = val;
@@ -534,8 +532,8 @@ function attachSettingsEvents(root: HTMLElement) {
     localStorage.setItem("pong_selectMap", selectedMapIndex.toString())
   })
   root.querySelector('#btn-save-settings')?.addEventListener("click", () => {
-    const signX = Math.sign(ball.vx)||1
-    const signY = Math.sign(ball.vy)||1
+    const signX = Math.sign(ball.vx) || 1
+    const signY = Math.sign(ball.vy) || 1
     ball.vx = signX * ballSpeed
     ball.vy = signY * ballSpeed
     // Sauvegarde les settings dans le localStorage
@@ -675,8 +673,15 @@ function update() {
   if (powerUpsEnabled) {
     updatePowerUps(Date.now(), canvas!.width, canvas!.height, ball);
   }
+
+
   ball.x += ball.vx
   ball.y += ball.vy
+  const currentSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
+  if (currentSpeed > 0) {
+    ball.vx = (ball.vx / currentSpeed) * ballSpeed
+    ball.vy = (ball.vy / currentSpeed) * ballSpeed
+  }
 
   // Collision pour les blocs
   for (const obs of currentObstacles) {
@@ -806,7 +811,7 @@ export function startMatch() {
   if (map.randomObstacle)
     currentObstacles = generateRandomObstacles(map.randomObstacle)
   else if (map.obstacle)
-    currentObstacles = [...map.obstacle]
+    currentObstacles = map.obstacle.slice()
   else
     currentObstacles = []
   

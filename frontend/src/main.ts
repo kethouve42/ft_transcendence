@@ -60,6 +60,7 @@ const routeDynamiques = [
 const routeDynamiquesurl = [
   "loginUser2",
   "registerRedirect",
+  "loginTournament"
 ]
 //system pour lier l'url a l'affichage
 function renderRoute(url: string)

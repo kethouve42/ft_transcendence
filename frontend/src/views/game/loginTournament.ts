@@ -14,13 +14,13 @@ export function loginTournamentView(): string {
     return `
     <div class="settings-panel">
       <h2> ${t("tournament.login_page.title")} ${playerNum} </h2>
-        <form id="tournament-login-form" class="flex flex-col gap-4">
+        <form id="tournament-login-form" class="mdp">
         <input type="text" name="login" placeholder="${t("login.username")}" required class="input" />
           <input type="password" name="password" placeholder="${t("login.password")}" required class="input" />
           <button type="submit" class="menu-btn save-btn">${t("login.submit")}</button>
           <div id="tournament-login-message" class="text-cyan-200"></div>
           </form>
-        <a href="/register" class="text-cyan-400 underline mt-4 inline-block">${t("login.register")}</a>
+        <a href="/register" class="register-container">${t("login.register")}</a>
     </div>
     `
 }
@@ -78,7 +78,7 @@ export interface Score {
 }
 
 export function renderPanelFinalScoreTable(scores: Score[]): string {
-  const sorted = [...scores].sort((a, b) => a.score - b.score)
+  const sorted = scores.slice().sort((a, b) => a.score - b.score)
 
   const rows = sorted.map(s => `
     <tr>
@@ -181,24 +181,20 @@ export function clearTournamentData() {
 export function handleTournamentProgress(winner: "left" | "right", showOnly: (panel: Panel) => void) {
   const playerCount = Number(localStorage.getItem("tournament_player_count") || "4")
   let phase = Number(localStorage.getItem("tournament_phase") || "1")
-
-  // Helper pour récupérer login/token/userId
-  const get = (type: string, i: number) => localStorage.getItem(`tournament_${type}_${i}`) || ""
-
   // 4 joueurs : phases 1 (1v2), 2 (3v4), 3 (demi-finale)
   if (playerCount === 4) {
     if (phase === 1) {
-      const winnerUserId = winner === "left" ? get("userId", 1) : get("userId", 2)
-      const winnerToken = winner === "left" ? get("token", 1) : get("token", 2)
-      localStorage.setItem("tournament_winner1", winnerUserId)
-      localStorage.setItem("tournament_winner1_token", winnerToken)
+      const winnerUserId = winner === "left" ? localStorage.getItem("tournament_userId_1") : localStorage.getItem("tournament_userId_2")
+      const winnerToken = winner === "left" ? localStorage.getItem("tournament_token_1") : localStorage.getItem("tournament_token_2")
+      localStorage.setItem("tournament_winner1", winnerUserId || "")
+      localStorage.setItem("tournament_winner1_token", winnerToken || "")
       localStorage.setItem("tournament_phase", "2")
       showOnly("keyConfig")
       return
     }
     if (phase === 2) {
-      const winnerUserId = winner === "left" ? get("userId", 3) : get("userId", 4)
-      const winnerToken = winner === "left" ? get("token", 3) : get("token", 4)
+      const winnerUserId = winner === "left" ? localStorage.getItem("tournament_userId_3") || "" : localStorage.getItem("tournament_userId_4") || ""
+      const winnerToken = winner === "left" ? localStorage.getItem("tournament_userId_3") || "" : localStorage.getItem("tournament_token_4") || ""
       localStorage.setItem("tournament_winner2", winnerUserId)
       localStorage.setItem("tournament_winner2_token", winnerToken)
       localStorage.setItem("tournament_phase", "3")
@@ -207,26 +203,33 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
     }
     if (phase === 3) {
       // Finale et classement
-      const login1 = get("login", 1), login2 = get("login", 2), login3 = get("login", 3), login4 = get("login", 4)
+      const login1 = localStorage.getItem("tournament_login_1") || ""
+      const login2 = localStorage.getItem("tournament_login_2") || ""
+      const login3 = localStorage.getItem("tournament_login_3") || ""
+      const login4 = localStorage.getItem("tournament_login_4") || ""
       const winnerSemi1Id = localStorage.getItem("tournament_winner1")!
       const winnerSemi2Id = localStorage.getItem("tournament_winner2")!
+
+      // Permet d'associer les id au login.
       const idToLogin: Record<string, string> = {
-        [get("userId", 1)]: login1,
-        [get("userId", 2)]: login2,
-        [get("userId", 3)]: login3,
-        [get("userId", 4)]: login4,
+        [localStorage.getItem("tournament_userId_1")!]: login1,
+        [localStorage.getItem("tournament_userId_2")!]: login2,
+        [localStorage.getItem("tournament_userId_3")!]: login3,
+        [localStorage.getItem("tournament_userId_4")!]: login4,
       }
+
+      // Construit le tableau des scores
       const semi1Winner = idToLogin[winnerSemi1Id]
       const semi2Winner = idToLogin[winnerSemi2Id]
       const loserSemi1 = [login1, login2].find(p => p !== semi1Winner)!
       const loserSemi2 = [login3, login4].find(p => p !== semi2Winner)!
-      const finalWinner   = winner === "left"  ? semi1Winner : semi2Winner
-      const finalRunnerUp = winner === "left"  ? semi2Winner : semi1Winner
+      const finalWinner = winner === "left" ? semi1Winner : semi2Winner
+      const second = winner === "left" ? semi2Winner : semi1Winner
       const finalScores: Score[] = [
-        { player: finalWinner,   score: 1 },
-        { player: finalRunnerUp, score: 2 },
-        { player: loserSemi2,    score: 3 },
-        { player: loserSemi1,    score: 3 },
+        { player: finalWinner, score: 1 },
+        { player: second, score: 2 },
+        { player: loserSemi2, score: 3 },
+        { player: loserSemi1, score: 3 },
       ]
       const modalHtml = renderPanelFinalScoreTable(finalScores)
       document.body.insertAdjacentHTML("beforeend", modalHtml)
@@ -236,27 +239,26 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
         modal?.remove()
         setTimeout(() => { showOnly("menu") })
       });
-      // Clean up
       [
-        ...Array(4).fill(0).map((_,i)=>i+1).flatMap(i=>[
-          `tournament_userId_${i}`,`tournament_token_${i}`,`tournament_login_${i}`
-        ]),
+        "tournament_userId_1", "tournament_token_1", "tournament_login_1",
+        "tournament_userId_2", "tournament_token_2", "tournament_login_2",
+        "tournament_userId_3", "tournament_token_3", "tournament_login_3",
+        "tournament_userId_4", "tournament_token_4", "tournament_login_4",
         "tournament_winner1","tournament_winner1_token","tournament_winner2","tournament_winner2_token",
         "tournament_phase","tournament_original_token","tournament_original_userId"
       ].forEach(key=>localStorage.removeItem(key))
       return
     }
   }
-
   // 8 joueurs : phases 1-4 (quarts), 5-6 (demis), 7 (finale)
   if (playerCount === 8) {
     // Quarts de finale
     if (phase >= 1 && phase <= 4) {
       // Matchs : 1v2, 3v4, 5v6, 7v8
-      const idxA = (phase - 1) * 2 + 1
-      const idxB = idxA + 1
-      const winnerUserId = winner === "left" ? get("userId", idxA) : get("userId", idxB)
-      const winnerToken = winner === "left" ? get("token", idxA) : get("token", idxB)
+      const player_idA = (phase - 1) * 2 + 1
+      const player_idB = player_idA + 1
+      const winnerUserId = winner === "left" ? localStorage.getItem(`tournament_userId_${player_idA}`) || "" : localStorage.getItem(`tournament_userId_${player_idB}`) || ""
+      const winnerToken = winner === "left" ? localStorage.getItem(`tournament_token_${player_idA}`) || "" : localStorage.getItem(`tournament_token_${player_idB}`) || ""
       localStorage.setItem(`tournament_winner${phase}`, winnerUserId)
       localStorage.setItem(`tournament_winner${phase}_token`, winnerToken)
       if (phase < 4) {
@@ -264,7 +266,6 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
         showOnly("keyConfig")
         return
       } else {
-        // Après le 4e quart, on passe aux demis
         localStorage.setItem("tournament_phase", "5")
         showOnly("keyConfig")
         return
@@ -273,25 +274,26 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
     // Demi-finales
     if (phase === 5 || phase === 6) {
       // Demi 1: winner1 vs winner2, Demi 2: winner3 vs winner4
-      const demiIdx = phase - 4
-      const winnerA = localStorage.getItem(`tournament_winner${demiIdx * 2 - 1}`)!
-      const winnerB = localStorage.getItem(`tournament_winner${demiIdx * 2}`)!
-      const winnerA_token = localStorage.getItem(`tournament_winner${demiIdx * 2 - 1}_token`)!
-      const winnerB_token = localStorage.getItem(`tournament_winner${demiIdx * 2}_token`)!
+      const player_idA = (phase - 4) * 2 - 1
+      const player_idB = player_idA + 1
+      const winnerA = localStorage.getItem(`tournament_winner${player_idA}`)!
+      const winnerB = localStorage.getItem(`tournament_winner${player_idB}`)!
+      const winnerA_token = localStorage.getItem(`tournament_winner${player_idA}_token`)!
+      const winnerB_token = localStorage.getItem(`tournament_winner${player_idB}_token`)!
       const winnerUserId = winner === "left" ? winnerA : winnerB
       const winnerToken = winner === "left" ? winnerA_token : winnerB_token
-      localStorage.setItem(`tournament_finalist${demiIdx}`, winnerUserId)
-      localStorage.setItem(`tournament_finalist${demiIdx}_token`, winnerToken)
-      // Stocke le perdant pour la petite finale
+      localStorage.setItem(`tournament_finalist${phase - 4}`, winnerUserId)
+      localStorage.setItem(`tournament_finalist${phase - 4}_token`, winnerToken)
+
       const loserUserId = winner === "left" ? winnerB : winnerA
-      const loserLogin = get("login", Array.from({length:8},(_,i)=>i+1).find(i=>get("userId",i)===loserUserId)!)
-      localStorage.setItem(`tournament_loser${demiIdx}`, loserLogin)
+      const loserLogin = localStorage.getItem(`tournament_login_${Array.from({length: 8}, (_, i) => i + 1).find(i => localStorage.getItem(`tournament_userId_${i}`) === loserUserId)!}`) || ""
+      localStorage.setItem(`tournament_loser${phase - 4}`, loserLogin)
       if (phase === 5) {
         localStorage.setItem("tournament_phase", "6")
         showOnly("keyConfig")
         return
-      } else {
-        // Après la 2e demi, on passe à la finale
+      }
+      else {
         localStorage.setItem("tournament_phase", "7")
         showOnly("keyConfig")
         return
@@ -303,9 +305,8 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
       const logins: string[] = []
       const userIds: string[] = []
       for (let i = 1; i <= 8; i++) {
-        logins[i] = get("login", i)
-        userIds[i] = get("userId", i)
-
+        logins[i] = localStorage.getItem(`tournament_login_${i}`) || ""
+        userIds[i] = localStorage.getItem(`tournament_login_${i}`) || ""
       }
 
       // Finalistes
@@ -326,10 +327,10 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
         const looserLogin = logins[userIds.findIndex(id => id === looserId)]
         losersQuarts.push(looserLogin)
       }
-      const finalWinner   = winner === "left" ? finalist1Login : finalist2Login
+      const finalWinner = winner === "left" ? finalist1Login : finalist2Login
       const finalRunnerUp = winner === "left" ? finalist2Login : finalist1Login
       const finalScores: Score[] = [
-        { player: finalWinner,   score: 1 },
+        { player: finalWinner, score: 1 },
         { player: finalRunnerUp, score: 2 },
         { player: loser1Login, score: 3 },
         { player: loser2Login, score: 3 },
@@ -346,14 +347,17 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
         modal?.remove()
         setTimeout(() => { showOnly("menu") })
       });
-      // Clean up
       [
-        ...Array(8).fill(0).map((_,i)=>i+1).flatMap(i=>[
-          `tournament_userId_${i}`,`tournament_token_${i}`,`tournament_login_${i}`
-        ]),
-        ...Array(4).fill(0).map((_,i)=>i+1).flatMap(i=>[
-          `tournament_winner${i}`,`tournament_winner${i}_token`
-        ]),
+        "tournament_userId_1", "tournament_token_1", "tournament_login_1",
+        "tournament_userId_2", "tournament_token_2", "tournament_login_2",
+        "tournament_userId_3", "tournament_token_3", "tournament_login_3",
+        "tournament_userId_4", "tournament_token_4", "tournament_login_4",
+        "tournament_userId_5", "tournament_token_5", "tournament_login_5",
+        "tournament_userId_6", "tournament_token_6", "tournament_login_6",
+        "tournament_userId_7", "tournament_token_7", "tournament_login_7",
+        "tournament_userId_8", "tournament_token_8", "tournament_login_8",
+        "tournament_winner1", "tournament_winner1_token", "tournament_winner2", "tournament_winner2_token",
+        "tournament_winner3", "tournament_winner3_token", "tournament_winner4", "tournament_winner4_token",
         "tournament_finalist1","tournament_finalist1_token","tournament_finalist2","tournament_finalist2_token",
         "tournament_loser1","tournament_loser2","tournament_phase","tournament_original_token","tournament_original_userId"
       ].forEach(key=>localStorage.removeItem(key))
@@ -363,63 +367,65 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
 }
 
 export function getTournamentMatchPlayers(phase: number, playerCount: number) {
-  // 4 joueurs
   if (playerCount === 4) {
     if (phase === 1) {
       return {
         token1: localStorage.getItem("tournament_token_1")!,
         userId1: localStorage.getItem("tournament_userId_1")!,
-        login1: localStorage.getItem("tournament_login_1") || "Joueur 1",
+        login1: localStorage.getItem("tournament_login_1") || "",
         token2: localStorage.getItem("tournament_token_2")!,
         userId2: localStorage.getItem("tournament_userId_2")!,
-        login2: localStorage.getItem("tournament_login_2") || "Joueur 2",
+        login2: localStorage.getItem("tournament_login_2") || "",
       }
     }
     if (phase === 2) {
       return {
         token1: localStorage.getItem("tournament_token_3")!,
         userId1: localStorage.getItem("tournament_userId_3")!,
-        login1: localStorage.getItem("tournament_login_3") || "Joueur 3",
+        login1: localStorage.getItem("tournament_login_3") || "",
         token2: localStorage.getItem("tournament_token_4")!,
         userId2: localStorage.getItem("tournament_userId_4")!,
-        login2: localStorage.getItem("tournament_login_4") || "Joueur 4",
+        login2: localStorage.getItem("tournament_login_4") || "",
       }
     }
     if (phase === 3) {
       return {
         token1: localStorage.getItem("tournament_winner1_token")!,
         userId1: localStorage.getItem("tournament_winner1")!,
-        login1: localStorage.getItem("tournament_login_" + [1,2,3,4].find(i=>localStorage.getItem("tournament_userId_"+i)===localStorage.getItem("tournament_winner1"))!) || "Vainqueur 1",
+        login1: localStorage.getItem("tournament_login_" + [1,2,3,4]
+          .find(i => localStorage.getItem("tournament_userId_"+i)===localStorage.getItem("tournament_winner1"))!) || "",
         token2: localStorage.getItem("tournament_winner2_token")!,
         userId2: localStorage.getItem("tournament_winner2")!,
-        login2: localStorage.getItem("tournament_login_" + [1,2,3,4].find(i=>localStorage.getItem("tournament_userId_"+i)===localStorage.getItem("tournament_winner2"))!) || "Vainqueur 2",
+        login2: localStorage.getItem("tournament_login_" + [1,2,3,4]
+          .find(i => localStorage.getItem("tournament_userId_"+i)===localStorage.getItem("tournament_winner2"))!) || "",
       }
     }
   }
-  // 8 joueurs
   if (playerCount === 8) {
-    // Quarts
     if (phase >= 1 && phase <= 4) {
-      const idxA = (phase - 1) * 2 + 1
-      const idxB = idxA + 1
+      const player_idA = (phase - 1) * 2 + 1
+      const player_idB = player_idA + 1
       return {
-        token1: localStorage.getItem(`tournament_token_${idxA}`)!,
-        userId1: localStorage.getItem(`tournament_userId_${idxA}`)!,
-        login1: localStorage.getItem(`tournament_login_${idxA}`) || `Joueur ${idxA}`,
-        token2: localStorage.getItem(`tournament_token_${idxB}`)!,
-        userId2: localStorage.getItem(`tournament_userId_${idxB}`)!,
-        login2: localStorage.getItem(`tournament_login_${idxB}`) || `Joueur ${idxB}`,
+        token1: localStorage.getItem(`tournament_token_${player_idA}`)!,
+        userId1: localStorage.getItem(`tournament_userId_${player_idA}`)!,
+        login1: localStorage.getItem(`tournament_login_${player_idA}`) || "",
+        token2: localStorage.getItem(`tournament_token_${player_idB}`)!,
+        userId2: localStorage.getItem(`tournament_userId_${player_idB}`)!,
+        login2: localStorage.getItem(`tournament_login_${player_idB}`) || "",
       }
     }
     // Demis
     if (phase === 5 || phase === 6) {
-      const demiIdx = phase - 4
-      const winnerA = localStorage.getItem(`tournament_winner${demiIdx * 2 - 1}`)!
-      const winnerB = localStorage.getItem(`tournament_winner${demiIdx * 2}`)!
-      const winnerA_token = localStorage.getItem(`tournament_winner${demiIdx * 2 - 1}_token`)!
-      const winnerB_token = localStorage.getItem(`tournament_winner${demiIdx * 2}_token`)!
-      const loginA = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8].find(i=>localStorage.getItem(`tournament_userId_${i}`)===winnerA)}`) || "Vainqueur 1"
-      const loginB = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8].find(i=>localStorage.getItem(`tournament_userId_${i}`)===winnerB)}`) || "Vainqueur 2"
+      const player_idA = (phase - 4) * 2 - 1
+      const player_idB = player_idA + 1
+      const winnerA = localStorage.getItem(`tournament_winner${player_idA}`)!
+      const winnerB = localStorage.getItem(`tournament_winner${player_idB}`)!
+      const winnerA_token = localStorage.getItem(`tournament_winner${player_idA}_token`)!
+      const winnerB_token = localStorage.getItem(`tournament_winner${player_idB}_token`)!
+      const loginA = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8]
+        .find(i => localStorage.getItem(`tournament_userId_${i}`) === winnerA)}`) || ""
+      const loginB = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8]
+        .find(i => localStorage.getItem(`tournament_userId_${i}`) === winnerB)}`) || ""
       return {
         token1: winnerA_token,
         userId1: winnerA,
@@ -435,8 +441,10 @@ export function getTournamentMatchPlayers(phase: number, playerCount: number) {
       const finalist2 = localStorage.getItem("tournament_finalist2")!
       const finalist1_token = localStorage.getItem("tournament_finalist1_token")!
       const finalist2_token = localStorage.getItem("tournament_finalist2_token")!
-      const login1 = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8].find(i=>localStorage.getItem(`tournament_userId_${i}`)===finalist1)}`) || "Finaliste 1"
-      const login2 = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8].find(i=>localStorage.getItem(`tournament_userId_${i}`)===finalist2)}`) || "Finaliste 2"
+      const login1 = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8]
+        .find(i => localStorage.getItem(`tournament_userId_${i}`) === finalist1)}`) || ""
+      const login2 = localStorage.getItem(`tournament_login_${[1,2,3,4,5,6,7,8]
+        .find(i => localStorage.getItem(`tournament_userId_${i}`) === finalist2)}`) || ""
       return {
         token1: finalist1_token,
         userId1: finalist1,
