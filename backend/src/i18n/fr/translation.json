@@ -18,7 +18,7 @@
   "2fa_text": "Votre code 2FA est : {{code}}",
   "2fa_sent": "Un code 2FA a été envoyé à votre adresse e-mail.",
   "fields_required": "Champs requis manquants",
-  "email_or_password_incorrect": "Email ou mot de passe incorrect",
+  "email_or_password_incorrect": "Identifiants ou mot de passe incorrect",
   "user_unknown": "Utilisateur inconnu",
   "2fa_expired_or_invalid": "Code 2FA expiré ou invalide",
   "2fa_incorrect": "Code 2FA incorrect",
@@ -38,5 +38,5 @@
   "2fa_disabled": "2FA désactivé avec succès",
   "email_verified": "Email vérifié !",
   "player2_token_invalid": "Token du joueur 2 invalide",
-  "devmode_cannot_be_changed": "Le devmode ne peut-être changé"
+  "devmode_cannot_be_changed": "Le devmode ne peut être changé"
 }

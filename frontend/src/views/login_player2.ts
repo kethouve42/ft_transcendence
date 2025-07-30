@@ -133,6 +133,7 @@ export function attachLoginPlayer2Events() {
         if (data.step === "email_not_verified")
         {
           if (emailNotVerfied) emailNotVerfied.style.display = "";
+          msg!.textContent = data.error;
           return;
         }
         if (!res.ok || !data.token) {
@@ -183,7 +184,7 @@ export function forgotPasswordPopup() {
   document.body.appendChild(modal);
   const msgForgot = document.getElementById("forgot-message");
     document.getElementById("confirm-yes")?.addEventListener("click", async () => {
-      if (isProcessing = true)
+      if (isProcessing == true)
       {
         msgForgot!.textContent = t("all.wait");
       }
