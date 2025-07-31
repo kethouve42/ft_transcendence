@@ -400,10 +400,10 @@ async function endGame() {
   resetGame()
   showOnly("menu")
   localStorage.removeItem("token_player2")
+  restoreOriginalUser()
 
   if (localStorage.getItem("tournament_phase")) {
     handleTournamentProgress(winner!, showOnly)
-    restoreOriginalUser()
     return
   }
 }
