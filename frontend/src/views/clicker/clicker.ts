@@ -583,7 +583,7 @@ export function clickerEvent(): void {
           pointCount!.textContent = data.newScore;
         })
         .catch(err => {
-          //console.error("Erreur :", err.message);
+          console.error("Erreur :", err.message);
         });
         }
       }

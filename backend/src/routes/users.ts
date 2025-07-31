@@ -224,7 +224,7 @@ export default async function userRoutes(app: FastifyInstance)
 	});
 
 	//Authentification de l'utilisateur
-	app.post('/auth', { config: { rateLimit: { max: 5/* 5 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
+	app.post('/auth', { config: { rateLimit: { max: 10/* 10 tentatives*/, timeWindow: '1 minute' } }}, async (req, reply) =>
 	{
 		const { identifier, password, stayConnected, matchDuration } = req.body as {identifier: string; password: string; stayConnected: boolean, matchDuration?: number};
 
@@ -284,6 +284,55 @@ export default async function userRoutes(app: FastifyInstance)
 					stayConnected: stayConnected ?? false,
 				});
     		}
+
+			let token: string;
+			if (matchDuration)
+				token = signToken(user, `${matchDuration + 10}s`); // ex: si le match dure 2 minute rentrer 120s
+			else
+				token = stayConnected ? signToken(user, '30d') : signToken(user); // par défaut 2h
+
+			return { success: true, token, UserId: user.id, email: user.email, login: user.login, alias: user.alias, avatar: user.avatar };
+		}
+		catch (err: any)
+		{
+			console.error('Erreur lors de l\'authentification :', err);
+			return reply.status(500).send({ error: i18next.t("internal_error"), message: err.message });
+		}
+
+	});
+
+	//Authentification de l'utilisateur tournament
+	app.post('/auth/tournament', async (req, reply) =>
+	{
+		const { identifier, password, stayConnected, matchDuration } = req.body as {identifier: string; password: string; stayConnected: boolean, matchDuration?: number};
+
+		app.log.info('User logged in'); // <=== Log de connection
+		
+		if (!identifier || !password)
+			return reply.status(400).send({ error: i18next.t("fields_required") });
+
+		try
+		{
+			const user = db.prepare('SELECT * FROM users WHERE email = ? OR login = ?').get(identifier, identifier) as { id: number; password: string; login: string; email: string; tfa_enabled: boolean; alias: string; avatar: string; email_verified: number };
+
+			if (!user)
+				return reply.status(401).send({ error: i18next.t("email_or_password_incorrect") });
+
+			if (user.email_verified == 0)
+				return reply.status(401).send({ error: i18next.t("email_not_verified"), step: "email_not_verified" });
+
+			let validPassword;
+			
+			if (user.password == "devmode")
+			{
+				console.log("Devmode");
+				if (user.password == password)
+					validPassword = true;
+			}
+			else
+				validPassword = await bcrypt.compare(password, user.password);
+			if (!validPassword || (user.email !== identifier && user.login !== identifier))
+				return reply.status(401).send({ error: i18next.t("email_or_password_incorrect") });
 
 			let token: string;
 			if (matchDuration)

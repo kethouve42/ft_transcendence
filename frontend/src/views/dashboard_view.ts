@@ -62,22 +62,22 @@ export function attachDashboardViewEvents (): void {
             ]);
             if (!userReponse.ok) {
                 const error = await userReponse.json();
-                throw new Error(error.message);
+                throw new Error(error.error);
             } else if (!matchReponsepong.ok) {
                 const error = await matchReponsepong.json();
-                throw new Error(error.message);
+                throw new Error(error.error);
             } else if (!matchReponseclicker.ok) {
                 const error = await matchReponseclicker.json();
-                throw new Error(error.message);
+                throw new Error(error.error);
             } else if (!statsReponsepong.ok) {
                 const error = await statsReponsepong.json();
-                throw new Error(error.message);
+                throw new Error(error.error);
             } else if (!statsReponseclicker.ok) {
                 const error = await statsReponseclicker.json();
-                throw new Error(error.message);
+                throw new Error(error.error);
             } else if (!usersReponse.ok) {
                 const error = await usersReponse.json();
-                throw new Error(error.message);
+                throw new Error(error.error);
             }
             user = await userReponse.json();
             matchpong = await matchReponsepong.json();
@@ -86,7 +86,7 @@ export function attachDashboardViewEvents (): void {
             statsclicker = await statsReponseclicker.json();
             users = await usersReponse.json();
         } catch (err: any) {
-            msg!.textContent = (err);
+            msg!.textContent = err.message;
         }
 
         const infoUser = document.getElementById("infoUser")
@@ -107,12 +107,12 @@ export function attachDashboardViewEvents (): void {
             if (matchpong.length === 0)
             {
                 matchUserpong.innerHTML = `
-                    <b>${t("dashboard.no_pong_match")}}</b>
+                    <b>${t("dashboard.no_pong_match")}</b>
                 `;
             }
             else
             {
-                for (let i = 0; i < matchpong.length && i < 11; i++)
+                for (let i = 0; i < matchpong.length && i < 10; i++)
                 {
                     matchUserpong.innerHTML += `
                         <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
@@ -143,12 +143,12 @@ export function attachDashboardViewEvents (): void {
             if (matchclicker.length === 0)
             {
                 matchUserclicker.innerHTML = `
-                    <b>${t("dashboard.no_clicker_match")}}</b>
+                    <b>${t("dashboard.no_clicker_match")}</b>
                 `;
             }
             else
             {
-                for (let i = 0; i < matchclicker.length && i < 11; i++)
+                for (let i = 0; i < matchclicker.length && i < 10; i++)
                 {
                     if (matchclicker[i]?.game_mode == "timer") 
                     matchUserclicker.innerHTML += `
@@ -208,30 +208,28 @@ export function attachDashboardViewEvents (): void {
                         <b>${t("dashboard.wins")} : ${statspong.global.wins ?? "?"}</b>
                         <b>${t("dashboard.losses")} : ${statspong.global.losses ?? "?"}</b>
                         <b>${t("dashboard.winrate")} : ${statspong.global.winRate ?? "?"}%</b>
-                        <b>${t("dashboard.avg_duration")} : ${statspong.global.averageDuration ?? "?"}</b>
-                        <b>${t("dashboard.total_time")} : ${statspong.global.totalGameTime ?? "?"}</b>
+                        <b>${t("dashboard.avg_duration")} : ${statspong.global.averageDuration ?? "?"}s</b>
+                        <b>${t("dashboard.total_time")} : ${statspong.global.totalGameTime ?? "?"}s</b>
                     </div>
                 </div>
                 <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
                     <h4>${t("dashboard.vs_ai")}</h4>
                     <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
-                        <b>${t("dashboard.matches")} : ${statspong.vsAI.totalMatches ?? "?"}</b>
+                        <b>${t("dashboard.matches")} : ${statspong.vsAI.matches ?? "?"}</b>
                         <b>${t("dashboard.wins")} : ${statspong.vsAI.wins ?? "?"}</b>
                         <b>${t("dashboard.losses")} : ${statspong.vsAI.losses ?? "?"}</b>
                         <b>${t("dashboard.winrate")} : ${statspong.vsAI.winRate ?? "?"}%</b>
-                        <b>${t("dashboard.avg_duration")} : ${statspong.vsAI.averageDuration ?? "?"}</b>
-                        <b>${t("dashboard.total_time")} : ${statspong.vsAI.totalGameTime ?? "?"}</b>
+                        <b>${t("dashboard.total_time")} : ${statspong.vsAI.totalIaTime ?? "?"}s</b>
                     </div>
                 </div>
                 <div class="bg-cyan-800/60 border border-cyan-500/30 rounded-lg p-3 shadow-md text-cyan-100 text-sm hover:scale-[1.03] transition-transform">
                     <h4>${t("dashboard.vs_players")}</h4>
                     <div class="grid grid-cols-2 gap-2 text-cyan-100 text-sm">
-                        <b>${t("dashboard.matches")} : ${statspong.vsPlayer.totalMatches ?? "?"}</b>
+                        <b>${t("dashboard.matches")} : ${statspong.vsPlayer.matches ?? "?"}</b>
                         <b>${t("dashboard.wins")} : ${statspong.vsPlayer.wins ?? "?"}</b>
                         <b>${t("dashboard.losses")} : ${statspong.vsPlayer.losses ?? "?"}</b>
                         <b>${t("dashboard.winrate")} : ${statspong.vsPlayer.winRate ?? "?"}%</b>
-                        <b>${t("dashboard.avg_duration")} : ${statspong.vsPlayer.averageDuration ?? "?"}</b>
-                        <b>${t("dashboard.total_time")} : ${statspong.vsPlayer.totalGameTime ?? "?"}</b>
+                        <b>${t("dashboard.total_time")} : ${statspong.vsPlayer.totalMultiTime ?? "?"}s</b>
                     </div>
                 </div>
             </div>

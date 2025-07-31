@@ -47,7 +47,8 @@ export function resetPasswordEvents() {
             });
 
             if (!response.ok) {
-                throw new Error(await response.text());
+                const error = await response.json();
+                throw new Error(error.error);
             }
 
             msg!.textContent = t("reset_password.success_message");

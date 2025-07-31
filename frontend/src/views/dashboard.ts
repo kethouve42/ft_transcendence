@@ -12,13 +12,13 @@ export function dashboardMainView() {
             <div class="w-full max-w-[1800px] mx-auto">
                 <div class="flex gap-4 mb-8" id="dashboard-menu">
                     <button class="btn-main dashboard-menu-btn active" data-section="home">
-                        Accueil
+                        ${t("dashboard.view")}
                     </button>
                     <button class="btn-main dashboard-menu-btn" data-section="friends">
-                        Friends
+                    ${t("dashboard.friends")}
                     </button>
                     <button class="btn-main dashboard-menu-btn" data-section="edit">
-                        Edit
+                    ${t("dashboard.edit")}
                     </button>
                 </div>
                 <div>

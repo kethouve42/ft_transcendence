@@ -101,7 +101,7 @@ export function attachLoginPlayer2Events() {
             navigateTo(getRedirectUrl());
         }, 100);
         } catch (err: any) {
-        msg!.textContent = t("login.error_2fa_connexion") + " " + err.message;
+        msg!.textContent = err.message;
       }
       return;
     }
@@ -141,13 +141,10 @@ export function attachLoginPlayer2Events() {
         localStorage.setItem("token_player2", data.token);
         if (data.UserId)
           localStorage.setItem("userId_player2", data.UserId.toString())
-        localStorage.setItem("userLogin_player2", data.login || "");
-        localStorage.setItem("userAlias_player2", data.alias || "");
-        localStorage.setItem("userAvatar_player2", data.avatar || "");
         localStorage.removeItem("2fa_identifier");
         navigateTo(getRedirectUrl());
       } catch (err: any) {
-        msg!.textContent = t("login.error_connexion") + " " + err.message;
+        msg!.textContent = err.message;
       } finally {
         isProcessing = false;
       }
