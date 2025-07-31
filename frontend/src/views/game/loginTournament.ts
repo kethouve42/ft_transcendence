@@ -43,16 +43,15 @@ export function attachLoginTournamentEvents() {
       const login = (form.login as HTMLInputElement).value
       const password = (form.password as HTMLInputElement).value
     try {
-      const res = await fetch("/api/users/auth", {
+      const res = await fetch("/api/users/auth/tournament", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Accept-Language": localStorage.getItem("lang") || "fr", "Content-Type": "application/json" },
           body: JSON.stringify({ identifier: login, password }),
       })
       const data = await res.json()
       if (!res.ok || !data.token) {
         if (msg) 
-          msg.textContent = data.error || "Erreur de connexion"
-        return
+        throw new Error(data.error);
       }
       // Stocke le token et l'id pour ce joueur de tournoi
       localStorage.setItem(`tournament_token_${playerNum}`, data.token)
@@ -67,7 +66,7 @@ export function attachLoginTournamentEvents() {
       }, 500)
     } 
     catch (err: any) {
-      if (msg) msg.textContent = "Erreur lors de la connexion : " + err.message
+      if (msg) msg.textContent = err.message
     }
   }
 }
