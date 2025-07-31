@@ -142,18 +142,28 @@ export default async function userRoutes(app: FastifyInstance)
 
 		try
 		{
+			//Verifie que le login et le mail n'est pas deja pris
+			const identifierNotTaken = db.prepare('SELECT login, email FROM users WHERE id != ?').all(user.id) as { login: string, email: string }[]
+			for (const users of identifierNotTaken)
+			{
+				if ( users.login === login || users.email === email)
+					return reply.status(400).send({ error: i18next.t("login_or_email_taken") });
+			}
+			const oldMail = db.prepare('SELECT email FROM users WHERE id = ?').get(user.id) as { email: string };
+
 			const stmt = db.prepare(`
 				UPDATE users
 				SET login = ?, email = ?, alias = ?, avatar = ?
 				WHERE id = ?
-			`);
+				`);
 			const result = stmt.run(login, email, alias || null, avatar || null, user.id);
 
 			if (result.changes === 0)
 				return reply.status(404).send({ error: i18next.t("user_not_found") });
 
 			// Envoi de l'email de vérification
-			if (email && email !== user.email) {
+			if (email && email !== oldMail.email)
+			{
 				const verifyToken = crypto.randomBytes(32).toString('hex');
 				const expires = Date.now() + 1000 * 60 * 30;
 				db.prepare('UPDATE users SET email_verified = 0, email_verify_token = ?, email_verify_expires = ? WHERE id = ?')
@@ -195,7 +205,7 @@ export default async function userRoutes(app: FastifyInstance)
 		{
 			const userPass = db.prepare('SELECT password FROM users WHERE email = ? OR login = ?').get(user.email, user.login) as { password: string; };
 			if (userPass.password == "devmode")
-				return reply.status(400).send({ error: i18next.t("devmode_cannot_be_changed") });
+				return reply.status(403).send({ error: i18next.t("devmode_cannot_be_changed") });
 			const validPassword = await bcrypt.compare(oldPassword, userPass.password);
 			if (!validPassword)
 				return reply.status(400).send({ error: i18next.t("old_password_incorrect") });
@@ -428,7 +438,10 @@ export default async function userRoutes(app: FastifyInstance)
 		try {
 			const devmode = db.prepare('SELECT password FROM users WHERE id = ?').get(user.id) as {password: string};
 			if (devmode.password === "devmode")
-				return reply.status(400).send( "Devmode cannot activate 2fa" );
+				return reply.status(403).send( "Devmode cannot activate 2fa" );
+			const verifiedMail = db.prepare('SELECT email_verified FROM users WHERE id = ?').get(user.id) as { email_verified: number };
+			if (verifiedMail.email_verified != 1)
+				return reply.status(403).send({ error: i18next.t("email_not_verified")});
 			const result = db.prepare(`UPDATE users SET tfa_enabled = 1 WHERE id = ?`).run(user.id);
 
 			if (result.changes === 0)
@@ -660,7 +673,7 @@ export default async function userRoutes(app: FastifyInstance)
 				return reply.status(401).send({ error: i18next.t("email_not_verified"), step: "email_not_verified" });
 			const devmode = db.prepare('SELECT password FROM users WHERE id = ?').get(user.id) as { password: string}
 			if (devmode.password === "devmode")
-				return reply.status(400).send( "Your account is on devmode");
+				return reply.status(403).send( "Your account is on devmode");
 			// Génère un token sécurisé
 			const resetToken = crypto.randomBytes(32).toString('hex');
 			const expires = Date.now() + 1000 * 60 * 15; // 15 minutes
