@@ -188,7 +188,6 @@ function renderPanelSettings() {
 
 // Affiche le panneau de configuration des touches pour les joueurs
 function renderPanelKeys(fromSettings = false) {
-  console.log("fromSettings: ",fromSettings);
   return `
       <div id="panel-keyconfig" class="settings-panel">
       <h1>${t("local.title")}</h1>
@@ -333,10 +332,10 @@ export function startMatch() {
 
     const match = getTournamentMatchPlayers(phase, playerCount)
     if (match) {
-      localStorage.setItem("token", match.token1)
-      localStorage.setItem("userId", match.userId1)
-      localStorage.setItem("token_player2", match.token2)
-      localStorage.setItem("userId_player2", match.userId2)
+      localStorage.setItem("tournament_token_1", match.token1)
+      localStorage.setItem("tournament_userId_1", match.userId1)
+      localStorage.setItem("tournament_token_2", match.token2)
+      localStorage.setItem("tournament_userId_2", match.userId2) 
       pseudo1 = match.login1
       pseudo2 = match.login2
     }
@@ -369,10 +368,10 @@ async function endGame() {
   else if (score.right > score.left)
     winner = "right"
 
-  const token1 = localStorage.getItem("token")
-  const token2 = localStorage.getItem("token_player2")
-  const user1_id = Number(localStorage.getItem("userId"))
-  const user2_id = Number(localStorage.getItem("userId_player2"))
+  const token1 = localStorage.getItem("tournament_token_1")
+  const token2 = localStorage.getItem("tournament_token_2")
+  const user1_id = Number(localStorage.getItem("tournament_userId_1"))
+  const user2_id = Number(localStorage.getItem("tournament_userId_2"))
   const winnerID = winner === "left" ? user1_id : winner === "right" ? user2_id : null
   const scoreStr = `${score.left}-${score.right}`
 
@@ -451,7 +450,6 @@ function renderUI() {
 
 // Change le panneau affiché à l'écran
 export function showOnly(panel: Panel) {
-  console.log("previousPanel:", currentPanel, "->", panel)
   previousPanel = currentPanel
   currentPanel = panel
   renderUI()
@@ -558,7 +556,7 @@ function attachKeyConfigEvents(root: HTMLElement) {
     showOnly(previousPanel || "menu")
   })
   root.querySelector('#btn-giveup-keyconfig')?.addEventListener("click", () => {
-    if (localStorage.getItem("tournement_phase")) {
+    if (localStorage.getItem("tournament_phase")) {
       for (let i = 2; i <= 8; i++) {
         localStorage.removeItem(`tournament_login_${i}`)
         localStorage.removeItem(`tournament_userId_${i}`)
@@ -569,16 +567,10 @@ function attachKeyConfigEvents(root: HTMLElement) {
       localStorage.removeItem("tournament_winner2")
       localStorage.removeItem("tournament_winner3")
       localStorage.removeItem("tournament_winner4")
-      localStorage.removeItem("tournament_winner5")
-      localStorage.removeItem("tournament_winner6")
-      localStorage.removeItem("tournament_winner7")
       localStorage.removeItem("tournament_winner1_token")
       localStorage.removeItem("tournament_winner2_token")
       localStorage.removeItem("tournament_winner3_token")
       localStorage.removeItem("tournament_winner4_token")
-      localStorage.removeItem("tournament_winner5_token")
-      localStorage.removeItem("tournament_winner6_token")
-      localStorage.removeItem("tournament_winner7_token")
       localStorage.removeItem("tournament_original_token")
       localStorage.removeItem("tournament_original_userId")
       }
