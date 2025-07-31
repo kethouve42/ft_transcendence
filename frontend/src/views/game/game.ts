@@ -302,8 +302,6 @@ function restoreOriginalUser() {
   if (oriToken && oriUser) {
     localStorage.setItem("token", oriToken)
     localStorage.setItem("userId", oriUser)
-    localStorage.removeItem("tournament_original_token")
-    localStorage.removeItem("tournament_original_userId")
   }
 }
 
@@ -332,10 +330,10 @@ export function startMatch() {
 
     const match = getTournamentMatchPlayers(phase, playerCount)
     if (match) {
-      localStorage.setItem("tournament_token_1", match.token1)
-      localStorage.setItem("tournament_userId_1", match.userId1)
-      localStorage.setItem("tournament_token_2", match.token2)
-      localStorage.setItem("tournament_userId_2", match.userId2) 
+      localStorage.setItem("token", match.token1)
+      localStorage.setItem("userId", match.userId1)
+      localStorage.setItem("token_player2", match.token2)
+      localStorage.setItem("userId_player2", match.userId2) 
       pseudo1 = match.login1
       pseudo2 = match.login2
     }
@@ -368,10 +366,10 @@ async function endGame() {
   else if (score.right > score.left)
     winner = "right"
 
-  const token1 = localStorage.getItem("tournament_token_1")
-  const token2 = localStorage.getItem("tournament_token_2")
-  const user1_id = Number(localStorage.getItem("tournament_userId_1"))
-  const user2_id = Number(localStorage.getItem("tournament_userId_2"))
+  const token1 = localStorage.getItem("token")
+  const token2 = localStorage.getItem("token_player2")
+  const user1_id = Number(localStorage.getItem("userId"))
+  const user2_id = Number(localStorage.getItem("userId_player2"))
   const winnerID = winner === "left" ? user1_id : winner === "right" ? user2_id : null
   const scoreStr = `${score.left}-${score.right}`
 
@@ -405,6 +403,7 @@ async function endGame() {
 
   if (localStorage.getItem("tournament_phase")) {
     handleTournamentProgress(winner!, showOnly)
+    restoreOriginalUser()
     return
   }
 }

@@ -195,8 +195,8 @@ export function handleTournamentProgress(winner: "left" | "right", showOnly: (pa
       return
     }
     if (phase === 2) {
-      const winnerUserId = winner === "left" ? localStorage.getItem("tournament_userId_1") || "" : localStorage.getItem("tournament_userId_2") || ""
-      const winnerToken = winner === "left" ? localStorage.getItem("tournament_token_1") || "" : localStorage.getItem("tournament_token_2") || ""
+      const winnerUserId = winner === "left" ? localStorage.getItem("tournament_userId_3") || "" : localStorage.getItem("tournament_userId_4") || ""
+      const winnerToken = winner === "left" ? localStorage.getItem("tournament_token_3") || "" : localStorage.getItem("tournament_token_4") || ""
       localStorage.setItem("tournament_winner2", winnerUserId)
       localStorage.setItem("tournament_winner2_token", winnerToken)
       localStorage.setItem("tournament_phase", "3")
